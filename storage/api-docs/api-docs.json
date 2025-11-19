@@ -1,0 +1,27 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "pacadaworks-motomedic-ims-api",
+        "description": "API documentation generated using Swagger in Laravel",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000",
+            "description": "Local Server"
+        }
+    ],
+    "paths": {
+        "/api/dummy": {
+            "get": {
+                "summary": "Dummy endpoint",
+                "operationId": "d6689d47fafcd03b4453eb0daea834f5",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    }
+                }
+            }
+        }
+    }
+}
