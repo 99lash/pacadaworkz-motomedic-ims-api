@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Product_attributes extends Model
+class ProductAttribute extends Model
 {
+    use SoftDeletes;
+    
     //
 
-    use HasFactory, Notifiable,SoftDeletes;
-    
       protected $fillable = [
         'attribute_id',
         'attribute_value_id'

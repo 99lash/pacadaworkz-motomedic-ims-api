@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Inventory extends Model
 {
+    use SoftDeletes;
+    
     //
 
-    
-    use HasFactory, Notifiable,SoftDeletes;
     
       protected $fillable = [
         'product_id',

@@ -5,17 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Permission extends Model
+class StockAdjustment extends Model
 {
     use SoftDeletes;
     
     //
-
     
       protected $fillable = [
-        'role_name',
-        'description'
+        'user_id',
+        'adjustment_no',
+        'reason',
+        'notes'
     ];
-
-
 }

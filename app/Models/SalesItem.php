@@ -3,14 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Sales_item extends Model
+class SalesItem extends Model
 {
+    use SoftDeletes;
+    
     //
 
-    
-    use HasFactory, Notifiable,SoftDeletes;
-    
       protected $fillable = [
         'sales_transactions_id',
         'product_id',

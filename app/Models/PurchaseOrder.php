@@ -5,17 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Permission extends Model
+class PurchaseOrder extends Model
 {
     use SoftDeletes;
     
     //
 
-    
       protected $fillable = [
-        'role_name',
-        'description'
+        'supplier_id',
+        'user_id',
+        'order_date',
+        'expected_delivery',
+        'total_amount',
+        'status',
+        'notes'
     ];
-
 
 }
