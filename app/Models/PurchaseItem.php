@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PurchaseItem extends Model
 {
@@ -11,6 +12,7 @@ class PurchaseItem extends Model
     
     //
 
+    // fillable is for mass assigment (allowed na ifill up)
       protected $fillable = [
         'purchase_order_id',
         'product_id',
@@ -18,4 +20,17 @@ class PurchaseItem extends Model
         'unit_cost',
         'total_cost'
     ];
+
+     //Entity Reletionship to the purchase_order
+      public function purchase_order(): BelongsTo
+    {
+        return $this->belongsTo(PurchaseOrder::class);
+    }
+
+    //Entity Relationship to the product
+      public function products(): BelongsTo
+    {
+        return $this->belongsTo(Product::class);
+    }
+
 }

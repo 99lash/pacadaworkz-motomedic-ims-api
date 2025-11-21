@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Permission extends Model
@@ -11,11 +12,19 @@ class Permission extends Model
     
     //
 
-    
+     // fillable is for mass assigment (allowed na ifill up)
       protected $fillable = [
         'role_name',
         'description'
     ];
 
-
+    /**
+     * The roles that belong to the Permission
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class, 'role_permission');
+    }
 }

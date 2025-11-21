@@ -4,21 +4,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 class Category extends Model
 {
     use SoftDeletes;
     
     //
-
+  // fillable is for mass assigment (allowed na ifill up)
       protected $fillable = [
         'name',
         'description'
     ];
 
-
-    public function products(): belongsTo
+  
+//Entity Reletionship to the products
+    public function products():  HasMany
     {
-        return $this->belongsTo(Product::class);
+        return $this->hasMany(Product::class);
     }
 }

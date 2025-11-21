@@ -4,13 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 class PurchaseOrder extends Model
 {
     use SoftDeletes;
     
     //
 
+    // fillable is for mass assigment (allowed na ifill up)
       protected $fillable = [
         'supplier_id',
         'user_id',
@@ -20,5 +22,16 @@ class PurchaseOrder extends Model
         'status',
         'notes'
     ];
+  
 
+        //Entity Reletionship to the supplier
+       public function supplier(): BelongsTo
+    {
+        return $this->belongsTo(Supplier::class);
+    }
+      //Entity Reletionship to the purchase_items
+      public function purchase_items(): HasMany
+    {
+        return $this->hasMany(PurchaseItem::class);
+    }
 }
