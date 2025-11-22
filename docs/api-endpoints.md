@@ -132,16 +132,24 @@ GET     /api/v1/inventory/:productId (requires auth)
 GET     /api/v1/inventory/low-stock (requires auth)
 GET     /api/v1/inventory/out-of-stock (requires auth)
 GET     /api/v1/inventory/:productId/movements (filterable, AP and WP only)
+POST    /api/v1/inventory/:productId/adjust (requires auth)
 ```
 
-### Stock Adjustments (balikan ko to later)
+### Stock Adjustments
 
 ```
-GET     /api/v1/stock-adjustments
-POST    /api/v1/stock-adjustments
-GET     /api/v1/stock-adjustments/:id
-PUT     /api/v1/stock-adjustments/:id
-DELETE  /api/v1/stock-adjustments/:id
+GET     /api/v1/stock-adjustments (paginated, filterable, AP and WP only)
+GET     /api/v1/stock-adjustments/:id (AP and WP only)
+GET     /api/v1/stock-adjustments/:id (returns file, AP and WP only)
+```
+
+### Stock Movement History (Unified View)
+
+```
+GET     /api/v1/stock-movements (paginated, filterable, AP and WP only)
+GET     /api/v1/stock-movements/:id (AP and WP only)
+GET     /api/v1/stock-movements/export (returns file, AP and WP only)
+GET     /api/v1/inventory/:productId/movements (specific product history, AP and WP only)
 ```
 
 ### POS - Hold Cart Transaction (Drafts)
@@ -170,7 +178,7 @@ DELETE  /api/v1/pos/cart/remove-item/:id
 POST    /api/v1/pos/checkout (requires auth)
 ```
 
-### Sales - Transaction History (After checkout)
+### Sales - Transaction History (After checkout) //currently, walang ui view sa figma nito.
 
 ```
 GET     /api/v1/sales (paginated, searchable, filterable, AP and WP only)
