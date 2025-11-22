@@ -13,12 +13,11 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('category_id')->constrained('categories');
-            $table->foreignId('brand_id')->constrained('brands');
+            $table->foreignId('category_id');
+            $table->foreignId('brand_id');
             $table->string('sku',50);
             $table->string('name',50);
             $table->text('description')->nullable();
-            $table->string('name',50);
             $table->decimal('unit_price', 10, 2);
             $table->decimal('cost_price', 10, 2);
             $table->integer('reorder_level')->default(10);

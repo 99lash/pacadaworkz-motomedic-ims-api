@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sales_transactions_', function (Blueprint $table) {
+        Schema::create('sales_transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');;
             $table->string('transaction_no',50);
             $table->decimal('subtotal', 10, 2);
             $table->decimal('tax', 10, 2)->default(0);
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sales_transactions_');
+        Schema::dropIfExists('sales_transactions');
     }
 };

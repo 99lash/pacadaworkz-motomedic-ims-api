@@ -10,7 +10,7 @@ class Inventory extends Model
     use SoftDeletes;
     
     //
-
+       
      // fillable is for mass assigment (allowed na ifill up)
       protected $fillable = [
         'product_id',
