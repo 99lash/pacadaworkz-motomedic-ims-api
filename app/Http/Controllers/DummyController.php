@@ -10,6 +10,7 @@ class DummyController extends Controller
     /**
      * @OA\Get(
      *     path="/api/dummy",
+     *     tags={"Dummy Controller"},
      *     summary="Dummy endpoint",
      *     @OA\Response(
      *         response=200,
