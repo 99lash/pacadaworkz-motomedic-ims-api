@@ -34,8 +34,8 @@ public function register(array $data){
     'name' => $data['name'],
     'email' => $data['email'],
     'password_hash' => Hash::make($data['password']),
-    'first_name' =>data['first_name'],
-    'last_name'=>data['last_name'],
+    'first_name' =>$data['first_name'],
+    'last_name'=>$data['last_name'],
     ]);
   
 
