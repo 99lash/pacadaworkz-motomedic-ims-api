@@ -139,7 +139,6 @@ POST    /api/v1/inventory/:productId/adjust (requires auth)
 
 ```
 GET     /api/v1/stock-adjustments (paginated, filterable, AP and WP only)
-GET     /api/v1/stock-adjustments/:id (AP and WP only)
 GET     /api/v1/stock-adjustments/:id (returns file, AP and WP only)
 ```
 
