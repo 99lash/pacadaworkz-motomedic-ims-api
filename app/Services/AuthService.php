@@ -1,46 +1,50 @@
 <?php
 
 namespace App\Services;
+
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
+class AuthService
+{
+    // Login user and return token
+    public function login(array $credentials)
+    {
+        if (!$token = JWTAuth::attempt($credentials)) {
+            return false;
+        }
 
-class AuthService{
-public function login(array $credentials){
-   $user = User::where('email',$credentials['email'])->first();
+        return $token;
+    }
 
-   //pang check kung nag eexist yung user sa database at kung tama ba yung password
-   if(!$user || !Hash::check($credentials['password'],$user->password_hash)){
-     return null;
-   }
-   //access token
-   $accessToken = $user->createToken('access')->plainTextToken;
-
-  //refresh token
-   $refreshToken = $user->createToken('refresh')->plainTextToken;
   
-   return [
-    'user' => $user,
-    'access_token'=> $accessToken,
-    'refresh_token'=> $refreshToken
-   ];
-}
+    public function logout()
+    {
+        JWTAuth::invalidate(JWTAuth::getToken());
+        return true;
+    }
+
+    // Get authenticated user
+    public function me()
+    {
+        return JWTAuth::user();
+    }
 
 
+    public function register(array $data)
+    {
+        $user = User::create([
+            'role_id' =>$data['role_id'],
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password_hash' => bcrypt($data['password']),
+            'first_name' => $data['first_name'],
+             'lat_name' => $data['last_name']
+        ]);
 
-public function register(array $data){
-    $user = User::create([
-    'name' => $data['name'],
-    'email' => $data['email'],
-    'password_hash' => Hash::make($data['password']),
-    'first_name' =>$data['first_name'],
-    'last_name'=>$data['last_name'],
-    ]);
-  
+        $token = JWTAuth::fromUser($user);
 
-
-    return $user;
-}
-
+        return ['user' => $user, 'token' => $token];
+    }
 }

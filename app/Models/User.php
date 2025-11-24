@@ -12,10 +12,23 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\belongsTo;
 use App\Models\Role;
 
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-     use HasFactory, Notifiable, SoftDeletes;
+     use Notifiable, SoftDeletes;
+
+
+  // JWT methods
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
+
 
     /**
      * The attributes that are mass assignable.
