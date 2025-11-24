@@ -9,13 +9,11 @@ use App\Http\Controllers\API\AuthController;
 // })->middleware('auth:sanctum');
 
 
-Route::post('login', [AuthController::class, 'login']);
+Route::post('v1/auth/login', [AuthController::class, 'login']);
 Route::get('test',[AuthController::class,'test']);
-// Protected routes: logout & me
 Route::middleware('auth:api')->group(function () {
-    Route::post('logout', [AuthController::class, 'logout']);
-    Route::get('me', [AuthController::class, 'me']);
-
-
-
+    Route::post('v1/auth/logout', [AuthController::class, 'logout']);
+    Route::get('v1/auth/me', [AuthController::class, 'me']);
+    Route::post('v1/auth/refresh',[AuthController::class,'refresh']);
+    
 });

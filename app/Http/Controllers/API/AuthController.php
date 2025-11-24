@@ -17,38 +17,28 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
-        $token = $this->authService->login($credentials);
-
-        if (!$token) {
+        $tokens = $this->authService->login($credentials);
+         
+        if (!$tokens) {
             return response()->json(['error' => 'Invalid credentials'], 401);
         }
 
         return response()->json([
-            'access_token' => $token,
+            'access_token' => $tokens['access_token'],
+            'expires_in' => auth('api')->factory()->getTTL() * 60,
             'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60
+            'refresh_token' => $tokens['refresh_token']
+             
         ]);
     }
     
-   public function register(Request $request){
-    $validated = $request->validate([
-        'role_id' => 'required',
-        'name' => 'required|string|max:50',
-        'email' => 'required|email|unique:users,email',
-        'first_name' => 'required|string|max:50',
-        'last_name' => 'required|string|max:50',
-        'password' => 'required|string|min:6'
-    ]);
-
-    $register = $this->authService->register($validated);
-
-    return response()->json([
-        'message' => 'Successfully registered',
-        'data' => $register
-    ]); 
-}
-
-    public function logout()
+  
+    public function refresh(){
+        $refresh = $this->authService->refresh();
+          return response()->json($refresh);
+    }
+  
+    public function logout(Request $request)
     {
         $this->authService->logout();
         return response()->json(['message' => 'Successfully logged out']);

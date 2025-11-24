@@ -11,11 +11,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\belongsTo;
 use App\Models\Role;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-     use Notifiable, SoftDeletes;
+    use HasFactory, Notifiable, SoftDeletes;
 
 
   // JWT methods
@@ -39,7 +39,7 @@ class User extends Authenticatable implements JWTSubject
         'role_id',
         'name',
         'email',
-        'password_hash',
+        'password',
         'first_name',
         'last_name'
     ];
@@ -49,23 +49,23 @@ class User extends Authenticatable implements JWTSubject
      *
      * @var list<string>
      */
-    // protected $hidden = [
-    //     'password',
-    //     'remember_token',
-    // ];
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
 
     /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
      */
-    // protected function casts(): array
-    // {
-    //     return [
-    //         'email_verified_at' => 'datetime',
-    //         'password' => 'hashed',
-    //     ];
-    // }
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
 
    //Entity relationship to role
     public function role(): belongsTo
