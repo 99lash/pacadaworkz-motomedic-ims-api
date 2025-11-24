@@ -10,7 +10,6 @@ use App\Http\Controllers\API\AuthController;
 
 
 Route::post('login', [AuthController::class, 'login']);
-Route::post('register',[AuthController::class,'register']);
 Route::get('test',[AuthController::class,'test']);
 // Protected routes: logout & me
 Route::middleware('auth:api')->group(function () {
