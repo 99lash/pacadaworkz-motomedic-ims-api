@@ -16,7 +16,7 @@ class RoleController
     public function index(){
          $roles = $this->roleService->getAllRoles();
          if(!$roles)
-         return response()->json(["success"=>false, "data" => ['error' => 'Invalid credentials']], 401);
+          return response()->json(["success"=>false, "data" => ["error" => "Bad Request"]], 400);
 
          
         return response()->json(
@@ -30,8 +30,7 @@ class RoleController
         $roles = $this->roleService->getRoleById($id);
 
         if(!$roles)
-        return response()->json(["success"=>false, "data" => ['error' => $roles]], 404);
-
+           return response()->json(["success"=>false, "data" => ["error" => "Bad Request"]], 400);
 
          return response()->json(
            [
@@ -41,7 +40,27 @@ class RoleController
         );
     }
  
+   
 
+    public function store(Request $request){
+        
+        $validated = $request->validate([
+            'role_name' =>'required|unique:roles,role_name|max:50',
+            'description' =>'required'
+        ]);
+      
+        
 
- 
+         $post = $this->roleService->create($validated);
+
+         if(!$post)
+         return response()->json(["success"=>false, "data" => ["error" => "Bad Request"]], 400);
+         return response()->json($post);
+    }
+
+    
+   public function update(){
+    
+   }
+
 }   

@@ -24,6 +24,21 @@ class RoleService{
         return new RoleResource($role);
     }
    
+   
+    public function create(array $data)
+    {
+        $role = Role::create([
+            'role_name' => $data['role_name'],
+            'description' => $data['description']
+        ]);
+       
 
+        return [
+            'success' =>true,
+            'data' => $data
+        ];
+    }
+
+    
 
 }
