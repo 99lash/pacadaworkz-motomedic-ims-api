@@ -1,36 +1,301 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "pacadaworks-motomedic-ims-api",
-        "description": "API documentation generated using Swagger in Laravel",
+        "title": "MotoMedic IMS API Documentation",
+        "description": "API documentation for the MotoMedic Inventory Management System, generated with a modular structure.",
         "version": "1.0.0"
     },
     "servers": [
         {
             "url": "http://localhost:8000",
-            "description": "Local Server"
+            "description": "API Server"
         }
     ],
     "paths": {
-        "/api/dummy": {
-            "get": {
+        "/api/v1/auth/login": {
+            "post": {
                 "tags": [
-                    "Dummy Controller"
+                    "Auth"
                 ],
-                "summary": "Dummy endpoint",
-                "operationId": "d6689d47fafcd03b4453eb0daea834f5",
+                "summary": "Logs in a user",
+                "description": "Logs in a user and returns an access token and refresh token.",
+                "operationId": "loginUser",
+                "requestBody": {
+                    "description": "User credentials",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LoginRequest"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
-                        "description": "Successful operation"
+                        "description": "Successful login",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TokenResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid credentials",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
                     }
                 }
+            }
+        },
+        "/api/v1/auth/refresh": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Refreshes an access token",
+                "description": "Refreshes an expired access token using a refresh token.",
+                "operationId": "refreshToken",
+                "responses": {
+                    "200": {
+                        "description": "Token refreshed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TokenResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "refreshToken": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logs out the current user",
+                "description": "Logs out the currently authenticated user by invalidating the token.",
+                "operationId": "logoutUser",
+                "responses": {
+                    "200": {
+                        "description": "Successfully logged out",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MessageResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/me": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Get the authenticated user's data",
+                "description": "Returns the data of the currently authenticated user.",
+                "operationId": "getAuthenticatedUser",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "LoginRequest": {
+                "title": "Login Request",
+                "required": [
+                    "email",
+                    "password"
+                ],
+                "properties": {
+                    "email": {
+                        "description": "User's email address",
+                        "type": "string",
+                        "format": "email",
+                        "example": "user@example.com"
+                    },
+                    "password": {
+                        "description": "User's password",
+                        "type": "string",
+                        "format": "password",
+                        "example": "password"
+                    }
+                },
+                "type": "object"
+            },
+            "TokenResponse": {
+                "title": "Authentication Token Response",
+                "properties": {
+                    "access_token": {
+                        "description": "The access token for authentication.",
+                        "type": "string"
+                    },
+                    "expires_in": {
+                        "description": "The token expiration time in seconds.",
+                        "type": "integer"
+                    },
+                    "token_type": {
+                        "description": "Type of the token.",
+                        "type": "string",
+                        "example": "bearer"
+                    },
+                    "refresh_token": {
+                        "description": "The refresh token to get a new access token.",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "User": {
+                "title": "User",
+                "description": "User model",
+                "properties": {
+                    "id": {
+                        "description": "User ID",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "name": {
+                        "description": "User's name",
+                        "type": "string"
+                    },
+                    "email": {
+                        "description": "User's email address",
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "created_at": {
+                        "description": "Creation timestamp",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "description": "Last update timestamp",
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "ErrorResponse": {
+                "title": "Error Response",
+                "properties": {
+                    "error": {
+                        "description": "Error message.",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "MessageResponse": {
+                "title": "Message Response",
+                "properties": {
+                    "message": {
+                        "description": "A success or informational message.",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "responses": {
+            "Unauthorized": {
+                "description": "Unauthorized. The token is invalid or expired.",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "Forbidden": {
+                "description": "Forbidden. The user does not have permission to access this resource.",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "NotFound": {
+                "description": "The specified resource was not found.",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Enter 'Bearer' [space] and then your ACCESS TOKEN.",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            },
+            "refreshToken": {
+                "type": "http",
+                "description": "Enter 'Bearer' [space] and then your REFRESH TOKEN.",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
             }
         }
     },
     "tags": [
         {
-            "name": "Dummy Controller",
-            "description": "Dummy Controller"
+            "name": "Auth",
+            "description": "API endpoints for Authentication"
         }
     ]
 }
