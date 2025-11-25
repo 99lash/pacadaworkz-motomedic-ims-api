@@ -15,5 +15,4 @@ Route::middleware('auth:api')->group(function () {
     Route::post('v1/auth/logout', [AuthController::class, 'logout']);
     Route::get('v1/auth/me', [AuthController::class, 'me']);
     Route::post('v1/auth/refresh',[AuthController::class,'refresh']);
-    
 });
