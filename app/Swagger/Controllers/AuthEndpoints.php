@@ -34,12 +34,12 @@ class AuthEndpoints
      *      @OA\Response(
      *          response=200,
      *          description="Successful login",
-     *          @OA\JsonContent(ref="#/components/schemas/TokenResponse")
+     *          @OA\JsonContent(ref="#/components/schemas/WrappedTokenResponse")
      *      ),
      *      @OA\Response(
      *          response=401,
      *          description="Invalid credentials",
-     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *          @OA\JsonContent(ref="#/components/schemas/WrappedErrorResponse")
      *      )
      * )
      */
@@ -56,7 +56,7 @@ class AuthEndpoints
      *      @OA\Response(
      *          response=200,
      *          description="Token refreshed successfully",
-     *          @OA\JsonContent(ref="#/components/schemas/TokenResponse")
+     *          @OA\JsonContent(ref="#/components/schemas/RefreshTokenResponse")
      *      ),
      *      @OA\Response(response="401", ref="#/components/responses/Unauthorized")
      * )
@@ -74,7 +74,7 @@ class AuthEndpoints
      *      @OA\Response(
      *          response=200,
      *          description="Successfully logged out",
-     *          @OA\JsonContent(ref="#/components/schemas/MessageResponse")
+     *          @OA\JsonContent(ref="#/components/schemas/WrappedMessageResponse")
      *      ),
      *      @OA\Response(response="401", ref="#/components/responses/Unauthorized")
      * )
@@ -92,7 +92,7 @@ class AuthEndpoints
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
-     *          @OA\JsonContent(ref="#/components/schemas/User")
+     *          @OA\JsonContent(ref="#/components/schemas/WrappedUserResponse")
      *      ),
      *      @OA\Response(response="401", ref="#/components/responses/Unauthorized")
      * )

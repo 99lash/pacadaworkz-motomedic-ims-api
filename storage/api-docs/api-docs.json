@@ -37,7 +37,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/TokenResponse"
+                                    "$ref": "#/components/schemas/WrappedTokenResponse"
                                 }
                             }
                         }
@@ -47,7 +47,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#/components/schemas/WrappedErrorResponse"
                                 }
                             }
                         }
@@ -69,7 +69,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/TokenResponse"
+                                    "$ref": "#/components/schemas/RefreshTokenResponse"
                                 }
                             }
                         }
@@ -99,7 +99,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/MessageResponse"
+                                    "$ref": "#/components/schemas/WrappedMessageResponse"
                                 }
                             }
                         }
@@ -129,7 +129,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/User"
+                                    "$ref": "#/components/schemas/WrappedUserResponse"
                                 }
                             }
                         }
@@ -240,6 +240,77 @@
                     "message": {
                         "description": "A success or informational message.",
                         "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "RefreshTokenResponse": {
+                "title": "Refresh Token Response",
+                "properties": {
+                    "new_access_token": {
+                        "description": "The new access token for authentication.",
+                        "type": "string"
+                    },
+                    "token_type": {
+                        "description": "Type of the token.",
+                        "type": "string",
+                        "example": "bearer"
+                    },
+                    "expires_in": {
+                        "description": "The token expiration time in seconds.",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "WrappedTokenResponse": {
+                "title": "Wrapped Token Response",
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/TokenResponse"
+                    }
+                },
+                "type": "object"
+            },
+            "WrappedErrorResponse": {
+                "title": "Wrapped Error Response",
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/ErrorResponse"
+                    }
+                },
+                "type": "object"
+            },
+            "WrappedMessageResponse": {
+                "title": "Wrapped Message Response",
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/MessageResponse"
+                    }
+                },
+                "type": "object"
+            },
+            "WrappedUserResponse": {
+                "title": "Wrapped User Response",
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/User"
                     }
                 },
                 "type": "object"

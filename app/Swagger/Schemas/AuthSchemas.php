@@ -59,6 +59,47 @@ namespace App\Swagger\Schemas;
  *     title="Message Response",
  *     @OA\Property(property="message", type="string", description="A success or informational message.")
  * )
+ * 
+ * @OA\Schema(
+ *     schema="RefreshTokenResponse",
+ *     type="object",
+ *     title="Refresh Token Response",
+ *     @OA\Property(property="new_access_token", type="string", description="The new access token for authentication."),
+ *     @OA\Property(property="token_type", type="string", example="bearer", description="Type of the token."),
+ *     @OA\Property(property="expires_in", type="integer", description="The token expiration time in seconds.")
+ * )
+ *
+ * @OA\Schema(
+ *     schema="WrappedTokenResponse",
+ *     type="object",
+ *     title="Wrapped Token Response",
+ *     @OA\Property(property="success", type="boolean", example=true),
+ *     @OA\Property(property="data", ref="#/components/schemas/TokenResponse")
+ * )
+ *
+ * @OA\Schema(
+ *     schema="WrappedErrorResponse",
+ *     type="object",
+ *     title="Wrapped Error Response",
+ *     @OA\Property(property="success", type="boolean", example=false),
+ *     @OA\Property(property="data", ref="#/components/schemas/ErrorResponse")
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="WrappedMessageResponse",
+ *     type="object",
+ *     title="Wrapped Message Response",
+ *     @OA\Property(property="success", type="boolean", example=true),
+ *     @OA\Property(property="data", ref="#/components/schemas/MessageResponse")
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="WrappedUserResponse",
+ *     type="object",
+ *     title="Wrapped User Response",
+ *     @OA\Property(property="success", type="boolean", example=true),
+ *     @OA\Property(property="data", ref="#/components/schemas/User")
+ * )
  */
 class AuthSchemas
 {
