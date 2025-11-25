@@ -1,11 +1,19 @@
 <?php
 
-namespace App\Serrvices;
-
+namespace App\Services;
 use App\Models\Role;
 
 
 class RoleService{
   
+
+    public function getAllRoles(){
+      
+        $roles = Role::all();
+
+        return $roles;
+
+    }
+
 
 }
