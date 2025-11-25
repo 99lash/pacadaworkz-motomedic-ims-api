@@ -14,6 +14,13 @@ class RoleService{
         return $roles;
 
     }
+   
+    // public function getRoleById($roleId){
+        
+    //     $role = Role::findby
+
+    // }
+   
 
 
 }

@@ -30,7 +30,7 @@ class RoleMiddleware
 
         }
       
-        if(!in_array($user->role_id,$roles)){
+        if (!$user->role || !in_array($user->role->role_name, $roles)) {
             
             return response()->json([
                 'success' => false,

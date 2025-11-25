@@ -19,4 +19,4 @@ Route::middleware('auth:api')->group(function () {
     
 });
 
-Route::middleware(['auth:api', 'role:1'])->get('/v1/roles', [RoleController::class, 'show']);
+Route::middleware(['auth:api', 'role:superadmin'])->get('/v1/roles', [RoleController::class, 'show']);
