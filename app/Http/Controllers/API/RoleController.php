@@ -13,20 +13,35 @@ class RoleController
     }
      
 
-    public function show(){
+    public function index(){
          $roles = $this->roleService->getAllRoles();
          if(!$roles)
-         {
          return response()->json(["success"=>false, "data" => ['error' => 'Invalid credentials']], 401);
 
-         }
-
+         
         return response()->json(
-        [
-            'success' => true,
-             'data' => $roles
-        ]
+           $roles
         );
     }
+    
+    
 
-}
+    public function show($id){
+        $roles = $this->roleService->getRoleById($id);
+
+        if(!$roles)
+        return response()->json(["success"=>false, "data" => ['error' => $roles]], 404);
+
+
+         return response()->json(
+           [
+            "success" =>true,
+            'data' => $roles
+           ]
+        );
+    }
+ 
+
+
+ 
+}   
