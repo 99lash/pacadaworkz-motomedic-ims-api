@@ -5,13 +5,14 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Role;
 use App\Models\SystemSetting;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\belongsTo;
-use App\Models\Role;
-use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -85,6 +86,7 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(StockAdjustment::class);
     }
 
+
      //Entity relationship to stock_adjustments
     public function stock_movements():HasMany
     {
@@ -92,9 +94,12 @@ class User extends Authenticatable implements JWTSubject
     }
 
 
+
+
     //Entity relationship to activity_logs
     public function activity_logs():HasMany
     {
+        return $this->hasMany(ActivityLog::class);
         return $this->hasMany(ActivityLog::class);
     }
 
@@ -102,7 +107,11 @@ class User extends Authenticatable implements JWTSubject
     public function system_settings(): HasOne
     {
         return $this->hasOne(SystemSetting::class);
+        return $this->hasOne(SystemSetting::class);
     }
+
+
+
 
 
 
