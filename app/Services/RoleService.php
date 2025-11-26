@@ -17,28 +17,65 @@ class RoleService{
         return new RoleCollection($this->roles);
     }
    
-    public function getRoleById($roleId){
+    public function getRoleById($id){
         
-        $role = $this->roles->findOrFail($roleId);
-       
+        $role = $this->roles->find($id);
+        if (!$role) return null;
+
         return new RoleResource($role);
     }
    
    
     public function create(array $data)
     {
+    
+
         $role = Role::create([
             'role_name' => $data['role_name'],
             'description' => $data['description']
         ]);
        
+        
 
-        return [
-            'success' =>true,
-            'data' => $data
-        ];
+        return  new RoleResource($role);
     }
 
-    
+     
+
+    public function update(array $data,$id){
+     
+        $role = $this->roles->find($id);
+        
+        $role->description= $data['description'];
+        
+        $role->save();
+
+          return [
+            'success' =>true,
+            'data' => new RoleResource($role)
+        ];
+
+    }
+
+
+
+    public function delete($id)
+    {
+       $role = $this->roles->find($id);
+       
+       
+
+       $role->delete();
+
+       
+          return [
+            'success' =>true,
+            'data' => [
+                'message' =>'deleted successfully'
+            ]
+        ];
+       
+
+    }
 
 }
