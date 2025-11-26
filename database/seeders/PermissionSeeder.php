@@ -2,8 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class PermissionSeeder extends Seeder
 {
@@ -12,6 +13,45 @@ class PermissionSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        $timestamp = Carbon::now();
+        $permissions = [];
+
+        $permissionSets = [
+            'Dashboard' => ['View', 'Create'],
+
+            'Inventory'   => ['View', 'Create', 'Edit', 'Delete'],
+            'Products'    => ['View', 'Create', 'Edit', 'Delete'],
+            'Categories'  => ['View', 'Create', 'Edit', 'Delete'],
+            'Brands'      => ['View', 'Create', 'Edit', 'Delete'],
+            'Attributes'  => ['View', 'Create', 'Edit', 'Delete'],
+            'Suppliers'   => ['View', 'Create', 'Edit', 'Delete'],
+            'Purchases'   => ['View', 'Create', 'Edit', 'Delete'],
+            'Users'       => ['View', 'Create', 'Edit', 'Delete'],
+            'Roles'       => ['View', 'Create', 'Edit', 'Delete'],
+
+            'POS' => ['Access', 'Create Transaction'],
+
+            'Reports' => ['View', 'Export'],
+
+            'Activity Logs' => ['View Own', 'View All'],
+
+           
+            'Settings' => ['View', 'Edit'],
+        ];
+
+
+        foreach ($permissionSets as $module => $actions) {
+            foreach ($actions as $action) {
+                $permissions[] = [
+                    'name' => $action,
+                    'description'     => $action . ' ' . $module,
+                    'module'          => $module,
+                    'created_at'      => $timestamp,
+                    'updated_at'      => $timestamp,
+                ];
+            }
+        }
+
+        DB::table('permissions')->insert($permissions);
     }
 }
