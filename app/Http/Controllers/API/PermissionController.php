@@ -10,7 +10,7 @@ class PermissionController extends Controller
 {
     //
 
-    private $permissionService;
+    protected $permissionService;
 
 
     public function __construct(PermissionService $permissionService){
