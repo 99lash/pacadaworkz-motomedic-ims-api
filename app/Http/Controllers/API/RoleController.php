@@ -57,32 +57,45 @@ class RoleController
             'data' => $validator->errors()
         ], 400);
     }
+   
+      $validated = $validator->validated();
 
-         $post = $this->roleService->create($validatpr);
-
-        
-
+      
+         $post = $this->roleService->create($validator);
          return response()->json(['success' =>'true','data' => $post]);
     }
 
-    
+
+
+
    public function update(Request $request,$id){
       
-      $validated = $request->validate([
-         'description' =>'required'
-      ]);
+     
+     $validator = Validator::make($request->all(), [
+    'description' => 'required'
+     ]);
+
+     if ($validator->fails()) {
+    return response()->json([
+        'success' => false,
+        'data' => $validator->errors()
+    ], 400);
+      }
+
+      $validated = $validator->validated();
 
 
       $update = $this->roleService->update($validated,$id);
 
        if(!$update)
         return response()->json(['success'=>false, 'data' => ['error' => 'Bad Request']], 400);
-
-
-     
+  
      return response()->json($update);
 
    }
+
+
+
 
 
    public function destroy($id){
