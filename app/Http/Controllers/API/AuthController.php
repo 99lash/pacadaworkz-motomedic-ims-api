@@ -20,16 +20,16 @@ class AuthController extends Controller
         $tokens = $this->authService->login($credentials);
          
         if (!$tokens) {
-            return response()->json(["success"=>false, "data" => ['error' => 'Invalid credentials']], 401);
+            return response()->json(["success"=>false, "data" => ["error" => "Invalid credentials"]], 401);
         }
 
         return response()->json([
             "success" => true,
              "data" => [
-            'access_token' => $tokens['access_token'],
-            'expires_in' => auth('api')->factory()->getTTL() * 60,
-            'token_type' => 'bearer',
-            'refresh_token' => $tokens['refresh_token']
+            "access_token" => $tokens["access_token"],
+            "expires_in" => auth('api')->factory()->getTTL() * 60,
+            "token_type" => "bearer",
+            "refresh_token" => $tokens["refresh_token"]
              ]
         ]);
     }
@@ -44,11 +44,11 @@ class AuthController extends Controller
     {
         $data  = $this->authService->logout();
          if (!$data) {
-            return response()->json(["success"=>false, "data" => ['error' => 'Invalid credentials']], 401);
+            return response()->json(["success"=>false, "data" => ["error" => "Invalid credentials"]], 401);
         }
 
         return response()->json([ "success" =>true,
-        data => ['message' => 'Successfully logged out']]);
+        data => ["message" => "Successfully logged out"]]);
     }
 
    public function me()
@@ -71,7 +71,7 @@ class AuthController extends Controller
 }
 
     public function test(){
-        return response()->json(['message'=>'success']);
+        return response()->json(["message"=>"success"]);
     }
 
 }

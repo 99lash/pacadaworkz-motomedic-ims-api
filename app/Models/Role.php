@@ -26,7 +26,7 @@ class Role extends Model
     }
 
     //Entity Reletionship to the permissions via role_permissions
-    public function permissons():BelongsToMany
+    public function permissions():BelongsToMany
     {
         return $this->belongsToMany(Permission::class,'role_permissions')
         ->using(RolePermission::class) //the pivot model
