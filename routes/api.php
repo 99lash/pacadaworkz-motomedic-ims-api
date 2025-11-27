@@ -21,6 +21,7 @@ Route::middleware('auth:api')->group(function () {
     
 });
 
+//api for Roles and permissions
 Route::middleware(['auth:api','role:superadmin'])->group(function () {
   Route::get('v1/roles', [RoleController::class, 'index']);
   Route::get('v1/roles/{id}',[RoleController::class,'show']);
@@ -31,3 +32,12 @@ Route::middleware(['auth:api','role:superadmin'])->group(function () {
   Route::post('v1/roles/{role}/permissions',[RolePermissionController::class,'assignPermissions']);
   
 });
+
+
+
+//api for catefories
+Route::middleware(['auth:api','role:superadmin'])->group(function() {
+
+}
+   
+);
