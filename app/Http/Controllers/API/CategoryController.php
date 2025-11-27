@@ -71,4 +71,24 @@ class CategoryController extends Controller
     }
 
 
+
+    public function update($id, CategoryRequest $request)
+    {
+        try{
+           $result = $this->categoryService->update($id,$request->validated());
+
+           return response()->json([
+             'success'  => true,
+             'data' => new CategoryResource($result)
+           ]);
+
+        }catch(\Exception $e){
+                return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+       
+    }
+
 }

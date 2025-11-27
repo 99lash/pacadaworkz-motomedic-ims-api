@@ -21,9 +21,15 @@ class CategoryRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-               'name' => ['required','max:100'],
-               'description' =>['required']
+
+          // $isupdate = $this->method == 'PUT' || $this->method == 'PATCH';
+
+        
+
+
+        return  [
+               'name' => 'required|max:100',
+               'description' =>'sometimes'
         ];
     }
 }

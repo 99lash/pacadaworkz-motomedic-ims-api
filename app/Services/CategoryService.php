@@ -33,4 +33,19 @@ class CategoryService{
  }
 
 
+
+ public function update($id, array $update)
+ {
+      
+    $category = Category::findOrfail($id);
+    
+    $category->update([
+       'name' => $update['name'],
+       'description' => $update['description']
+    ]);
+     
+     return $category;
+
+ }
+
 }
