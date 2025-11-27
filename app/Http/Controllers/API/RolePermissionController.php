@@ -26,26 +26,31 @@ class RolePermissionController extends Controller
      */
     public function assignPermissions(RolesPermissionRequest $request, $id)
     {
-        // Pass validated permissions to service layer
-        $result = $this->rolePermissionService->assignPermissions($id, $request->permissions);
+        try {
+            $result = $this->rolePermissionService->assignPermissions($id, $request->permissions);
 
-        if (! $result['success']) {
+            if (!$result['success']) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $result['message']
+                ], 404);
+            }
+
+            $permissionsResource = RolePermissionResource::collection($result['permissions']);
+
+            return response()->json([
+                'success' => true,
+                'message' => $result['message'],
+                'data' => [
+                    'role_name' => $result['role_name'],
+                    'permissions' => $permissionsResource
+                ]
+            ], 200);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $result['message']
-            ], 404);
+                'message' => $e->getMessage()
+            ], 500);
         }
-
-        // Wrap permissions in resource
-        $permissionsResource = RolePermissionResource::collection($result['permissions']);
-
-        return response()->json([
-            'success' => true,
-            'message' => $result['message'],
-            'data' => [
-                'role_name' => $result['role_name'],
-                'permissions' => $permissionsResource
-            ]
-        ], 200);
     }
 }
