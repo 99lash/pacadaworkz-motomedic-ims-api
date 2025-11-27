@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\API;
 use  App\Http\Resources\CategoryResource;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\API\Controller;
 use App\Http\Requests\CategoryRequest;
 use App\Services\CategoryService;
 
@@ -17,27 +17,38 @@ class CategoryController extends Controller
 
 
     public function index(){
+       try{
 
-        $result = $this->categoryService->getAll();
-
-
-
+               $result = $this->categoryService->getAllCategories();
         return response()->json([
             'success' => true,
             'data' => CategoryResource::collection($result)
         ]);
-
+       }catch(\Exception $e){
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+       }
 
     }
 
     public function store(CategoryRequest $request)
     {
+        try {
         $result = $this->categoryService->create($request->validated());
 
         return response()->json([
             'success' => true,
             'data' => new CategoryResource($result)
         ], 201);
+
+    }catch(\Exception $e){
+         return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+    }
     }
 
 

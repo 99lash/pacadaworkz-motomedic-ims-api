@@ -7,9 +7,17 @@ class CategoryService{
 
  public function getAllCategories(){
      $categories = Category::all();
-
      return $categories;
  }
 
+
+ public function create(array $category){
+     
+    return Category::create([
+        'name' => $category['name'],
+        'description' => $category['description']
+    ]);
+   
+ }
 
 }

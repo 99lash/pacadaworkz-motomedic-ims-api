@@ -6,7 +6,7 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\RoleController;
 use App\Http\Controllers\API\PermissionController;
 use App\Http\Controllers\API\RolePermissionController;
-
+use App\Http\Controllers\API\CategoryController;
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');
@@ -37,7 +37,8 @@ Route::middleware(['auth:api','role:superadmin'])->group(function () {
 
 //api for catefories
 Route::middleware(['auth:api','role:superadmin'])->group(function() {
-
+   Route::get('v1/categories',[CategoryController::class,'index']);
+   Route::post('v1/categories',[CategoryController::class,'store']);
 }
    
 );
