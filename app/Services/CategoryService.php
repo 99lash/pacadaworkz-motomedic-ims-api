@@ -7,6 +7,7 @@ class CategoryService{
 
  public function getAllCategories(){
      $categories = Category::all();
+
      return $categories;
  }
 

@@ -39,6 +39,5 @@ Route::middleware(['auth:api','role:superadmin'])->group(function () {
 Route::middleware(['auth:api','role:superadmin'])->group(function() {
    Route::get('v1/categories',[CategoryController::class,'index']);
    Route::post('v1/categories',[CategoryController::class,'store']);
-}
-   
-);
+
+});
