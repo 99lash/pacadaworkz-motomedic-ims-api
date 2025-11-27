@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Services\RoleService;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\API\Controller;
 use App\Http\Resources\RoleResource;
 use App\Http\Requests\RoleRequest;
 

@@ -1,11 +1,11 @@
 <?php
 
 namespace App\Http\Controllers\API;
-use  App\Http\Resources\CategoryResource;
+use App\Http\Resources\CategoryResource;
 use App\Http\Controllers\API\Controller;
 use App\Http\Requests\CategoryRequest;
 use App\Services\CategoryService;
-
+use Illuminate\Http\Request;
 class CategoryController extends Controller
 {
 
@@ -16,13 +16,19 @@ class CategoryController extends Controller
     }
 
 
-    public function index(){
+    public function index(Request $request){
        try{
-
-               $result = $this->categoryService->getAllCategories();
+                $search = $request->query('search',null);
+               $result = $this->categoryService->getAllCategories($search);
         return response()->json([
-            'success' => true,
-            'data' => CategoryResource::collection($result)
+            'success' =>true,
+            'data' => CategoryResource::collection($result),
+            'meta' => [
+                    'current_page' => $result->currentPage(),
+                    'per_page' => $result->perPage(),
+                    'total' => $result->total(),
+                    'total_pages' => $result->lastPage(),
+                ],
         ]);
        }catch(\Exception $e){
             return response()->json([

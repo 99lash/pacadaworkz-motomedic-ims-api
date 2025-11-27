@@ -5,10 +5,16 @@ use App\Models\Category;
 class CategoryService{
 
 
- public function getAllCategories(){
-     $categories = Category::all();
+ public function getAllCategories($search = null){
 
-     return $categories;
+      $query = Category::query();
+      
+      if($search)
+      {
+        $query->where('name','Ilike',"%{$search}%")->orWhere('description','Ilike',"%{$search}%");
+      }
+    
+     return $query->paginate(10)->withQueryString();
  }
 
 
