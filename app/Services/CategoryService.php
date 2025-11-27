@@ -21,4 +21,16 @@ class CategoryService{
    
  }
 
+
+
+ public function getCategoryById($id)
+ {
+    
+     $category = Category::find($id);
+
+     return $category;
+
+ }
+
+
 }

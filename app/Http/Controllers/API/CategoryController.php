@@ -51,6 +51,24 @@ class CategoryController extends Controller
     }
     }
 
+   
+    public function show($id){
+        
+
+        try{
+             $result = $this->categoryService->getCategoryById($id);
+            return response()->json([
+                'success' => true,
+                'data' => new CategoryResource($result)
+            ]);
+
+        }catch(\Exception $e){
+               return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 
 
 }
