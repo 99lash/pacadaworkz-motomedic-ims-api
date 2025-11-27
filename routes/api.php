@@ -11,7 +11,7 @@ use App\Http\Controllers\API\CategoryController;
 //     return $request->user();
 // })->middleware('auth:sanctum');
 
-
+//auth
 Route::post('v1/auth/login', [AuthController::class, 'login']);
 Route::get('test',[AuthController::class,'test']);
 Route::middleware('auth:api')->group(function () {
@@ -41,4 +41,5 @@ Route::middleware(['auth:api','role:superadmin'])->group(function() {
    Route::post('v1/categories',[CategoryController::class,'store']);
    Route::get('v1/categories/{id}',[CategoryController::class,'show']);
    Route::put('v1/categories/{id}',[CategoryController::class,'update']);
+   Route::delete('v1/categories/{id}',[CategoryController::class,'destroy']);
 });

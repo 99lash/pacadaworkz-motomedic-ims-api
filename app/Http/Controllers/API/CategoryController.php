@@ -91,4 +91,27 @@ class CategoryController extends Controller
        
     }
 
+ 
+    public function destroy($id){
+      
+      try{
+        $this->categoryService->delete($id);
+          
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'message' => 'Role deleted successfully']
+                ]);
+
+      }catch(\Exception $e){
+              
+                   return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+      }
+
+    }
+
+
 }

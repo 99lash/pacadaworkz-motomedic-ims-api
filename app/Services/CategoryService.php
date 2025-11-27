@@ -48,4 +48,14 @@ class CategoryService{
 
  }
 
+
+
+ public function delete($id){
+    
+    $category = Category::findOrFail($id);
+    
+   return $category->delete();
+
+ }
+
 }
