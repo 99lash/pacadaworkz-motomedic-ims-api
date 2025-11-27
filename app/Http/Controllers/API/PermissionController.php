@@ -18,16 +18,20 @@ class PermissionController extends Controller
     }
 
     
-    public function index(){
-      
-        $permissions = $this->permissionService->getAllPermissions();
+    public function index()
+    {
+        try {
+            $permissions = $this->permissionService->getAllPermissions();
 
-        return response()->json(
-            [
+            return response()->json([
                 'success' => true,
-                 'data' => PermissionResource::collection($permissions)
-            ]
-        );
-
+                'data' => PermissionResource::collection($permissions)
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }

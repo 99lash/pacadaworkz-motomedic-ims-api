@@ -4,14 +4,14 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ProductRequest extends FormRequest
+class CategoryRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,8 +21,15 @@ class ProductRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-          
+
+          // $isupdate = $this->method == 'PUT' || $this->method == 'PATCH';
+
+        
+
+
+        return  [
+               'name' => 'required|max:100',
+               'description' =>'sometimes'
         ];
     }
 }
