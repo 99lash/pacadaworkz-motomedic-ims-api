@@ -14,8 +14,8 @@ class AuthService
       // access token 60 mins
      $accessToken = auth('api')->setTTL(60)->attempt($credentials);
 
-    if (!$accessToken) 
-        return false; 
+    if (!$accessToken)
+        return false;
 
         $user=auth('api')->user();
         //refresh token 15 days
@@ -39,7 +39,7 @@ class AuthService
 
         ];
     }
-  
+
     public function logout()
     {
         JWTAuth::invalidate(JWTAuth::getToken());
@@ -53,5 +53,5 @@ class AuthService
     }
 
 
-   
+
 }
