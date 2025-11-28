@@ -32,7 +32,7 @@ class CategoryService{
  public function getCategoryById($id)
  {
     
-     $category = Category::find($id);
+     $category = Category::findOrFail($id);
 
      return $category;
 

@@ -6,6 +6,7 @@ use App\Http\Requests\BrandRequest;
 use App\Http\Controllers\Controller;
 use App\Services\BrandService;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class BrandController
 {
@@ -54,17 +55,22 @@ class BrandController
        $result = $this->brandService->getBrandById($id);
        return response()->json(
         [
-            'success' => false,
+            'success' => true,
              'data' => new BrandResource($result)
         ]
        );
 
 
-     }catch(\Exception $e){
+     }catch(ModelNotFoundException $e){
              return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'Brand not found.'
             ], 404);          
+      } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
       }
 
 
@@ -72,10 +78,78 @@ class BrandController
  
     //store Brand
 
-    public function store(){
+    public function store(BrandRequest $request){
         
+     try{
+       
+        $result = $this->brandService->create($request->validated());
+        
+        return response()->json([
+            'success' => true,
+            'data' => new BrandResource($result)
+        ]);
+
+     }catch(\Exception $e){
+           return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+     }
+
+    }
+
+
+    //update brand
+
+    public function update(BrandRequest $request,$id){
+         
+        try{
+            $result = $this->brandService->update($request->validated(),$id);
+           
+            return response()->json([
+                'success' => true,
+                'data' => new BrandResource($result)
+            ]);
+        }catch(ModelNotFoundException $e){
+                 return response()->json([
+                'success' => false,
+                'message' => 'Brand not found.'
+            ], 404);   
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
 
 
+    //delete brand
+
+
+    public function destroy($id){
+      
+        try{
+             
+            $this->brandService->delete($id);
+
+            return response()->json([
+                'success' => true,
+                'data' => 'Brand deleted succesfully'
+            ]);
+
+        }catch(ModelNotFoundException $e){
+              return response()->json([
+                'success' => false,
+                'message' => 'Brand not found.'
+            ], 404);   
+        }catch(\Exception $e){
+               return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+
+    }
 }
