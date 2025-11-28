@@ -19,7 +19,7 @@ class User extends Authenticatable implements JWTSubject
     use HasFactory, Notifiable, SoftDeletes;
 
 
-  // JWT methods
+    // JWT methods
     public function getJWTIdentifier()
     {
         return $this->getKey();
@@ -52,7 +52,7 @@ class User extends Authenticatable implements JWTSubject
      */
     protected $hidden = [
         'password',
-        'remember_token',
+        // 'remember_token',
     ];
 
     /**
@@ -68,7 +68,7 @@ class User extends Authenticatable implements JWTSubject
         ];
     }
 
-   //Entity relationship to role
+    //Entity relationship to role
     public function role(): belongsTo
     {
         return $this->belongsTo(Role::class);
@@ -77,27 +77,24 @@ class User extends Authenticatable implements JWTSubject
     //Entity relationship to sales_ransaction
     public function sales_transactions(): HasMany
     {
-          return $this->hasMany(SalesTransaction::class);
+        return $this->hasMany(SalesTransaction::class);
     }
 
     //Entity relationship to stock_adjustments
-    public function stock_adjustments():HasMany
+    public function stock_adjustments(): HasMany
     {
         return $this->hasMany(StockAdjustment::class);
     }
 
 
-     //Entity relationship to stock_adjustments
-    public function stock_movements():HasMany
+    //Entity relationship to stock_adjustments
+    public function stock_movements(): HasMany
     {
         return $this->hasMany(StockMovement::class);
     }
 
-
-
-
     //Entity relationship to activity_logs
-    public function activity_logs():HasMany
+    public function activity_logs(): HasMany
     {
         return $this->hasMany(ActivityLog::class);
         return $this->hasMany(ActivityLog::class);
@@ -109,12 +106,4 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasOne(SystemSetting::class);
         return $this->hasOne(SystemSetting::class);
     }
-
-
-
-
-
-
-
-
 }
