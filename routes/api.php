@@ -8,6 +8,7 @@ use App\Http\Controllers\API\PermissionController;
 use App\Http\Controllers\API\RolePermissionController;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\BrandController;
+use App\Http\Controllers\API\ProductController;
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');
@@ -57,13 +58,13 @@ Route::middleware(['auth:api','role:superadmin'])->group(function(){
 
 
 //api for products
-Route::middleware(['auth:api','role:superadmin'])-group(
+Route::middleware(['auth:api','role:superadmin'])->group(
   function(){
     Route::get('v1/products',[ProductController::class,'index']);
     Route::get('v1/products/{id}',[ProductController::class,'show']);
     Route::post('v1/products',[ProductController::class,'store']);
     Route::put('v1/products/{id}',[ProductController::class,'update']);
     Route::delete('v1/products/{id}',[ProductController::class,'delete']);
-    
+
     
   });
