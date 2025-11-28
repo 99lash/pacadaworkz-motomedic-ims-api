@@ -17,65 +17,71 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
-        $tokens = $this->authService->login($credentials);
+        try {
+            $credentials = $request->only('email', 'password');
+            $tokens = $this->authService->login($credentials);
 
-        if (!$tokens) {
-            return response()->json(["success" => false, "data" => ['error' => 'Invalid credentials']], 401);
+            return response()->json([
+                "success" => true,
+                "data" => [
+                    "access_token" => $tokens["access_token"],
+                    "expires_in" => auth('api')->factory()->getTTL() * 60,
+                    "token_type" => "bearer",
+                    "refresh_token" => $tokens["refresh_token"]
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 401);
         }
-
-        return response()->json([
-            "success" => true,
-            "data" => [
-                'access_token' => $tokens['access_token'],
-                'expires_in' => auth('api')->factory()->getTTL() * 60,
-                'token_type' => 'bearer',
-                'refresh_token' => $tokens['refresh_token']
-            ]
-        ]);
     }
-
 
     public function refresh()
     {
-        $refresh = $this->authService->refresh();
-        return response()->json($refresh);
+        try {
+            $refresh = $this->authService->refresh();
+            return response()->json($refresh);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 401);
+        }
     }
 
     public function logout(Request $request)
     {
-        $data  = $this->authService->logout();
-        if (!$data) {
-            return response()->json(["success" => false, "data" => ['error' => 'Invalid credentials']], 401);
+        try {
+            $this->authService->logout();
+            return response()->json([
+                "success" => true,
+                "data" => [
+                    "message" => "Successfully logged out"
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
         }
-
-        return response()->json([
-            "success" => true,
-            "data" => ['message' => 'Successfully logged out']
-        ]);
     }
 
     public function me()
     {
-        $me = $this->authService->me();
-
-        if (!$me) {
+        try {
+            $me = $this->authService->me();
             return response()->json([
-                "success" => false,
-                "data" => [
-                    "error" => "User not found or not authenticated"
-                ]
+                "success" => true,
+                "data" => $me
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
             ], 401);
         }
-
-        return response()->json([
-            "success" => true,
-            "data" => $me
-        ], 200);
-    }
-
-    public function test()
-    {
-        return response()->json(['message' => 'success']);
     }
 }

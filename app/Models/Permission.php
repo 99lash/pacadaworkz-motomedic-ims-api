@@ -14,8 +14,9 @@ class Permission extends Model
 
      // fillable is for mass assigment (allowed na ifill up)
       protected $fillable = [
-        'role_name',
-        'description'
+        'name',
+        'description',
+        'module'
     ];
 
     /**
@@ -25,6 +26,6 @@ class Permission extends Model
      */
     public function roles(): BelongsToMany
     {
-        return $this->belongsToMany(Role::class, 'role_permission');
+        return $this->belongsToMany(Role::class, 'role_permissions');
     }
 }
