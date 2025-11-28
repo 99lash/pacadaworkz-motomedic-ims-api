@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Http\Controllers\API\Controller;
 use Illuminate\Http\Request;
 use App\Services\AuthService;
 
@@ -50,7 +51,7 @@ class AuthController extends Controller
 
         return response()->json([
             "success" => true,
-            data => ['message' => 'Successfully logged out']
+            "data" => ['message' => 'Successfully logged out']
         ]);
     }
 
