@@ -15,7 +15,7 @@ use App\Http\Controllers\API\RolePermissionController;
 
 // Public routes
 Route::post('v1/auth/login', [AuthController::class, 'login']);
-Route::get('/test', [AuthController::class, 'test']);
+// Route::get('/test', [AuthController::class, 'test']);
 
 Route::middleware('auth:api')->group(function () {
     // Authentication endpoints
