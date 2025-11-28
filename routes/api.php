@@ -54,3 +54,16 @@ Route::middleware(['auth:api','role:superadmin'])->group(function(){
   Route::delete('v1/brands/{id}',[BrandController::class,'destroy']);
 
 });
+
+
+//api for products
+Route::middleware(['auth:api','role:superadmin'])-group(
+  function(){
+    Route::get('v1/products',[ProductController::class,'index']);
+    Route::get('v1/products/{id}',[ProductController::class,'show']);
+    Route::post('v1/products',[ProductController::class,'store']);
+    Route::put('v1/products/{id}',[ProductController::class,'update']);
+    Route::delete('v1/products/{id}',[ProductController::class,'delete']);
+    
+    
+  });
