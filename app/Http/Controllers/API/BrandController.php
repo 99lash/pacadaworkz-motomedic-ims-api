@@ -17,7 +17,7 @@ class BrandController
    }
 
 
-
+//get all brands
    public function index(Request $request){
     try{ 
          
@@ -44,6 +44,37 @@ class BrandController
     }
    }
 
+
+   //get brand by id
+   public function show($id)
+   {
+
+    try
+     {
+       $result = $this->brandService->getBrandById($id);
+       return response()->json(
+        [
+            'success' => false,
+             'data' => new BrandResource($result)
+        ]
+       );
+
+
+     }catch(\Exception $e){
+             return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 404);          
+      }
+
+
+   }
+ 
+    //store Brand
+
+    public function store(){
+        
+    }
 
 
 

@@ -18,4 +18,13 @@ public function getAllBrands($search = null){
 
 }
 
+
+
+
+public function getBrandById($id){
+    
+    return Brand::findOrFail($id);
+
+}
+
 }
