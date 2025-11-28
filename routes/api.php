@@ -43,3 +43,13 @@ Route::middleware(['auth:api','role:superadmin'])->group(function() {
    Route::put('v1/categories/{id}',[CategoryController::class,'update']);
    Route::delete('v1/categories/{id}',[CategoryController::class,'destroy']);
 });
+
+//api for brands
+Route::middleware(['auth:api','role:superadmin'])->group(function(){
+   Route::get('v1/brands',[BrandController::class,'index']);
+   Route::get('v1/brands/{id}',[BrandController::class,'show']);
+   Route::post('v1/brands',[BrandController::class,'store']);
+   Route::put('v1/brands/{id}',[BrandController::class,'update']);
+  Route::delete('v1/brands/{id}',[BrandController::class,'delete']);
+
+});
