@@ -497,6 +497,355 @@
                     }
                 ]
             }
+        },
+        "/api/v1/users": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get list of users",
+                "description": "Returns a paginated list of users.",
+                "operationId": "getUsersList",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by name",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "role_id",
+                        "in": "query",
+                        "description": "Filter by role_id",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "sort_by",
+                        "in": "query",
+                        "description": "Sort by",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort_order",
+                        "in": "query",
+                        "description": "Sort order",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Limit per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WrappedUserCollectionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Create a new user",
+                "description": "Creates a new user record.",
+                "operationId": "storeUser",
+                "requestBody": {
+                    "description": "User data",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreUserRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WrappedUserResourceResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WrappedErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/users/{id}": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get user information",
+                "description": "Returns user data by ID.",
+                "operationId": "getUserById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WrappedUserResourceResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update existing user",
+                "description": "Updates an existing user record.",
+                "operationId": "updateUser",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "User data to update",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateUserRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WrappedUserResourceResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WrappedErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Delete user",
+                "description": "Deletes a user record.",
+                "operationId": "deleteUser",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WrappedMessageResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/users/{id}/reset-password": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Reset user password",
+                "description": "Resets the password for a user.",
+                "operationId": "resetUserPassword",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Password reset data",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ResetPasswordUserRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Password reset successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WrappedMessageResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WrappedErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -796,6 +1145,193 @@
                         "type": "object"
                     }
                 ]
+            },
+            "UserResource": {
+                "title": "User Resource",
+                "description": "User resource representation",
+                "properties": {
+                    "id": {
+                        "description": "User ID",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "role_id": {
+                        "description": "Role ID",
+                        "type": "integer"
+                    },
+                    "name": {
+                        "description": "Username",
+                        "type": "string"
+                    },
+                    "email": {
+                        "description": "User's email address",
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "first_name": {
+                        "description": "First name",
+                        "type": "string"
+                    },
+                    "last_name": {
+                        "description": "Last name",
+                        "type": "string"
+                    },
+                    "is_active": {
+                        "description": "Active status",
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "StoreUserRequest": {
+                "title": "Store User Request",
+                "required": [
+                    "role_id",
+                    "name",
+                    "email",
+                    "password",
+                    "first_name",
+                    "last_name",
+                    "is_default_password"
+                ],
+                "properties": {
+                    "role_id": {
+                        "description": "Role ID",
+                        "type": "integer"
+                    },
+                    "name": {
+                        "description": "Username",
+                        "type": "string",
+                        "maxLength": 50,
+                        "minLength": 1
+                    },
+                    "email": {
+                        "description": "Email address",
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "password": {
+                        "description": "Password",
+                        "type": "string",
+                        "format": "password",
+                        "minLength": 6
+                    },
+                    "first_name": {
+                        "description": "First name",
+                        "type": "string",
+                        "maxLength": 50
+                    },
+                    "last_name": {
+                        "description": "Last name",
+                        "type": "string",
+                        "maxLength": 50
+                    },
+                    "is_default_password": {
+                        "description": "Is default password",
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateUserRequest": {
+                "title": "Update User Request",
+                "properties": {
+                    "role_id": {
+                        "description": "Role ID",
+                        "type": "integer"
+                    },
+                    "name": {
+                        "description": "Username",
+                        "type": "string",
+                        "maxLength": 50,
+                        "minLength": 1
+                    },
+                    "email": {
+                        "description": "Email address",
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "first_name": {
+                        "description": "First name",
+                        "type": "string",
+                        "maxLength": 50
+                    },
+                    "last_name": {
+                        "description": "Last name",
+                        "type": "string",
+                        "maxLength": 50
+                    },
+                    "is_active": {
+                        "description": "Is active",
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "ResetPasswordUserRequest": {
+                "title": "Reset Password User Request",
+                "required": [
+                    "is_default_password"
+                ],
+                "properties": {
+                    "new_password": {
+                        "description": "New password (required if is_default_password is false)",
+                        "type": "string",
+                        "format": "password",
+                        "minLength": 6
+                    },
+                    "is_default_password": {
+                        "description": "Use default password",
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "WrappedUserResourceResponse": {
+                "title": "Wrapped User Resource Response",
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/UserResource"
+                    }
+                },
+                "type": "object"
+            },
+            "WrappedUserCollectionResponse": {
+                "title": "Wrapped User Collection Response",
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/UserResource"
+                        }
+                    },
+                    "meta": {
+                        "properties": {
+                            "total": {
+                                "type": "integer"
+                            },
+                            "per_page": {
+                                "type": "integer"
+                            },
+                            "current_page": {
+                                "type": "integer"
+                            },
+                            "last_page": {
+                                "type": "integer"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
             }
         },
         "responses": {
@@ -857,6 +1393,10 @@
         {
             "name": "Roles",
             "description": "API endpoints for managing roles"
+        },
+        {
+            "name": "Users",
+            "description": "API endpoints for managing users"
         }
     ]
 }
