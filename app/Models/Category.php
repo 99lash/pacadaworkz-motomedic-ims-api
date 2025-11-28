@@ -18,7 +18,7 @@ class Category extends Model
 
   
 //Entity Reletionship to the products
-    public function products():  HasMany
+    public function products():HasMany
     {
         return $this->hasMany(Product::class);
     }

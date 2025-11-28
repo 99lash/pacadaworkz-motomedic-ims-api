@@ -42,7 +42,7 @@ class Product extends Model
     }
    
     //Entity Relationship to the Category
-    public function categories():BelongsTo
+    public function category():BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
