@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\RolesPermissionRequest; 
 use App\Services\RolePermissionService; 
 use App\Http\Resources\RolePermissionResource;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class RolePermissionController extends Controller
 {
@@ -29,13 +30,6 @@ class RolePermissionController extends Controller
         try {
             $result = $this->rolePermissionService->assignPermissions($id, $request->permissions);
 
-            if (!$result['success']) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $result['message']
-                ], 404);
-            }
-
             $permissionsResource = RolePermissionResource::collection($result['permissions']);
 
             return response()->json([
@@ -46,6 +40,11 @@ class RolePermissionController extends Controller
                     'permissions' => $permissionsResource
                 ]
             ], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Role not found'
+            ], 404);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
