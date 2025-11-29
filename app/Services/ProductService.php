@@ -15,7 +15,7 @@ class ProductService{
      $query->where('name','Ilike',"%{$search}%")->orWhere('description','Ilike',"%{$search}%")->orWhere('sku','Ilike',"%{$search}%");
     else if($filter)
  $query->join('categories', 'categories.id', '=', 'products.category_id')->join('brands','brands.id','=','products.brand_id')
-      ->where('categories.name', 'ILIKE', "%{$filter}%")->orwhere('brands.name','ILike','%{%filter}%');
+->where('categories.name', 'ILIKE', "%{$filter}%")->orwhere('brands.name','ILike',"%{$filter}%");
 
     
 
@@ -46,5 +46,26 @@ class ProductService{
      
    }
 
+
+
+//update product
+   public function update(array $data, $id){
+     
+      $product = Product::findOrFail($id);
+
+      $product->update($data);
+
+       return $product;
+
+   }
+
+//delete product
+   public function delete($id)
+   {
+     
+      $product = Product::findOrFail($id);
+       
+      return $product->delete();
+   }
 
 }

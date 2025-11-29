@@ -68,7 +68,7 @@ class ProductController
       }catch(ModelNotFoundException $e){
         return response()->json([
                 'success' => false,
-                'message' => 'Role not found'
+                'message' => 'Product not found'
             ], 404);
       }catch(\Exception $e){
                  return response()->json([
@@ -101,7 +101,7 @@ class ProductController
       }catch(ModelNotFoundException $e){
         return response()->json([
                 'success' => false,
-                'message' => 'Role not found'
+                'message' => 'Product not found'
             ], 404);
       }catch(\Exception $e){
                  return response()->json([
@@ -111,5 +111,71 @@ class ProductController
 
       }
       }
+
+
+
+//update product
+      public function update(ProductRequest $request, $id){
+     
+              
+      try{
+         
+
+         $result = $this->productService->update($request->validated(),$id);
+
+         return response()->json([
+           'success'  => true,
+            'data' => new ProductResource($result)
+         ] 
+         );
+
+      }catch(ModelNotFoundException $e){
+        return response()->json([
+                'success' => false,
+                'message' => 'Product not found'
+            ], 404);
+      }catch(\Exception $e){
+                 return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+
+      }
+
+      }
+
+
+//delete product 
+      
+
+public function destroy($id){
+
+         
+      try{
+       
+         $result = $this->productService->delete($id);
+
+           return response()->json([
+                'success' => true,
+                'data' => [
+                    'message' => 'Product deleted successfully']
+                ]);
+
+
+      }catch(ModelNotFoundException $e){
+        return response()->json([
+                'success' => false,
+                'message' => 'Product not found'
+            ], 404);
+      }catch(\Exception $e){
+                 return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+
+      }
+}
+
+
 
 }

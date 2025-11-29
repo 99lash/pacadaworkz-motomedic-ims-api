@@ -64,7 +64,7 @@ Route::middleware(['auth:api','role:superadmin'])->group(
     Route::get('v1/products/{id}',[ProductController::class,'show']);
     Route::post('v1/products',[ProductController::class,'store']);
     Route::put('v1/products/{id}',[ProductController::class,'update']);
-    Route::delete('v1/products/{id}',[ProductController::class,'delete']);
+    Route::delete('v1/products/{id}',[ProductController::class,'destroy']);
 
     
   });
