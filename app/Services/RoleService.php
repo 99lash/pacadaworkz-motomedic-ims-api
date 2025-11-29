@@ -11,7 +11,7 @@ class RoleService{
    
     public function getRoleById($id){
         
-        return Role::find($id);
+        return Role::findOrFail($id);
     }
    
    
@@ -27,14 +27,9 @@ class RoleService{
 
     public function update(array $data,$id){
      
-        $role = Role::find($id);
-        if (!$role) {
-            return null;
-        }
+        $role = Role::findOrFail($id);
         
-        $role->description = $data['description'];
-        
-        $role->save();
+        $role->update($data);
 
         return $role;
     }
@@ -43,10 +38,7 @@ class RoleService{
 
     public function delete($id)
     {
-       $role = Role::find($id);
-       if (!$role) {
-           return false;
-       }
+       $role = Role::findOrFail($id);
        
        return $role->delete();
     }

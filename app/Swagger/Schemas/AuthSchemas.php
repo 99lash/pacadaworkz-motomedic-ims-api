@@ -100,6 +100,12 @@ namespace App\Swagger\Schemas;
  *     @OA\Property(property="success", type="boolean", example=true),
  *     @OA\Property(property="data", ref="#/components/schemas/User")
  * )
+ *
+ * @OA\Response(
+ *      response="UnprocessableEntity",
+ *      description="Unprocessable Entity",
+ *      @OA\JsonContent(ref="#/components/schemas/WrappedErrorResponse")
+ * )
  */
 class AuthSchemas
 {
