@@ -18,7 +18,7 @@ class ProductController
       $this->productService = $productService;
    }
 
-   
+   //get all products
    public function index(Request $request){
      
     try{
@@ -41,7 +41,7 @@ class ProductController
          return response()->json([
                 'success' => false,
                 'message' => $e->getMessage()
-            ], 401);
+            ], 500);
 
 
     }
@@ -50,5 +50,66 @@ class ProductController
    }
   
 
+   //get product by id
+
+   public function show($id){
+
+
+      try{
+       
+         $result = $this->productService->getProductById($id);
+
+         return response()->json([
+           'success'  => true,
+            'data' => new ProductResource($result)
+         ] 
+         );
+
+      }catch(ModelNotFoundException $e){
+        return response()->json([
+                'success' => false,
+                'message' => 'Role not found'
+            ], 404);
+      }catch(\Exception $e){
+                 return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+
+      }
+
+
+
+   }
+
+
+   //store product
+
+      public function store(ProductRequest $request){
+
+         
+      try{
+       
+         $result = $this->productService->create($request->validated());
+
+         return response()->json([
+           'success'  => true,
+            'data' => new ProductResource($result)
+         ] 
+         );
+
+      }catch(ModelNotFoundException $e){
+        return response()->json([
+                'success' => false,
+                'message' => 'Role not found'
+            ], 404);
+      }catch(\Exception $e){
+                 return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+
+      }
+      }
 
 }

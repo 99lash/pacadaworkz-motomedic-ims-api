@@ -4,6 +4,9 @@ use App\Models\Product;
 
 class ProductService{
 
+
+
+  //get all products
   public function getAllProducts($search = null,$filter = null){
     
     $query = Product::query();
@@ -18,6 +21,30 @@ class ProductService{
 
       return $query->paginate(10)->withQueryString();
   }
+  
+ //get products by if
+  public function getProductById($id){
+
+     return Product::findOrFail($id);
+  }
+
+
+
+  // create  products
+   public function create(array $data){
+       
+     return Product::create([
+      'category_id' => $data['category_id'],
+      'brand_id' => $data['brand_id'],
+       'sku' => $data['sku'],
+       'name' => $data['name'],
+       'description' => $data['description'] ?? null,
+       'unit_price' => $data['unit_price'],
+       'cost_price' => $data['cost_price'],
+      'reorder_level' =>$data['reoder_level'] ?? 10,
+     ]);
+     
+   }
 
 
 }
