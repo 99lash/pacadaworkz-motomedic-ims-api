@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\AttributeResource;
 use App\Http\Requests\AttributeRequest;
+use App\Http\Resources\AttributesValueResource;
+use App\Http\Requests\AttributesValueRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class AttributeController
@@ -141,5 +143,33 @@ class AttributeController
             ], 500);
 
       }
+      }
+
+
+
+      //store AttributsValue
+      public function storeAttributesValue(AttributesValueRequest $request,$id){
+            try{
+             $result = $this->attributeService->createAttributesValue($request->validated(),$id);
+            
+        return response()->json([
+            'success' => true,
+            'data' => new AttributesValueResource($result)
+            ], 201);
+
+            }catch(ModelNotFoundException $e){
+
+                   return response()->json([
+                'success' => false,
+                'message' => 'Attribute not found'
+            ], 404);
+
+
+            }catch(\Exception $e){
+                       return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+            }
       }
 }

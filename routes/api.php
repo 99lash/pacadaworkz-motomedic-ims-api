@@ -107,7 +107,7 @@ Route::middleware(['auth:api','role:superadmin'])->group(
     Route::post('v1/attributes',[AttributeController::class,'store']);
     Route::put('v1/attributes/{id}',[AttributeController::class,'update']);
     Route::delete('v1/attributes/{id}',[AttributeController::class,'destroy']);
-
+    Route::post('v1/attributes/{id}/values',[AttributeController::class,'storeAttributesValue']);
   }
 );
 

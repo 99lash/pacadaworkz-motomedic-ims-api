@@ -4,9 +4,8 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Http\Resources\AttributesValueResource; // Import AttributesValueResource
 
-class AttributeResource extends JsonResource
+class AttributesValueResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,8 +16,8 @@ class AttributeResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' =>$this->name ,
-            'attribute_values' => AttributesValueResource::collection($this->attribute_values) 
+             'attribute' => $this->attribute->name,
+             'value' => $this->value
         ];
     }
 }
