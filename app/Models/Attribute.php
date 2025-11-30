@@ -18,7 +18,7 @@ class Attribute extends Model
       //Entity Reletionship to the attribute values
       public function attribute_values(): HasMany
     {
-        return $this->hasMany(AttributeValue::class);
+        return $this->hasMany(AttributesValue::class);
     }
     
 }
