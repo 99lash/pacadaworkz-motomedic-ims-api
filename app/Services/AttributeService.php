@@ -38,4 +38,14 @@ class AttributeService{
 
     }
 
+
+//update attribute
+  public function update(array $data,$id){
+      $attribute = Attribute::findOrFail($id);
+
+      $attribute->update($data);
+      return $attribute;
+  } 
+  
+
 }

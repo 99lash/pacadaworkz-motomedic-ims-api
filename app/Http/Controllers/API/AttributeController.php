@@ -54,6 +54,12 @@ class AttributeController
                 'data' => new AttributeResource($result)
             ]);
 
+        }catch(ModelNotFoundException $e){
+             return response()->json([
+                'success' => false,
+                'message' => 'Attribute not found'
+            ], 404);
+
         }catch(\Exception $e){
                return response()->json([
                 'success' => false,
@@ -84,7 +90,29 @@ class AttributeController
     }
     }
 
+ 
+    // update attribute
+      public function update(AttributeRequest $request,$id){
 
-    
+         try{
+            $result = $this->attributeService->update($request->validated(),$id);
+           
+            return response()->json([
+                'success' => true,
+                'data' => new AttributeResource($result)
+            ]);
+        }catch(ModelNotFoundException $e){
+                 return response()->json([
+                'success' => false,
+                'message' => 'Attribute not found.'
+            ], 404);   
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+      }
+
 
 }
