@@ -72,7 +72,7 @@ class Product extends Model
 //Entity Reletionship to the attribute_values
     public function attribute_values():BelongsToMany
     {
-       return $this->belongsToMany(AttributeValue::class,'product_attributes')
+       return $this->belongsToMany(AttributesValue::class,'product_attributes')
         ->using(ProductAttribute::class) //the pivot model
         ->withTimestamps() //for created at and updated at
         ->withPivot('deleted_at'); //for deletion

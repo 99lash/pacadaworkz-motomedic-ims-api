@@ -1195,6 +1195,51 @@
                         "name": "role",
                         "in": "path",
                         "description": "Role id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Permissions to assign",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RolePermissionRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WrappedRolePermissionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/UnprocessableEntity"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/users": {
             "get": {
                 "tags": [
@@ -1499,13 +1544,11 @@
                     }
                 ],
                 "requestBody": {
-                    "description": "Permissions to assign",
                     "description": "Password reset data",
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RolePermissionRequest"
                                 "$ref": "#/components/schemas/ResetPasswordUserRequest"
                             }
                         }
@@ -1513,11 +1556,6 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/WrappedRolePermissionResponse"
                         "description": "Password reset successfully",
                         "content": {
                             "application/json": {
@@ -1534,7 +1572,6 @@
                         "$ref": "#/components/responses/NotFound"
                     },
                     "422": {
-                        "$ref": "#/components/responses/UnprocessableEntity"
                         "description": "Validation error",
                         "content": {
                             "application/json": {
@@ -2472,6 +2509,10 @@
         {
             "name": "RolePermissions",
             "description": "API endpoints for RolePermissions"
+        },
+        {
+            "name": "Users",
+            "description": "API endpoints for managing users"
         }
     ]
 }

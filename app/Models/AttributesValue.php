@@ -20,7 +20,7 @@ class AttributesValue extends Model
 
 
       //Entity Reletionship to the Attributes
-     public function attributes(): BelongsTo
+     public function attribute(): BelongsTo
     {
         return $this->belongsTo(Attribute::class);
     }
