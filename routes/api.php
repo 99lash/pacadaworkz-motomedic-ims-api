@@ -10,6 +10,7 @@ use App\Http\Controllers\API\RolePermissionController;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\BrandController;
 use App\Http\Controllers\API\ProductController;
+use App\Http\Controllers\API\AttributeController;
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');
@@ -96,6 +97,24 @@ Route::middleware(['auth:api','role:superadmin'])->group(
 
     
   });
+
+
+
+Route::middleware(['auth:api','role:superadmin'])->group(
+  function(){
+    Route::get('v1/attributes',[AttributeController::class,'index']);
+    Route::get('v1/attributes/{id}',[AttributeController::class,'show']);
+    Route::post('v1/attributes',[AttributeController::class,'store']);
+    Route::put('v1/attributes/{id}',[AttributeController::class,'update']);
+    Route::delete('v1/attributes/{id}',[AttributeController::class,'destroy']);
+
+  }
+);
+
+
+
+
+
 // Route::fallback(function () {
 //     return response()->json([
 //         'success' => false,

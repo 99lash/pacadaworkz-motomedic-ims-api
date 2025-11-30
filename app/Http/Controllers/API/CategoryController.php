@@ -38,7 +38,7 @@ class CategoryController extends Controller
        }
 
     }
-
+//store category
     public function store(CategoryRequest $request)
     {
         try {
@@ -57,7 +57,7 @@ class CategoryController extends Controller
     }
     }
 
-   
+   //show category by id
     public function show($id){
         
 
@@ -77,7 +77,7 @@ class CategoryController extends Controller
     }
 
 
-
+//update category by id
     public function update($id, CategoryRequest $request)
     {
         try{
