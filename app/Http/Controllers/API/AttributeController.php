@@ -114,5 +114,32 @@ class AttributeController
         }
       }
 
+    
 
+      //destroy attribute
+      public function destroy($id){
+              try{
+       
+         $result = $this->attributeService->delete($id);
+
+           return response()->json([
+                'success' => true,
+                'data' => [
+                    'message' => 'Attribute deleted successfully']
+                ]);
+
+
+      }catch(ModelNotFoundException $e){
+        return response()->json([
+                'success' => false,
+                'message' => 'Attribute not found'
+            ], 404);
+      }catch(\Exception $e){
+                 return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+
+      }
+      }
 }

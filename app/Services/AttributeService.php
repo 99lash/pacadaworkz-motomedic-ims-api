@@ -48,4 +48,11 @@ class AttributeService{
   } 
   
 
+  //delete attribute
+   public function delete($id){
+        $attribute = Attribute::findOrFail($id);
+        $attribute->delete($attribute);
+
+   }
+
 }
