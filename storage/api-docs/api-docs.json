@@ -1154,6 +1154,85 @@
                 ]
             }
         },
+        "/api/v1/products/{id}/attributeValueId/{attributeValueId}": {
+            "delete": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Delete existing product attribute",
+                "description": "Deletes a product attribute record and returns a success message",
+                "operationId": "deleteProductAttribute",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Product id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "attributeValueId",
+                        "in": "path",
+                        "description": "Attribute Value id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WrappedMessageResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/products/export": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Export products to CSV file",
+                "description": "Returns a CSV file with all products",
+                "operationId": "exportProducts",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "text/csv": {}
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/roles": {
             "get": {
                 "tags": [

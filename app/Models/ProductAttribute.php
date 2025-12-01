@@ -15,16 +15,15 @@ class ProductAttribute extends Model
 
 // fillable is for mass assigment (allowed na ifill up)
       protected $fillable = [
-        'attribute_id',
         'attribute_value_id',
         'product_id'
     ];
 
 
-     public function attribute(): BelongsTo
-    {
-        return $this->belongsTo(Attribute::class);
-    }
+    //  public function attribute(): BelongsTo
+    // {
+    //     return $this->belongsTo(Attribute::class);
+    // }
 
     public function product(): BelongsTo
     {

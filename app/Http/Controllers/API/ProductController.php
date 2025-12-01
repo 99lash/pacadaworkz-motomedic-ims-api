@@ -6,8 +6,11 @@ use App\Services\ProductService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\ProductResource;
+use App\Http\Resources\ProductAttributeResource;
 use App\Http\Requests\ProductRequest;
+use App\Http\Requests\ProductAttributeRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 class ProductController
 {
 
@@ -177,5 +180,100 @@ public function destroy($id){
 }
 
 
+//store attribute to the product
+    public function storeAttribute(ProductAttributeRequest $request,$id,$attributeId){
+        
 
+         try{
+       
+         $result = $this->productService->createAttributeProduct($request->validated(),$id,$attributeId);
+
+           return response()->json([
+                'success' => true,
+                'data' => [
+                    'message' => new ProductAttributeResource($result)
+                    
+                ]
+                ]);
+
+
+      }catch(ModelNotFoundException $e){
+        return response()->json([
+                'success' => false,
+                'message' => 'Attribute/Product not found'
+            ], 404);
+      }catch(\Exception $e){
+                 return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+
+      }
+      
+    }
+
+
+
+    //delete attribute to the product 
+        public function destroyAttributeProduct($id,$attributeProductId){
+                try{
+       
+         $result = $this->productService->deleteAttributeProduct($id,$attributeProductId);
+
+           return response()->json([
+                'success' => true,
+                'data' => [
+                    'message' => 'Product deleted successfully']
+                ]);
+
+
+      }catch(ModelNotFoundException $e){
+        return response()->json([
+                'success' => false,
+                'message' => 'Product not found'
+            ], 404);
+      }catch(\Exception $e){
+                 return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+
+      }
+        }
+
+        //export as csv
+    public function export(){
+        $products = $this->productService->getProductsForExport();
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="products.csv"',
+        ];
+
+        $callback = function() use ($products) {
+            $file = fopen('php://output', 'w');
+            
+            // Add CSV headers
+            fputcsv($file, ['ID', 'SKU', 'Name', 'Category', 'Brand', 'Unit Price', 'Cost Price', 'Description']);
+
+            // Add data rows
+            foreach ($products as $product) {
+                fputcsv($file, [
+                    $product->id,
+                    $product->sku,
+                    $product->name,
+                    $product->category ? $product->category->name : '',
+                    $product->brand ? $product->brand->name : '',
+                    $product->unit_price,
+                    $product->cost_price,
+                    $product->description,
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return new StreamedResponse($callback, 200, $headers);
+   }
+       
 }

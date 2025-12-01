@@ -159,4 +159,61 @@ class ProductEndpoints
      * )
      */
     public function destroy() {}
+
+    /**
+     * @OA\Delete(
+     *      path="/api/v1/products/{id}/attributeValueId/{attributeValueId}",
+     *      operationId="deleteProductAttribute",
+     *      tags={"Products"},
+     *      summary="Delete existing product attribute",
+     *      description="Deletes a product attribute record and returns a success message",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Product id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="attributeValueId",
+     *          description="Attribute Value id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/WrappedMessageResponse")
+     *      ),
+     *      @OA\Response(response="401", ref="#/components/responses/Unauthorized"),
+     *      @OA\Response(response="404", ref="#/components/responses/NotFound")
+     * )
+     */
+    public function destroyAttributeProduct() {}
+
+    /**
+     * @OA\Get(
+     *      path="/api/v1/products/export",
+     *      operationId="exportProducts",
+     *      tags={"Products"},
+     *      summary="Export products to CSV file",
+     *      description="Returns a CSV file with all products",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\MediaType(
+     *              mediaType="text/csv",
+     *          )
+     *      ),
+     *      @OA\Response(response="401", ref="#/components/responses/Unauthorized")
+     * )
+     */
+    public function export() {}
 }
