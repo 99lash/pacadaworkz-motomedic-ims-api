@@ -6,7 +6,9 @@ use App\Services\ProductService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\ProductResource;
+use App\Http\Resources\ProductAttributeResource;
 use App\Http\Requests\ProductRequest;
+use App\Http\Requests\ProductAttributeRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 class ProductController
 {
@@ -177,5 +179,36 @@ public function destroy($id){
 }
 
 
+//store attribute to the product
+    public function storeAttribute(ProductAttributeRequest $request,$id,$attributeId){
+        
+
+         try{
+       
+         $result = $this->productService->createAttributeProduct($request->validated(),$id,$attributeId);
+
+           return response()->json([
+                'success' => true,
+                'data' => [
+                    'message' => new ProductAttributeResource($result)
+                    
+                ]
+                ]);
+
+
+      }catch(ModelNotFoundException $e){
+        return response()->json([
+                'success' => false,
+                'message' => 'Attribute/Product not found'
+            ], 404);
+      }catch(\Exception $e){
+                 return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+
+      }
+      
+    }
 
 }

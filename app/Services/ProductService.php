@@ -1,7 +1,8 @@
 <?php
 namespace App\Services;
 use App\Models\Product;
-
+use App\Models\Attribute;
+use App\Models\ProductAttribute;
 class ProductService{
 
 
@@ -67,5 +68,24 @@ class ProductService{
        
       return $product->delete();
    }
+
+
+   //create attribute in product
+
+     public function createAttributeProduct(array $data,$id,$attributeId){
+       
+      $attribute = Attribute::findOrFail($attributeId);
+      if(!$attribute)
+         return $attribute;
+   
+      
+
+      return ProductAttribute::updateOrCreate(
+          ['product_id' => $id, 'attribute_value_id' => $data['attribute_value_id']],
+          ['product_id' => $id, 'attribute_value_id' => $data['attribute_value_id']]
+      );
+      
+      
+     }
 
 }
