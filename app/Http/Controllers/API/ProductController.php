@@ -211,4 +211,33 @@ public function destroy($id){
       
     }
 
+
+
+    //delete attribute to the product 
+        public function destroyAttributeProduct($id,$attributeProductId){
+                try{
+       
+         $result = $this->productService->deleteAttributeProduct($id,$attributeProductId);
+
+           return response()->json([
+                'success' => true,
+                'data' => [
+                    'message' => 'Product deleted successfully']
+                ]);
+
+
+      }catch(ModelNotFoundException $e){
+        return response()->json([
+                'success' => false,
+                'message' => 'Product not found'
+            ], 404);
+      }catch(\Exception $e){
+                 return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+
+      }
+        }
+       
 }

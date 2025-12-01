@@ -94,8 +94,8 @@ Route::middleware(['auth:api','role:superadmin'])->group(
     Route::post('v1/products',[ProductController::class,'store']);
     Route::put('v1/products/{id}',[ProductController::class,'update']);
     Route::delete('v1/products/{id}',[ProductController::class,'destroy']);
-    Route::post('v1/products/{id}/attributes/{attribute_id}',[ProductController::class,'storeAttribute']);
-    
+    Route::post('v1/products/{id}/attributes/{attributeId}',[ProductController::class,'storeAttribute']);
+       Route::delete('v1/products/{id}/attributeValueId/{attributeProductId}',[ProductController::class,'destroyAttributeProduct']);
   });
 
 
@@ -107,7 +107,7 @@ Route::middleware(['auth:api','role:superadmin'])->group(
     Route::post('v1/attributes',[AttributeController::class,'store']);
     Route::put('v1/attributes/{id}',[AttributeController::class,'update']);
     Route::delete('v1/attributes/{id}',[AttributeController::class,'destroy']);
-    Route::post('v1/attributes/{id}/values/{attributeId}',[AttributeController::class,'storeAttributesValue']);
+    Route::post('v1/attributes/{id}/values',[AttributeController::class,'storeAttributesValue']);
   }
 );
 

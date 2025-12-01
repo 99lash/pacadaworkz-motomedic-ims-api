@@ -88,4 +88,15 @@ class ProductService{
       
      }
 
+
+     //delete Attribute product
+
+     public function deleteAttributeProduct($id,$attributeValueId){
+          
+        return ProductAttribute::where('product_id', $id)
+                                ->where('attribute_value_id', $attributeValueId)
+                                ->delete();
+
+     }
+
 }
