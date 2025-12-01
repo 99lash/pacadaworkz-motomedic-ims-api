@@ -10,6 +10,7 @@ use App\Http\Resources\ProductAttributeResource;
 use App\Http\Requests\ProductRequest;
 use App\Http\Requests\ProductAttributeRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 class ProductController
 {
 
@@ -239,5 +240,40 @@ public function destroy($id){
 
       }
         }
+
+        //export as csv
+    public function export(){
+        $products = $this->productService->getProductsForExport();
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="products.csv"',
+        ];
+
+        $callback = function() use ($products) {
+            $file = fopen('php://output', 'w');
+            
+            // Add CSV headers
+            fputcsv($file, ['ID', 'SKU', 'Name', 'Category', 'Brand', 'Unit Price', 'Cost Price', 'Description']);
+
+            // Add data rows
+            foreach ($products as $product) {
+                fputcsv($file, [
+                    $product->id,
+                    $product->sku,
+                    $product->name,
+                    $product->category ? $product->category->name : '',
+                    $product->brand ? $product->brand->name : '',
+                    $product->unit_price,
+                    $product->cost_price,
+                    $product->description,
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return new StreamedResponse($callback, 200, $headers);
+   }
        
 }

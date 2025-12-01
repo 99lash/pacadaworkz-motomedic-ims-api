@@ -89,6 +89,12 @@ class ProductService{
      }
 
 
+   //get all products for export
+   public function getProductsForExport(){
+       return Product::with(['category', 'brand'])->get();
+   }
+
+
      //delete Attribute product
 
      public function deleteAttributeProduct($id,$attributeValueId){
