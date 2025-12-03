@@ -21,8 +21,10 @@ use App\Http\Controllers\GoogleAuthController;
 
 // Public routes
 // Route::get('/test', [AuthController::class, 'test']);
-Route::post('/v1/auth/login', [AuthController::class, 'login']);
-Route::post('/v1/auth/login/google',[GoogleAuthController::class, 'login']);
+Route::middleware('guest.api')->group(function () {
+    Route::post('/v1/auth/login', [AuthController::class, 'login']);
+    Route::post('/v1/auth/login/google', [GoogleAuthController::class, 'login']);
+});
 
 Route::middleware('auth:api')->group(function () {
     // Authentication endpoints

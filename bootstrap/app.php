@@ -2,11 +2,14 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Application;
-use App\Http\Middleware\ForceJsonResponseMiddleware;
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
+use App\Http\Middleware\ForceJsonResponseMiddleware;
+use Illuminate\Auth\AuthenticationException;
+use App\Http\Middleware\RejectIfAuthenticatedMiddleware;
+use App\Http\Middleware\RoleMiddleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -17,6 +20,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append(ForceJsonResponseMiddleware::class);
+        $middleware->alias([
+            'role' => RoleMiddleware::class,
+            'guest.api' => RejectIfAuthenticatedMiddleware::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (AuthenticationException $e, Request $request) {
