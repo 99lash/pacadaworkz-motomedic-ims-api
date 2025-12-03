@@ -20,6 +20,7 @@ class UserResource extends JsonResource
         return [
             'id' => $this->id,
             'role_id' => $this->role_id,
+            'role' => $this->role->role_name, // Add role name for frontend
             'name' => $this->name,
             'email' => $this->email,
             'first_name' => $this->first_name,

@@ -3,84 +3,108 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\API\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Resources\Auth\LoginResource;
+use App\Http\Resources\Auth\RefreshTokenResource;
+use App\Http\Resources\UserResource;
 use App\Services\AuthService;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Http\JsonResponse;
 
 class AuthController extends Controller
 {
-    protected $authService;
+    public function __construct(
+        protected AuthService $authService
+    ) {}
 
-    public function __construct(AuthService $authService)
-    {
-        $this->authService = $authService;
-    }
-
-    public function login(Request $request)
+    /**
+     * Login user and return tokens
+     *
+     * @param LoginRequest $request
+     * @return JsonResponse
+     */
+    public function login(LoginRequest $request): JsonResponse
     {
         try {
-            $credentials = $request->only('email', 'password');
+            $credentials = $request->validated();
             $tokens = $this->authService->login($credentials);
 
             return response()->json([
-                "success" => true,
-                "data" => [
-                    "access_token" => $tokens["access_token"],
-                    "expires_in" => auth('api')->factory()->getTTL() * 60,
-                    "token_type" => "bearer",
-                    "refresh_token" => $tokens["refresh_token"]
-                ]
-            ]);
-        } catch (\Exception $e) {
+                'success' => true,
+                'data' => new LoginResource($tokens),
+            ], 200);
+        } catch (AuthenticationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 401);
         }
     }
 
-    public function refresh()
+    /**
+     * Refresh access token
+     *
+     * @return JsonResponse
+     */
+    public function refresh(): JsonResponse
     {
         try {
-            $refresh = $this->authService->refresh();
-            return response()->json($refresh);
-        } catch (\Exception $e) {
+            $tokens = $this->authService->refresh();
+
+            return response()->json([
+                'success' => true,
+                'data' => new RefreshTokenResource($tokens),
+            ], 200);
+        } catch (AuthenticationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 401);
         }
     }
 
-    public function logout(Request $request)
+    /**
+     * Logout user
+     *
+     * @return JsonResponse
+     */
+    public function logout(): JsonResponse
     {
         try {
             $this->authService->logout();
+
             return response()->json([
-                "success" => true,
-                "data" => [
-                    "message" => "Successfully logged out"
-                ]
-            ]);
-        } catch (\Exception $e) {
+                'success' => true,
+                'data' => [
+                    'message' => 'Successfully logged out',
+                ],
+            ], 200);
+        } catch (AuthenticationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
+                'message' => $e->getMessage(),
+            ], 401);
         }
     }
 
-    public function me()
+    /**
+     * Get authenticated user
+     *
+     * @return JsonResponse
+     */
+    public function me(): JsonResponse
     {
         try {
-            $me = $this->authService->me();
+            $user = $this->authService->me();
+
             return response()->json([
-                "success" => true,
-                "data" => $me
-            ]);
-        } catch (\Exception $e) {
+                'success' => true,
+                'data' => new UserResource($user),
+            ], 200);
+        } catch (AuthenticationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 401);
         }
     }

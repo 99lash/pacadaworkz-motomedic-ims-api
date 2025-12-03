@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Application;
 use App\Http\Middleware\ForceJsonResponse;
+use App\Http\Middleware\HandleCors;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -16,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->append(HandleCors::class);
         $middleware->append(ForceJsonResponse::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
