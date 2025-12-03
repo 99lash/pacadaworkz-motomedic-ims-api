@@ -11,6 +11,8 @@ use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\BrandController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\AttributeController;
+use App\Http\Controllers\GoogleAuthController;
+
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');
@@ -18,8 +20,9 @@ use App\Http\Controllers\API\AttributeController;
 //auth
 
 // Public routes
-Route::post('v1/auth/login', [AuthController::class, 'login']);
 // Route::get('/test', [AuthController::class, 'test']);
+Route::post('/v1/auth/login', [AuthController::class, 'login']);
+Route::post('/v1/auth/login/google',[GoogleAuthController::class, 'login']);
 
 Route::middleware('auth:api')->group(function () {
     // Authentication endpoints
@@ -61,7 +64,7 @@ Route::middleware(['auth:api','role:superadmin'])->group(function () {
   Route::delete('v1/roles/{id}',[RoleController::class,'destroy']);
   Route::get('v1/permissions',[PermissionController::class,'index']);
   Route::post('v1/roles/{role}/permissions',[RolePermissionController::class,'assignPermissions']);
-  
+
 });
 
 
