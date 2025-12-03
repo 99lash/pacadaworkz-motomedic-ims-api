@@ -26,11 +26,13 @@ class Role extends Model
     }
 
     //Entity Reletionship to the permissions via role_permissions
-    public function permissions():BelongsToMany
-    {
-        return $this->belongsToMany(Permission::class,'role_permissions')
-        ->using(RolePermission::class) //the pivot model
-        ->withTimestamps() //for created at and updated at
-        ->withPivot('deleted_at'); //for deletion
-    }
+  public function permissions(): BelongsToMany
+{
+    return $this->belongsToMany(Permission::class, 'role_permissions')
+        ->using(RolePermission::class)
+        ->withTimestamps()
+        ->withPivot('deleted_at')
+        ->wherePivotNull('deleted_at'); 
+}
+
 }

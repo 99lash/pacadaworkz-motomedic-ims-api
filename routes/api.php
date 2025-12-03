@@ -87,16 +87,16 @@ Route::middleware(['auth:api','role:superadmin'])->group(function(){
 
 
 //api for products
-Route::middleware(['auth:api','role:superadmin'])->group(
+Route::middleware(['auth:api','role:superadmin','modules:Products'])->group(
   function(){
     Route::get('v1/products/export', [ProductController::class, 'export']);
-    Route::get('v1/products',[ProductController::class,'index']);
+    Route::get('v1/products',[ProductController::class,'index'])->middleware('permissions:View');
     Route::get('v1/products/{id}',[ProductController::class,'show']);
     Route::post('v1/products',[ProductController::class,'store']);
     Route::put('v1/products/{id}',[ProductController::class,'update']);
     Route::delete('v1/products/{id}',[ProductController::class,'destroy']);
     Route::post('v1/products/{id}/attributes/{attributeId}',[ProductController::class,'storeAttribute']);
-       Route::delete('v1/products/{id}/attributeValueId/{attributeProductId}',[ProductController::class,'destroyAttributeProduct']);
+     Route::delete('v1/products/{id}/attributeValueId/{attributeProductId}',[ProductController::class,'destroyAttributeProduct']);
   });
 
 
