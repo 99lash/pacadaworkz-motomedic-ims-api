@@ -22,6 +22,7 @@ class GoogleAuthController
     {
         $validated = $request->validated();
         try {
+            // $validated['credential'] ay yung `id_token` from the frontend which is response from google-oauth
             $result = $this->googleAuthService->authenticate($validated['credential']);
             return response()->json([
                 'success' => true,
