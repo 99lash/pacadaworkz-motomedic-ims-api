@@ -10,7 +10,7 @@ use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\BrandController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\AttributeController;
-
+use App\Http\Controllers\API\InventoryController;
 Route::prefix('v1')->group(function () {
     // Public routes
     Route::post('auth/login', [AuthController::class, 'login']);
@@ -107,7 +107,7 @@ Route::prefix('v1')->group(function () {
         });
         
         // Products
-        Route::middleware('modules:Products')->prefix('products')->group(function() {
+        Route::prefix('products')->group(function() {
 
                  Route::middleware('modules:Products')->group(function(){
                  Route::get('/', [ProductController::class,'index'])->middleware('permissions:View');
@@ -122,5 +122,17 @@ Route::prefix('v1')->group(function () {
             Route::post('/{id}/attributes/{attributeId}',[ProductController::class,'storeAttribute']);
             Route::delete('/{id}/attributeValueId/{attributeProductId}',[ProductController::class,'destroyAttributeProduct']);
         });
+
+        //inventory 
+         Route::prefix('inventory')->group(function(){
+              Route::get('/', [InventoryController::class,'index']);
+         });
     });
+
+        //suppliers
+       Route::prefix('suppliers')->group(function(){
+        
+       });
+
+      
 });
