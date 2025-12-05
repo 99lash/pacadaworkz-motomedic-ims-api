@@ -11,6 +11,7 @@ use App\Http\Controllers\API\BrandController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\AttributeController;
 use App\Http\Controllers\API\InventoryController;
+use App\Http\Controllers\API\SupplierController;
 Route::prefix('v1')->group(function () {
     // Public routes
     Route::post('auth/login', [AuthController::class, 'login']);
@@ -131,7 +132,14 @@ Route::prefix('v1')->group(function () {
 
         //suppliers
        Route::prefix('suppliers')->group(function(){
-        
+            // suppliers module middleware
+            Route::middleware('modules:Suppliers')->group(function(){
+                Route::get('/', [SupplierController::class,'index'])->middleware('permissions:View');
+                Route::post('/', [SupplierController::class,'store'])->middleware('permissions:Create');
+                Route::get('/{supplier}', [SupplierController::class,'show'])->middleware('permissions:View');
+                Route::patch('/{supplier}', [SupplierController::class,'update'])->middleware('permissions:Edit');
+                Route::delete('/{supplier}', [SupplierController::class,'destroy'])->middleware('permissions:Delete');
+            });
        });
 
       
