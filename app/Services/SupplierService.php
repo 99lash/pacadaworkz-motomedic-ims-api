@@ -16,9 +16,9 @@ class SupplierService
         return Supplier::create($data);
     }
 
-    public function getSupplierById(Supplier $supplier)
+    public function getSupplierById($id)
     {
-        return $supplier;
+        return Supplier::findOrfail($id);
     }
 
     public function updateSupplier(Supplier $supplier, array $data)
@@ -27,8 +27,9 @@ class SupplierService
         return $supplier;
     }
 
-    public function deleteSupplier(Supplier $supplier)
-    {
+    public function deleteSupplier($id)
+    {  
+        $supplier = Supplier::findOrFail($id);
         $supplier->delete();
     }
 }

@@ -8,6 +8,7 @@ use App\Http\Resources\SupplierResource;
 use App\Models\Supplier;
 use App\Services\SupplierService;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class SupplierController extends Controller
 {
@@ -17,84 +18,87 @@ class SupplierController extends Controller
     {
         $this->supplierService = $supplierService;
     }
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Http\JsonResponse
-     */
-    public function index()
+
+      // get all Suppliers
+     function index()
     {
         try {
-            $suppliers = $this->supplierService->getAllSuppliers(); // Calls to a non-existent service method
+            $result = $this->supplierService->getAllSuppliers(); // Calls to a non-existent service method
             return response()->json([
              'success' => true,
-             'data' => SupplierResource::collection($suppliers)
+             'data' => SupplierResource::collection($result),
+             'meta' => [
+            'current_page' => $result->currentPage(),
+            'per_page' => $result->perPage(),
+            'total' => $result->total(),
+            'last_page' => $result->lastPage()
+        ]
             ]); 
         } catch (Exception $e) {
             return response()->json(['message' => 'Failed to retrieve suppliers', 'error' => $e->getMessage()], 500);
         }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\SupplierRequest  $request
-     * @return \App\Http\Resources\SupplierResource|\Illuminate\Http\JsonResponse
-     */
+    //create new Suppliers
     public function store(SupplierRequest $request)
     {
         try {
             $supplier = $this->supplierService->createSupplier($request->validated()); // Calls to a non-existent service method
-            return new SupplierResource($supplier);
+            return response()->json([
+                'success' => true,
+                'data' => new SupplierResource($supplier)
+            ]);
         } catch (Exception $e) {
             return response()->json(['message' => 'Failed to create supplier', 'error' => $e->getMessage()], 500);
         }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Supplier  $supplier
-     * @return \App\Http\Resources\SupplierResource|\Illuminate\Http\JsonResponse
-     */
-    public function show(Supplier $supplier)
+
+    //show specific supplier
+    public function show($id)
     {
         try {
-            $supplier = $this->supplierService->getSupplierById($supplier); // Calls to a non-existent service method
-            return new SupplierResource($supplier);
+            $supplier = $this->supplierService->getSupplierById($id); // Calls to a non-existent service method
+            return response()->json([
+                'success' => true,
+                'data' => new SupplierResource($supplier)
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => 'Supplier not found'], 404);
         } catch (Exception $e) {
             return response()->json(['message' => 'Failed to retrieve supplier', 'error' => $e->getMessage()], 500);
         }
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\SupplierRequest  $request
-     * @param  \App\Models\Supplier  $supplier
-     * @return \App\Http\Resources\SupplierResource|\Illuminate\Http\JsonResponse
-     */
+  
+    //update supplier
     public function update(SupplierRequest $request, Supplier $supplier)
     {
         try {
             $updatedSupplier = $this->supplierService->updateSupplier($supplier, $request->validated()); // Calls to a non-existent service method
-            return new SupplierResource($updatedSupplier);
+            return response()->json([
+                'success' => true,
+                'data' => new SupplierResource($updatedSupplier)
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => 'Supplier not found'], 404);
         } catch (Exception $e) {
             return response()->json(['message' => 'Failed to update supplier', 'error' => $e->getMessage()], 500);
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Supplier  $supplier
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function destroy(Supplier $supplier)
+ 
+    //delete supplier
+    public function destroy($id)
     {
         try {
-            $this->supplierService->deleteSupplier($supplier); // Calls to a non-existent service method
-            return response()->json(['message' => 'Supplier deleted successfully']);
+            $this->supplierService->deleteSupplier($id); // Calls to a non-existent service method
+            return response()->json([
+                'success' => true,
+                'message' => 'Supplier deleted successfully'
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => 'Supplier not found'], 404);
         } catch (Exception $e) {
             return response()->json(['message' => 'Failed to delete supplier', 'error' => $e->getMessage()], 500);
         }

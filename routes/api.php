@@ -137,7 +137,7 @@ Route::prefix('v1')->group(function () {
                 Route::get('/', [SupplierController::class,'index'])->middleware('permissions:View');
                 Route::post('/', [SupplierController::class,'store'])->middleware('permissions:Create');
                 Route::get('/{supplier}', [SupplierController::class,'show'])->middleware('permissions:View');
-                Route::put('/{supplier}', [SupplierController::class,'update'])->middleware('permissions:Edit');
+                Route::patch('/{supplier}', [SupplierController::class,'update'])->middleware('permissions:Edit');
                 Route::delete('/{supplier}', [SupplierController::class,'destroy'])->middleware('permissions:Delete');
             });
        });
