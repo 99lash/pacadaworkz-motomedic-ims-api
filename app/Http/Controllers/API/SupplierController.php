@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\API\Controller;
 use App\Http\Requests\SupplierRequest;
 use App\Http\Resources\SupplierResource;
 use App\Models\Supplier;
@@ -26,7 +26,10 @@ class SupplierController extends Controller
     {
         try {
             $suppliers = $this->supplierService->getAllSuppliers(); // Calls to a non-existent service method
-            return SupplierResource::collection($suppliers);
+            return response()->json([
+             'success' => true,
+             'data' => SupplierResource::collection($suppliers)
+            ]); 
         } catch (Exception $e) {
             return response()->json(['message' => 'Failed to retrieve suppliers', 'error' => $e->getMessage()], 500);
         }
