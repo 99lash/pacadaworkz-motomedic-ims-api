@@ -4,9 +4,10 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class ForceJsonResponse
+class RejectIfAuthenticatedMiddleware
 {
     /**
      * Handle an incoming request.
@@ -15,7 +16,13 @@ class ForceJsonResponse
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $request->headers->set('Accept', 'application/json');
+        if (Auth::guard('api')->check()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User is already logged in.',
+            ], 403);
+        }
+
         return $next($request);
     }
 }
