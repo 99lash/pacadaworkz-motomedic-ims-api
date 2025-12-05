@@ -37,16 +37,16 @@ class InventoryController
         ]
      ]);
 
-          }catch(\Exception $e){
-                return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
           }catch(ModelNotFoundException $e){
              return response()->json([
                 'success' => false,
                 'message' => 'Product not found'
             ], 404);
+          }catch(\Exception $e){
+                return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
           }
 
       
@@ -54,6 +54,58 @@ class InventoryController
          
     }
 
+    public function show($id)
+    {
+        try {
+            // Logic to show a specific inventory item
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Inventory item not found'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function update(Request $request, $id)
+    {
+        try {
+            // Logic to update a specific inventory item
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Inventory item not found'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function destroy($id)
+    {
+        try {
+            // Logic to delete a specific inventory item
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Inventory item not found'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
 
 
 }
+
