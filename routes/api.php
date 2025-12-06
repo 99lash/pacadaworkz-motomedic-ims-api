@@ -10,6 +10,8 @@ use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\BrandController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\AttributeController;
+use App\Http\Controllers\API\InventoryController;
+use App\Http\Controllers\API\SupplierController;
 use App\Http\Controllers\GoogleAuthController;
 
 Route::prefix('v1')->group(function () {
@@ -119,5 +121,31 @@ Route::prefix('v1')->group(function () {
             Route::post('/{id}/attributes/{attributeId}', [ProductController::class, 'storeAttribute']);
             Route::delete('/{id}/attributeValueId/{attributeProductId}', [ProductController::class, 'destroyAttributeProduct']);
         });
+
+        //inventory 
+         Route::prefix('inventory')->group(function(){
+            Route::middleware('modules:Inventory')->group(function(){
+                Route::get('/', [InventoryController::class,'index'])->middleware('permissions:View');
+                Route::post('/', [InventoryController::class,'store'])->middleware('permissions:Create');
+                Route::get('/{id}', [InventoryController::class,'show'])->middleware('permissions:View');
+                Route::patch('/{id}', [InventoryController::class,'update'])->middleware('permissions:Edit');
+                Route::delete('/{id}', [InventoryController::class,'destroy'])->middleware('permissions:Delete');
+            });
+         });
     });
+
+        //suppliers
+       Route::prefix('suppliers')->group(function(){
+            // suppliers module middleware
+            Route::middleware('modules:Suppliers')->group(function(){
+                Route::get('/', [SupplierController::class,'index'])->middleware('permissions:View');
+                Route::post('/', [SupplierController::class,'store'])->middleware('permissions:Create');
+                Route::get('/{supplier}', [SupplierController::class,'show'])->middleware('permissions:View');
+                Route::patch('/{supplier}', [SupplierController::class,'update'])->middleware('permissions:Edit');
+                Route::delete('/{supplier}', [SupplierController::class,'destroy'])->middleware('permissions:Delete');
+            });
+       });
+
+      
+});
 });
