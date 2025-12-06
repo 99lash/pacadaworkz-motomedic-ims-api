@@ -23,9 +23,22 @@ class SupplierController extends Controller
         try {
             $search = $request->query('search', null);
             $suppliers = $this->supplierService->getAllSuppliers($search);
-            return SupplierResource::collection($suppliers);
+            
+            return response()->json([
+                'success' => true,
+                'data' => SupplierResource::collection($suppliers),
+                'meta' => [
+                    'current_page' => $suppliers->currentPage(),
+                    'per_page' => $suppliers->perPage(),
+                    'total' => $suppliers->total(),
+                    'last_page' => $suppliers->lastPage()
+                ]
+            ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 
@@ -33,9 +46,15 @@ class SupplierController extends Controller
     {
         try {
             $supplier = $this->supplierService->createSupplier($request->validated());
-            return new SupplierResource($supplier);
+            return response()->json([
+                'success' => true,
+                'data' => new SupplierResource($supplier)
+            ], 201);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 
@@ -43,11 +62,20 @@ class SupplierController extends Controller
     {
         try {
             $supplier = $this->supplierService->getSupplierById($id);
-            return new SupplierResource($supplier);
+            return response()->json([
+                'success' => true,
+                'data' => new SupplierResource($supplier)
+            ]);
         } catch (ModelNotFoundException $e) {
-            return response()->json(['message' => 'Supplier not found'], 404);
+            return response()->json([
+                'success' => false,
+                'message' => 'Supplier not found'
+            ], 404);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 
@@ -55,11 +83,20 @@ class SupplierController extends Controller
     {
         try {
             $supplier = $this->supplierService->updateSupplier($request->validated(), $id);
-            return new SupplierResource($supplier);
+            return response()->json([
+                'success' => true,
+                'data' => new SupplierResource($supplier)
+            ]);
         } catch (ModelNotFoundException $e) {
-            return response()->json(['message' => 'Supplier not found'], 404);
+            return response()->json([
+                'success' => false,
+                'message' => 'Supplier not found'
+            ], 404);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 
@@ -67,11 +104,20 @@ class SupplierController extends Controller
     {
         try {
             $this->supplierService->deleteSupplier($id);
-            return response()->json(['message' => 'Supplier deleted successfully']);
+            return response()->json([
+                'success' => true,
+                'message' => 'Supplier deleted successfully'
+            ]);
         } catch (ModelNotFoundException $e) {
-            return response()->json(['message' => 'Supplier not found'], 404);
+            return response()->json([
+                'success' => false,
+                'message' => 'Supplier not found'
+            ], 404);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 }
