@@ -40,7 +40,7 @@ class InventoryController
           }catch(ModelNotFoundException $e){
              return response()->json([
                 'success' => false,
-                'message' => 'Product not found'
+                'message' => 'Inventory not found'
             ], 404);
           }catch(\Exception $e){
                 return response()->json([

@@ -18,13 +18,21 @@ class InventoryResource extends JsonResource
 
 
         return [
-           'sku' => $this->product->sku,
-           'product_name' => $this->product->name,
-            'category' => $this->product->category_id,
-            'brand' => $this->product->brand_id,
-             'quantity' => $this->quantity,
-             'last_stock_in' => $this->last_stock_in,
-             
+            'id' => $this->id,
+            'sku' => $this->whenLoaded('product', function () {
+                return $this->product->sku;
+            }),
+            'product_name' => $this->whenLoaded('product', function () {
+                return $this->product->name;
+            }),
+            'category' => $this->whenLoaded('product', function () {
+                return $this->product->category->name;
+            }),
+            'brand' => $this->whenLoaded('product', function () {
+                return $this->product->brand->name;
+            }),
+            'quantity' => $this->quantity,
+            'last_stock_in' => $this->last_stock_in,
         ];
     }
 }

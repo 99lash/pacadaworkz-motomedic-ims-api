@@ -7,21 +7,24 @@ use App\Models\Inventory;
 class InventoryService{
 
 
-  public function getAllInventory($search = null){
-   
-
-    $query = Inventory::query();
-
-     if($search)
-     {
-        $query->join('products','products.id','inventory.product_id')->join('brands','brands.id','inventory.brand_id')
-        ->where('products.name','ILIKE',"%{$search}%")->orwhere('brands.name','ILIKE',"%{$search}%");
-
-        return $query->paginate(10)->withQueryString(); 
-     }
+  public function getAllInventory($search = null)
+  {
+      $query = Inventory::with(['product.brand', 'product.category']);
+  
+      if ($search) {
+          $query->whereHas('product', function ($q) use ($search) {
+              $q->where('name', 'ILIKE', "%{$search}%")
+                ->orWhereHas('brand', function ($q) use ($search) {
+                    $q->where('name', 'ILIKE', "%{$search}%");
+                });
+          });
+      }
+  
+      return $query->paginate(10)->withQueryString();
   }
 
 
+  public function getInventoryById($id){}
 
 
 }
