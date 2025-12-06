@@ -5,44 +5,32 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
 class Inventory extends Model
 {
     use SoftDeletes;
-
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'inventory';
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
+    
+    //
+       
+     // fillable is for mass assigment (allowed na ifill up)
+      protected $fillable = [
         'product_id',
         'supplier_id',
         'quantity',
-        'last_stock_in',
+        'reorder_quantity_point',
+        'minimum_quantity',
+        'last_quantity_count'
     ];
-
-    /**
-     * Get the product that owns the inventory.
-     */
-    public function product(): BelongsTo
+   
+    
+//Entity Reletionship to the products
+      public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
     }
 
-    /**
-     * Get the supplier that owns the inventory.
-     */
-    public function supplier(): BelongsTo
-    {
+//Entity Relationship to the supplier
+      public function supplier():BelongsTo
+      {
         return $this->belongsTo(Supplier::class);
-    }
+      }
 }
-
