@@ -126,7 +126,13 @@ Route::prefix('v1')->group(function () {
 
         //inventory 
          Route::prefix('inventory')->group(function(){
-              Route::get('/', [InventoryController::class,'index']);
+            Route::middleware('modules:Inventory')->group(function(){
+                Route::get('/', [InventoryController::class,'index'])->middleware('permissions:View');
+                Route::post('/', [InventoryController::class,'store'])->middleware('permissions:Create');
+                Route::get('/{id}', [InventoryController::class,'show'])->middleware('permissions:View');
+                Route::patch('/{id}', [InventoryController::class,'update'])->middleware('permissions:Edit');
+                Route::delete('/{id}', [InventoryController::class,'destroy'])->middleware('permissions:Delete');
+            });
          });
     });
 

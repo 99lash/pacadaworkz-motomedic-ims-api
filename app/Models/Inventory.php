@@ -26,11 +26,7 @@ class Inventory extends Model
         'product_id',
         'supplier_id',
         'quantity',
-        'reorder_quantity_point',
-        'minimum_quantity',
-        'last_quantity_count',
-        'created_at',
-        'updated_at'
+        'last_stock_in',
     ];
 
     /**

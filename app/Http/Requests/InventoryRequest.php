@@ -11,7 +11,7 @@ class InventoryRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,9 +21,19 @@ class InventoryRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            
-
+        $rules = [
+            'product_id' => 'required|exists:products,id',
+            'supplier_id' => 'required|exists:suppliers,id',
+            'quantity' => 'required|integer|min:0',
+            'last_stock_in' => 'nullable|date',
         ];
+
+        if ($this->isMethod('patch')) {
+            $rules = array_map(function ($rule) {
+                return 'sometimes|' . $rule;
+            }, $rules);
+        }
+
+        return $rules;
     }
 }

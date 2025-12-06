@@ -17,22 +17,32 @@ class InventoryResource extends JsonResource
         //return parent::toArray($request);
 
 
-        return [
-            'id' => $this->id,
-            'sku' => $this->whenLoaded('product', function () {
-                return $this->product->sku;
-            }),
-            'product_name' => $this->whenLoaded('product', function () {
-                return $this->product->name;
-            }),
-            'category' => $this->whenLoaded('product', function () {
-                return $this->product->category->name;
-            }),
-            'brand' => $this->whenLoaded('product', function () {
-                return $this->product->brand->name;
-            }),
+        // return [
+        //     'id' => $this->id,
+        //     'sku' => $this->whenLoaded('product', function () {
+        //         return $this->product->sku;
+        //     }),
+        //     'product_name' => $this->whenLoaded('product', function () {
+        //         return $this->product->name;
+        //     }),
+        //     'category' => $this->whenLoaded('product', function () {
+        //         return $this->product->category->name;
+        //     }),
+        //     'brand' => $this->whenLoaded('product', function () {
+        //         return $this->product->brand->name;
+        //     }),
+        //     'quantity' => $this->quantity,
+        //     'last_stock_in' => $this->last_stock_in,
+        // ];
+    return     [
+             'id' => $this->id,
+             'sku' => $this->product->sku,
+             'category' => $this->product->category->name,
+            'brand' => $this->product->brand->name,
             'quantity' => $this->quantity,
-            'last_stock_in' => $this->last_stock_in,
+             'last_stock_in' => $this->last_stock_in
+
+
         ];
     }
 }
