@@ -5,32 +5,39 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+
 class Supplier extends Model
 {
     use SoftDeletes;
-    
-    //
 
- // fillable is for mass assigment (allowed na ifill up)
-      protected $fillable = [
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
         'name',
         'contact_person',
         'email',
         'phone',
         'address',
-        'is_active'
+        'is_active',
     ];
-      
-      //Entity Reletionship to the purchase_orders
-        public function purchase_orders(): HasMany
+
+    /**
+     * Get the purchase orders for the supplier.
+     */
+    public function purchase_orders(): HasMany
     {
         return $this->hasMany(PurchaseOrder::class);
-    } 
+    }
 
-       //Entity Reletionship to the inventory
-        public function inventory(): HasOne
+    /**
+     * Get the inventory for the supplier.
+     */
+    public function inventory(): HasMany
     {
         return $this->hasMany(Inventory::class);
-    } 
+    }
 }
+
