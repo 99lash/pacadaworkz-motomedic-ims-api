@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
 
 use App\Services\GoogleAuthService;
 use Illuminate\Support\Facades\Log;
