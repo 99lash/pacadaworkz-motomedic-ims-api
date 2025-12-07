@@ -8,13 +8,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class SalesItem extends Model
 {
     use SoftDeletes;
-    
+
     //
 
         // fillable is for mass assigment (allowed na ifill up)
       protected $fillable = [
         'sales_transactions_id',
         'product_id',
+        'quantity',
         'unit_price',
         'subtotal',
         'total'
