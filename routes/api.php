@@ -12,6 +12,7 @@ use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\AttributeController;
 use App\Http\Controllers\API\InventoryController;
 use App\Http\Controllers\API\SupplierController;
+use App\Http\Controllers\API\StocksController;
 use App\Http\Controllers\GoogleAuthController;
 
 Route::prefix('v1')->group(function () {
