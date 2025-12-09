@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\API\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Exception;
@@ -57,12 +57,15 @@ class StocksController extends Controller
 
 
   // show Stock movements
-    public function showStockMovements(Request $request){
+    public function showStockMovements(){
         try {
-            $movements = $this->stocksService->showStockMovements($request->all());
-            return response()->json($movements);
+            $result = $this->stocksService->getStockMovements();
+            return response()->json([
+                'success' => true,
+                'data' =>  $result
+            ]);
         } catch (Exception $e) {
-            return response()->json(['message' => 'An unexpected error occurred.'], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 

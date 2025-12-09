@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Services;
-
+use App\Models\StockMovement;
 class StocksService
 {
    
@@ -27,9 +27,12 @@ class StocksService
         // Logic to export stock adjustments
     }
 
-    public function showStockMovements(array $filters = [])
+    public function getStockMovements()
     {
         // Logic to retrieve and filter stock movements
+        return StockMovement::all();
+          
+
     }
 
     public function showStockMovementsById($id)

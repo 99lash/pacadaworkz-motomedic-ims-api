@@ -142,19 +142,11 @@ Route::prefix('v1')->group(function () {
                 });
            });
 
-            // Stocks
-            Route::prefix('stocks')->group(function () {
-                // stocks module middleware
-                Route::middleware('modules:Stocks')->group(function () {
-                    Route::get('/adjustments', [StocksController::class, 'showStockAdjustments'])->middleware('permissions:View');
-                    Route::get('/adjustments/{id}', [StocksController::class, 'showStockAdjustmentsById'])->middleware('permissions:View');
-                    Route::get('/adjustments/export', [StocksController::class, 'exportStockAdjustments'])->middleware('permissions:View');
-                    Route::get('/movements', [StocksController::class, 'showStockMovements'])->middleware('permissions:View');
-                    Route::get('/movements/{id}', [StocksController::class, 'showStockMovementsById'])->middleware('permissions:View');
-                    Route::get('/movements/export', [StocksController::class, 'exportStockMovements'])->middleware('permissions:View');
-                    Route::get('/movements/product/{productId}', [StocksController::class, 'getStockMovementsbyProductId'])->middleware('permissions:View');
-                });
-            });
+            // Stock-movements
+             Route::prefix('stock-movements')->group(function(){
+                Route::get('/',[StocksController::class,'showStockMovements']);
+             });
+           
         });
 
       
