@@ -53,4 +53,55 @@ class StocksController extends Controller
             return response()->json(['message' => 'An unexpected error occurred during the export.'], 500);
         }
     }
+
+
+
+  // show Stock movements
+    public function showStockMovements(Request $request){
+        try {
+            $movements = $this->stocksService->showStockMovements($request->all());
+            return response()->json($movements);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'An unexpected error occurred.'], 500);
+        }
+    }
+
+
+ // show stock movements by id
+ public function showStockMovementsById($id){
+    try {
+        $movement = $this->stocksService->showStockMovementsById($id);
+        return response()->json($movement);
+    } catch (ModelNotFoundException $e) {
+        return response()->json(['message' => 'Stock movement not found.'], 404);
+    } catch (Exception $e) {
+        return response()->json(['message' => 'An unexpected error occurred.'], 500);
+    }
+ }
+
+
+ //export stock movements
+   public function exportStockMovements(){
+    try {
+        $filePath = $this->stocksService->exportStockMovements();
+        return response()->json(['message' => 'Stock movements exported successfully.', 'file_path' => $filePath]);
+    } catch (Exception $e) {
+        return response()->json(['message' => 'An unexpected error occurred during the export.'], 500);
+    }
+   }
+
+   //show stock movements by product id
+
+   public function getStockMovementsbyProductId($productId){
+    try {
+        $movements = $this->stocksService->getStockMovementsbyProductId($productId);
+        return response()->json($movements);
+    } catch (ModelNotFoundException $e) {
+        return response()->json(['message' => 'Product not found.'], 404);
+    } catch (Exception $e) {
+        return response()->json(['message' => 'An unexpected error occurred.'], 500);
+    }
+   }
+
+
 }

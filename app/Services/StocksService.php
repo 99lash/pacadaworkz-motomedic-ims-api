@@ -26,4 +26,24 @@ class StocksService
     {
         // Logic to export stock adjustments
     }
+
+    public function showStockMovements(array $filters = [])
+    {
+        // Logic to retrieve and filter stock movements
+    }
+
+    public function showStockMovementsById($id)
+    {
+        // Logic to find a specific stock movement
+    }
+
+    public function exportStockMovements()
+    {
+        // Logic to export stock movements
+    }
+
+    public function getStockMovementsbyProductId($productId)
+    {
+        // Logic to retrieve stock movements by product ID
+    }
 }
