@@ -2,17 +2,18 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
-use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\RoleController;
-use App\Http\Controllers\API\PermissionController;
-use App\Http\Controllers\API\RolePermissionController;
-use App\Http\Controllers\API\CategoryController;
+use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\BrandController;
+use App\Http\Controllers\API\GoogleAuthController;
 use App\Http\Controllers\API\ProductController;
+use App\Http\Controllers\API\CategoryController;
+use App\Http\Controllers\API\SupplierController;
 use App\Http\Controllers\API\AttributeController;
 use App\Http\Controllers\API\InventoryController;
-use App\Http\Controllers\API\SupplierController;
-use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\API\PermissionController;
+use App\Http\Controllers\API\RolePermissionController;
+use App\Http\Controllers\API\PosController;
 
 Route::prefix('v1')->group(function () {
     // Public routes (Unauthenticated)
@@ -42,7 +43,7 @@ Route::prefix('v1')->group(function () {
                 Route::middleware('modules:Users')->group(function () {
                     Route::get('/{id}', [UserController::class, 'show'])->middleware('permissions:View');
                     Route::post('/', [UserController::class, 'store'])->middleware('permissions:Create');
-                    Route::post('/{id}/reset-password', [UserController::class, 'resetPassword'])->middleware('permissions:Edit');;                   
+                    Route::post('/{id}/reset-password', [UserController::class, 'resetPassword'])->middleware('permissions:Edit');;
                     Route::patch('/{id}', [UserController::class, 'update'])->middleware('permissions:Edit');
                     Route::delete('/{id}', [UserController::class, 'destroy'])->middleware('permissions:Delete');
                 });
@@ -119,29 +120,40 @@ Route::prefix('v1')->group(function () {
             });
 
             //inventory
-            Route::prefix('inventory')->group(function(){
-                Route::middleware('modules:Inventory')->group(function(){
-                    Route::get('/', [InventoryController::class,'index'])->middleware('permissions:View');
-                    Route::post('/', [InventoryController::class,'store'])->middleware('permissions:Create');
-                    Route::get('/{id}', [InventoryController::class,'show'])->middleware('permissions:View');
-                    Route::patch('/{id}', [InventoryController::class,'update'])->middleware('permissions:Edit');
-                    Route::delete('/{id}', [InventoryController::class,'destroy'])->middleware('permissions:Delete');
+            Route::prefix('inventory')->group(function () {
+                Route::middleware('modules:Inventory')->group(function () {
+                    Route::get('/', [InventoryController::class, 'index'])->middleware('permissions:View');
+                    Route::post('/', [InventoryController::class, 'store'])->middleware('permissions:Create');
+                    Route::get('/{id}', [InventoryController::class, 'show'])->middleware('permissions:View');
+                    Route::patch('/{id}', [InventoryController::class, 'update'])->middleware('permissions:Edit');
+                    Route::delete('/{id}', [InventoryController::class, 'destroy'])->middleware('permissions:Delete');
                 });
-             });
+            });
 
             //suppliers
-           Route::prefix('suppliers')->group(function(){
+            Route::prefix('suppliers')->group(function () {
                 // suppliers module middleware
-                Route::middleware('modules:Suppliers')->group(function(){
-                    Route::get('/', [SupplierController::class,'index'])->middleware('permissions:View');
-                    Route::post('/', [SupplierController::class,'store'])->middleware('permissions:Create');
-                    Route::get('/{id}', [SupplierController::class,'show'])->middleware('permissions:View');
-                    Route::patch('/{id}', [SupplierController::class,'update'])->middleware('permissions:Edit');
-                    Route::delete('/{id}', [SupplierController::class,'destroy'])->middleware('permissions:Delete');
+                Route::middleware('modules:Suppliers')->group(function () {
+                    Route::get('/', [SupplierController::class, 'index'])->middleware('permissions:View');
+                    Route::post('/', [SupplierController::class, 'store'])->middleware('permissions:Create');
+                    Route::get('/{id}', [SupplierController::class, 'show'])->middleware('permissions:View');
+                    Route::patch('/{id}', [SupplierController::class, 'update'])->middleware('permissions:Edit');
+                    Route::delete('/{id}', [SupplierController::class, 'destroy'])->middleware('permissions:Delete');
                 });
-           });
-        });
+            });
 
-      
-});
+            //POS
+            Route::prefix('pos')->group(function () {
+                //Cart
+                Route::prefix('cart')->group(function () {
+                    //pos module middleware
+                    Route::middleware('modules:POS')->group(function () {
+                        Route::get('/', [PosController::class, 'show']);
+                        Route::post('/add-item/{id}', [PosController::class, 'store']);
+                    });
+                });
+            });
+
+        });
+    });
 });
