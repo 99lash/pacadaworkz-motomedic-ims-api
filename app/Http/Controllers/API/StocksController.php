@@ -6,6 +6,7 @@ use App\Http\Controllers\API\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Exception;
+use App\Http\Resources\StockMovementResource;
 use App\Services\StocksService;
 
 class StocksController extends Controller
@@ -62,7 +63,7 @@ class StocksController extends Controller
             $result = $this->stocksService->getStockMovements();
             return response()->json([
                 'success' => true,
-                'data' =>  $result
+                'data' =>  StockMovementResource::collection($result)
             ]);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
