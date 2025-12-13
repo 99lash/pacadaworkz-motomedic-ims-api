@@ -150,6 +150,7 @@ Route::prefix('v1')->group(function () {
                     Route::middleware('modules:POS')->group(function () {
                         Route::get('/', [PosController::class, 'show']);
                         Route::post('/add-item', [PosController::class, 'store']);
+                        Route::patch('/update-item/{id}', [PosController::class, 'update']);
                     });
                 });
             });

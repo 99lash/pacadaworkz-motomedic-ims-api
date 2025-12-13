@@ -54,8 +54,16 @@ class PosService
 
     public function updateCartItem(int $userId, int $cartItemId, int $quantity)
     {
-        // TODO: Implement logic to update cart item quantity
-        return [];
+        $cart = Cart::where('user_id', $userId)->firstOrFail();
+
+        $cartItem = $cart->cart_items()->where('id', $cartItemId)->firstOrFail();
+
+        $cartItem->quantity = $quantity;
+        $cartItem->save();
+
+        $cartItem->load('product');
+
+        return $cartItem;
     }
 
     public function removeCartItem(int $userId, int $cartItemId)

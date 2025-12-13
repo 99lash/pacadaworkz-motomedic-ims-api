@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\API\Controller;
 use App\Http\Requests\POS\Cart\StoreCartItemRequest;
+use App\Http\Requests\POS\Cart\UpdateCartItemRequest;
 use App\Services\PosService;
 use App\Http\Resources\CartResource;
 use App\Http\Resources\CartItemResource;
@@ -55,7 +56,7 @@ class PosController extends Controller
                 'success' => true,
                 // 'data' => new CartItemResource($result),
                 'data' => CartItemResource::make($result),
-                'message' => 'Added item to cart successfully'
+                'message' => 'Item added to cart successfully'
             ], 201);
         } catch (\Exception $e) {
             \Log::error('POS Add to Cart Error: ' . $e->getMessage(), [
@@ -70,5 +71,35 @@ class PosController extends Controller
                 'message' => $e->getMessage(),
             ], $e->getCode());
         }
+    }
+
+    public function update(UpdateCartItemRequest $request, int $id)
+    {
+        try {
+            $validated = $request->validated();
+            $userId = Auth::id();
+
+            $result = $this->posService->updateCartItem($userId, $id, $validated['quantity']);
+
+            return response()->json([
+                'success' => true,
+                'data' => CartItemResource::make($result),
+                'message' => 'Cart item updated successfully'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('POS Update Cart Item Error: ' . $e->getMessage(), [
+                'user_id' => $userId,
+                'request' => $request->all(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal server error',
+                'message' => $e->getMessage(),
+            ], $e->getCode());
+        }
+
+        return [];
     }
 }
