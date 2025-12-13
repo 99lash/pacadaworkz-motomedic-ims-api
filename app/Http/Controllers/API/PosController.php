@@ -102,4 +102,57 @@ class PosController extends Controller
 
         return [];
     }
+
+    public function delete(int $id)
+    {
+        try {
+            $userId = Auth::id();
+
+            $this->posService->removeCartItem($userId, $id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cart item removed successfully'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('POS Delete Cart Item Error: ' . $e->getMessage(), [
+                'user_id' => $userId,
+                'cart_item_id' => $id,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function clearCart()
+    {
+        try {
+            $userId = Auth::id();
+
+            $this->posService->clearCart($userId);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cart cleared successfully'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('POS Clear Cart Error: ' . $e->getMessage(), [
+                'user_id' => $userId,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function applyDiscount() {
+
+    }
 }

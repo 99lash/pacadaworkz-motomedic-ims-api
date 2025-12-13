@@ -151,6 +151,9 @@ Route::prefix('v1')->group(function () {
                         Route::get('/', [PosController::class, 'show']);
                         Route::post('/add-item', [PosController::class, 'store']);
                         Route::patch('/update-item/{id}', [PosController::class, 'update']);
+                        Route::delete('/remove-item/{id}', [PosController::class, 'delete']);
+                        Route::post('/clear', [PosController::class, 'clearCart']);
+                        Route::post('/apply-discount', [PosController::class, 'applyDiscount']);
                     });
                 });
             });

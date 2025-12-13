@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Cart;
 use App\Models\User;
+use App\Models\Product;
 
 class PosService
 {
@@ -35,9 +36,13 @@ class PosService
 
     public function addItemToCart(int $userId, array $itemDetails)
     {
+        $productId = $itemDetails['product_id'];
+
+        //validate Product exists and is not soft-deleted
+        $product = Product::findOrFail($productId);
+
         $cart = $this->createCart($userId);
 
-        $productId = $itemDetails['product_id'];
         // $quantity = intval($itemDetails['quantity']);
 
         $cart_item = $cart->cart_items()->firstOrCreate(
@@ -68,14 +73,22 @@ class PosService
 
     public function removeCartItem(int $userId, int $cartItemId)
     {
-        // TODO: Implement logic to remove item from cart
-        return [];
+        $cart = Cart::where('user_id', $userId)->firstOrFail();
+
+        $cartItem = $cart->cart_items()->where('id', $cartItemId)->firstOrFail();
+
+        $cartItem->delete();
+
+        return true;
     }
 
     public function clearCart(int $userId)
     {
-        // TODO: Implement logic to clear all items from user's cart
-        return [];
+        $cart = Cart::where('user_id', $userId)->firstOrFail();
+
+        $cart->cart_items()->delete();
+
+        return true;
     }
 
     public function applyDiscount(int $userId, array $discountDetails)
