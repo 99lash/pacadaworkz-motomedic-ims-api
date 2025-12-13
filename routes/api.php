@@ -149,7 +149,7 @@ Route::prefix('v1')->group(function () {
                     //pos module middleware
                     Route::middleware('modules:POS')->group(function () {
                         Route::get('/', [PosController::class, 'show']);
-                        Route::post('/add-item/{id}', [PosController::class, 'store']);
+                        Route::post('/add-item', [PosController::class, 'store']);
                     });
                 });
             });
