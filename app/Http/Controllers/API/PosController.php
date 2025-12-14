@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Exceptions\POS\Cart\CartItemNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\API\Controller;
+use App\Http\Requests\POS\Cart\ApplyDiscountRequest;
 use App\Http\Requests\POS\Cart\StoreCartItemRequest;
 use App\Http\Requests\POS\Cart\UpdateCartItemRequest;
 use App\Services\PosService;
 use App\Http\Resources\CartResource;
 use App\Http\Resources\CartItemResource;
+use App\Exceptions\POS\Cart\EmptyCartException;
 
 class PosController extends Controller
 {
@@ -38,17 +41,19 @@ class PosController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                // 'message' => "Internal server error" //least information bai kapag production na
-                'message' => $e->getMessage() //comment out kapag dev mode
+                'message' => "Internal server error" //least information bai kapag production na
+                // 'message' => $e->getMessage() //comment out kapag dev mode
             ], 500);
         }
     }
 
     public function store(StoreCartItemRequest $request)
     {
+
         try {
-            $validated = $request->validated();
             $userId = Auth::id();
+
+            $validated = $request->validated();
 
             $result = $this->posService->addItemToCart($userId, $validated);
 
@@ -68,16 +73,17 @@ class PosController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Internal server error',
-                'message' => $e->getMessage(),
-            ], $e->getCode());
+                // 'message' => $e->getMessage(),
+            ], $e->getCode() ?: 500);
         }
     }
 
     public function update(UpdateCartItemRequest $request, int $id)
     {
         try {
-            $validated = $request->validated();
             $userId = Auth::id();
+
+            $validated = $request->validated();
 
             $result = $this->posService->updateCartItem($userId, $id, $validated['quantity']);
 
@@ -86,6 +92,11 @@ class PosController extends Controller
                 'data' => CartItemResource::make($result),
                 'message' => 'Cart item updated successfully'
             ]);
+        } catch (CartItemNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], $e->getCode());
         } catch (\Exception $e) {
             \Log::error('POS Update Cart Item Error: ' . $e->getMessage(), [
                 'user_id' => $userId,
@@ -96,15 +107,14 @@ class PosController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Internal server error',
-                'message' => $e->getMessage(),
-            ], $e->getCode());
+                // 'message' => $e->getMessage(),
+            ], $e->getCode() ?: 500);
         }
-
-        return [];
     }
 
     public function delete(int $id)
     {
+
         try {
             $userId = Auth::id();
 
@@ -114,6 +124,11 @@ class PosController extends Controller
                 'success' => true,
                 'message' => 'Cart item removed successfully'
             ]);
+        } catch (CartItemNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], $e->getCode());
         } catch (\Exception $e) {
             \Log::error('POS Delete Cart Item Error: ' . $e->getMessage(), [
                 'user_id' => $userId,
@@ -123,7 +138,8 @@ class PosController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => 'Internal server error',
+                // 'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -131,6 +147,7 @@ class PosController extends Controller
     public function clearCart()
     {
         try {
+
             $userId = Auth::id();
 
             $this->posService->clearCart($userId);
@@ -147,12 +164,46 @@ class PosController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => 'Internal server error',
+                // 'message' => $e->getMessage(),
             ], 500);
         }
     }
 
-    public function applyDiscount() {
+    public function applyDiscount(ApplyDiscountRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+            $userId = Auth::id();
 
+            $cart = $this->posService->applyDiscount($userId, $validated);
+            $result = $this->posService->getCart($userId); //recalculate summary after discount
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'cart' => CartResource::make($result['cart']),
+                    'summary' => $result['summary'],
+                ],
+                'message' => 'Discount applied successfully'
+            ]);
+        } catch (EmptyCartException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], $e->getCode());
+        } catch (\Exception $e) {
+            \Log::error('POS Apply Discount Error: ' . $e->getMessage(), [
+                'user_id' => $userId,
+                'request' => $request->all(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal server error'
+                // 'message' => $e->getMessage(),
+            ], $e->getCode());
+        }
     }
 }

@@ -13,6 +13,8 @@ class Cart extends Model
 
     protected $fillable = [
         'user_id',
+        'discount',
+        'discount_type',
     ];
 
     public function user(): BelongsTo

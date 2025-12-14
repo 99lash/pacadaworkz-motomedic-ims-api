@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\Cart;
 use App\Models\User;
 use App\Models\Product;
+use App\Exceptions\Pos\EmptyCartException;
+use App\Exceptions\POS\Cart\CartItemNotFoundException;
 
 class PosService
 {
@@ -21,14 +23,25 @@ class PosService
         $itemsCount = $cart->cart_items->count();
         $totalQuantity = $cart->cart_items->sum('quantity');
         $subtotal = $cart->cart_items->sum(fn($item) => $item->product->unit_price * $item->quantity);
-        $discount = 0.00;
-        $total = $subtotal - $discount;
+        $discountAmount = 0.00;
+
+        if ($cart->discount > 0) {
+            if ($cart->discount_type === 'percentage') {
+                $discountAmount = $subtotal * ($cart->discount / 100);
+            } else { // fixed
+                $discountAmount = $cart->discount;
+            }
+        }
+        $total = $subtotal - $discountAmount;
+        if ($total < 0) {
+            $total = 0;
+        }
 
         $result['summary'] = [
             'items_count' => $itemsCount,
             'total_quantity' => $totalQuantity,
             'subtotal' => $subtotal,
-            'discount' => $discount,
+            'discount' => $discountAmount,
             'total' => $total,
         ];
         return $result;
@@ -61,7 +74,10 @@ class PosService
     {
         $cart = Cart::where('user_id', $userId)->firstOrFail();
 
-        $cartItem = $cart->cart_items()->where('id', $cartItemId)->firstOrFail();
+        $cartItem = $cart->cart_items()->where('id', $cartItemId)->first();
+
+        if (!$cartItem)
+            throw new CartItemNotFoundException();
 
         $cartItem->quantity = $quantity;
         $cartItem->save();
@@ -75,7 +91,10 @@ class PosService
     {
         $cart = Cart::where('user_id', $userId)->firstOrFail();
 
-        $cartItem = $cart->cart_items()->where('id', $cartItemId)->firstOrFail();
+        $cartItem = $cart->cart_items()->where('id', $cartItemId)->first();
+
+        if (!$cartItem)
+            throw new CartItemNotFoundException();
 
         $cartItem->delete();
 
@@ -93,8 +112,16 @@ class PosService
 
     public function applyDiscount(int $userId, array $discountDetails)
     {
-        // TODO: Implement logic to apply discount to the cart
-        return [];
+        $cart = $this->createCart($userId);
+
+        if (!$cart->cart_items()->exists())
+            throw new EmptyCartException();
+
+        $cart->discount = $discountDetails['discount'];
+        $cart->discount_type = $discountDetails['discount_type'];
+        $cart->save();
+
+        return $cart;
     }
 
     public function processCheckout(int $userId, array $paymentDetails): array
