@@ -1,19 +1,51 @@
 <?php
 
 namespace App\Services;
+
+use App\Models\StockAdjustment;
 use App\Models\StockMovement;
+use Illuminate\Pagination\LengthAwarePaginator;
+
 class StocksService
 {
-   
-    public function showStockAdjustments(array $filters = [])
+    /**
+     * Retrieve and filter stock adjustments.
+     *
+     * @param array $filters
+     * @return LengthAwarePaginator
+     */
+    public function showStockAdjustments(array $filters = []): LengthAwarePaginator
     {
-        // Logic to retrieve and filter stock adjustments
+        $query = StockAdjustment::query();
+
+        if (isset($filters['user_id'])) {
+            $query->where('user_id', $filters['user_id']);
+        }
+
+        if (isset($filters['reason'])) {
+            $query->where('reason', 'like', '%' . $filters['reason'] . '%');
+        }
+
+        if (isset($filters['start_date'])) {
+            $query->whereDate('created_at', '>=', $filters['start_date']);
+        }
+
+        if (isset($filters['end_date'])) {
+            $query->whereDate('created_at', '<=', $filters['end_date']);
+        }
+
+        return $query->paginate($filters['per_page'] ?? 15);
     }
 
-
-    public function showStockAdjustmentsById($id)
+    /**
+     * Find a specific stock adjustment by ID.
+     *
+     * @param int $id
+     * @return StockAdjustment
+     */
+    public function showStockAdjustmentsById(int $id): StockAdjustment
     {
-        // Logic to find a specific stock adjustment
+        return StockAdjustment::findOrFail($id);
     }
 
     /**
@@ -22,31 +54,95 @@ class StocksService
      * @param array $filters
      * @return mixed // Typically a file path or stream
      */
-    public function exportStockAdjustments()
+    public function exportStockAdjustments(array $filters = [])
     {
-        // Logic to export stock adjustments
+        // Logic to export stock adjustments based on filters
     }
 
-    public function getStockMovements()
+    /**
+     * Retrieve and filter stock movements.
+     *
+     * @param array $filters
+     * @return LengthAwarePaginator
+     */
+    public function getStockMovements(array $filters = []): LengthAwarePaginator
     {
-        // Logic to retrieve and filter stock movements
-        return StockMovement::all();
-          
+        $query = StockMovement::with(['product.brand', 'user']); // Eager load product.brand as well
 
+        if (isset($filters['product_id'])) {
+            $query->where('product_id', $filters['product_id']);
+        }
+
+        if (isset($filters['user_id'])) {
+            $query->where('user_id', $filters['user_id']);
+        }
+
+        if (isset($filters['product_name'])) {
+            $query->whereHas('product', function ($q) use ($filters) {
+                $q->where('name', 'like', '%' . $filters['product_name'] . '%');
+            });
+        }
+
+        if (isset($filters['user_name'])) {
+            $query->whereHas('user', function ($q) use ($filters) {
+                $q->where('name', 'like', '%' . $filters['user_name'] . '%');
+            });
+        }
+
+        // Add filtering by brand name
+        if (isset($filters['brand_name'])) {
+            $query->whereHas('product.brand', function ($q) use ($filters) {
+                $q->where('name', 'like', '%' . $filters['brand_name'] . '%');
+            });
+        }
+
+        if (isset($filters['movement_type'])) {
+            $query->where('movement_type', $filters['movement_type']);
+        }
+
+        if (isset($filters['start_date'])) {
+            $query->whereDate('created_at', '>=', $filters['start_date']);
+        }
+
+        if (isset($filters['end_date'])) {
+            $query->whereDate('created_at', '<=', $filters['end_date']);
+        }
+
+        return $query->paginate($filters['per_page'] ?? 15);
     }
 
-    public function showStockMovementsById($id)
+    /**
+     * Find a specific stock movement by ID.
+     *
+     * @param int $id
+     * @return StockMovement
+     */
+    public function showStockMovementsById(int $id): StockMovement
     {
-        // Logic to find a specific stock movement
+        return StockMovement::findOrFail($id);
     }
 
-    public function exportStockMovements()
+    /**
+     * Export stock movements data.
+     *
+     * @param array $filters
+     * @return mixed // Typically a file path or stream
+     */
+    public function exportStockMovements(array $filters = [])
     {
-        // Logic to export stock movements
+        // Logic to export stock movements based on filters
     }
 
-    public function getStockMovementsbyProductId($productId)
+    /**
+     * Retrieve stock movements by product ID.
+     *
+     * @param int $productId
+     * @param array $filters
+     * @return LengthAwarePaginator
+     */
+    public function getStockMovementsbyProductId(int $productId, array $filters = []): LengthAwarePaginator
     {
-        // Logic to retrieve stock movements by product ID
+        $filters['product_id'] = $productId;
+        return $this->getStockMovements($filters);
     }
 }

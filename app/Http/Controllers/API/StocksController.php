@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\API\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Exception;
+use App\Http\Resources\StockAdjustmentResource;
 use App\Http\Resources\StockMovementResource;
 use App\Services\StocksService;
+use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Request;
 
 class StocksController extends Controller
 {
@@ -17,34 +18,47 @@ class StocksController extends Controller
     {
         $this->stocksService = $stocksService;
     }
-    
-      //Display a listing of the stock adjustments.
-     
+
+    /**
+     * Display a listing of the stock adjustments.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function showStockAdjustments(Request $request)
     {
         try {
             $adjustments = $this->stocksService->showStockAdjustments($request->all());
-            return response()->json($adjustments);
+            return StockAdjustmentResource::collection($adjustments)->response();
         } catch (Exception $e) {
             return response()->json(['message' => 'An unexpected error occurred.'], 500);
         }
     }
 
-  // Display the specified stock adjustment.
-    public function showStockAdjustmentsById(Request $request, $id)
+    /**
+     * Display the specified stock adjustment.
+     *
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function showStockAdjustmentsById($id)
     {
         try {
             $adjustment = $this->stocksService->showStockAdjustmentsById($id);
-            return response()->json($adjustment);
+            return (new StockAdjustmentResource($adjustment))->response();
         } catch (ModelNotFoundException $e) {
             return response()->json(['message' => 'Stock adjustment not found.'], 404);
         } catch (Exception $e) {
             return response()->json(['message' => 'An unexpected error occurred.'], 500);
         }
     }
- 
 
-     // Export stock adjustments to a file.
+    /**
+     * Export stock adjustments to a file.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function exportStockAdjustments(Request $request)
     {
         try {
@@ -55,57 +69,72 @@ class StocksController extends Controller
         }
     }
 
-
-
-  // show Stock movements
-    public function showStockMovements(){
+    /**
+     * Display a listing of the stock movements.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function showStockMovements(Request $request)
+    {
         try {
-            $result = $this->stocksService->getStockMovements();
-            return response()->json([
-                'success' => true,
-                'data' =>  StockMovementResource::collection($result)
-            ]);
+            $movements = $this->stocksService->getStockMovements($request->all());
+            return StockMovementResource::collection($movements)->response();
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
-
- // show stock movements by id
- public function showStockMovementsById($id){
-    try {
-        $movement = $this->stocksService->showStockMovementsById($id);
-        return response()->json($movement);
-    } catch (ModelNotFoundException $e) {
-        return response()->json(['message' => 'Stock movement not found.'], 404);
-    } catch (Exception $e) {
-        return response()->json(['message' => 'An unexpected error occurred.'], 500);
+    /**
+     * Display the specified stock movement.
+     *
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function showStockMovementsById($id)
+    {
+        try {
+            $movement = $this->stocksService->showStockMovementsById($id);
+            return (new StockMovementResource($movement))->response();
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => 'Stock movement not found.'], 404);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'An unexpected error occurred.'], 500);
+        }
     }
- }
 
-
- //export stock movements
-   public function exportStockMovements(){
-    try {
-        $filePath = $this->stocksService->exportStockMovements();
-        return response()->json(['message' => 'Stock movements exported successfully.', 'file_path' => $filePath]);
-    } catch (Exception $e) {
-        return response()->json(['message' => 'An unexpected error occurred during the export.'], 500);
+    /**
+     * Export stock movements to a file.
+     *
+        * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function exportStockMovements(Request $request)
+    {
+        try {
+            $filePath = $this->stocksService->exportStockMovements($request->all());
+            return response()->json(['message' => 'Stock movements exported successfully.', 'file_path' => $filePath]);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'An unexpected error occurred during the export.'], 500);
+        }
     }
-   }
 
-   //show stock movements by product id
-
-   public function getStockMovementsbyProductId($productId){
-    try {
-        $movements = $this->stocksService->getStockMovementsbyProductId($productId);
-        return response()->json($movements);
-    } catch (ModelNotFoundException $e) {
-        return response()->json(['message' => 'Product not found.'], 404);
-    } catch (Exception $e) {
-        return response()->json(['message' => 'An unexpected error occurred.'], 500);
+    /**
+     * Display a listing of the stock movements for a specific product.
+     *
+     * @param Request $request
+     * @param int $productId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getStockMovementsbyProductId(Request $request, $productId)
+    {
+        try {
+            $movements = $this->stocksService->getStockMovementsbyProductId($productId, $request->all());
+            return StockMovementResource::collection($movements)->response();
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => 'Product not found.'], 404);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'An unexpected error occurred.'], 500);
+        }
     }
-   }
-
-
 }
