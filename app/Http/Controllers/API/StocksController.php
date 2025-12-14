@@ -78,8 +78,20 @@ class StocksController extends Controller
     public function showStockMovements(Request $request)
     {
         try {
-            $movements = $this->stocksService->getStockMovements($request->all());
-            return StockMovementResource::collection($movements)->response();
+        $result = $this->stocksService->getStockMovements($request->all());
+            //  return StockMovementResource::collection($movements)->response();
+            return response()->json(
+                [
+                    'success' => true,
+                    'data' => StockMovementResource::collection($result),
+                     'meta' => [
+                    'current_page' => $result->currentPage(),
+                    'per_page' => $result->perPage(),
+                    'total' => $result->total(),
+                    'last_page' => $result->lastPage(),
+                ],
+                ]
+            );
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
@@ -94,8 +106,13 @@ class StocksController extends Controller
     public function showStockMovementsById($id)
     {
         try {
-            $movement = $this->stocksService->showStockMovementsById($id);
-            return (new StockMovementResource($movement))->response();
+            $result = $this->stocksService->showStockMovementsById($id);
+            //return (new StockMovementResource($movement))->response();
+
+            return response()->json([
+                'success' => true,
+                'data' => new StockMovementResource($result)
+            ]);
         } catch (ModelNotFoundException $e) {
             return response()->json(['message' => 'Stock movement not found.'], 404);
         } catch (Exception $e) {
