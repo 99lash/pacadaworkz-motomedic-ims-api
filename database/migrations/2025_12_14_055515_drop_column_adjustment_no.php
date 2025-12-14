@@ -13,6 +13,7 @@ return new class extends Migration
     {
          Schema::table('stock_adjustments',function (Blueprint $table){
                $table->dropColumn('adjustment_no');
+                $table->timestamp('updated_at')->nullable();
          });
     }
 
@@ -23,6 +24,7 @@ return new class extends Migration
     {
         Schema::table('stock_adjustments',function (Blueprint $table){
                $table->string('adjustment_no', 50)->unique();
+               $table->dropColumn('updated_at');
         });
     }
 };

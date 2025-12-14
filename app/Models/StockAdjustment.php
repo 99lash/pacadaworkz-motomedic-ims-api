@@ -14,7 +14,6 @@ class StockAdjustment extends Model
      // fillable is for mass assigment (allowed na ifill up)
       protected $fillable = [
         'user_id',
-        'adjustment_no',
         'reason',
         'notes'
     ];
