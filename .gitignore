@@ -1,0 +1,42 @@
+# Dependency directories
+/vendor
+/node_modules
+
+# Environment files
+.env
+.env.backup
+.env.production
+
+# Build and cache artifacts
+.phpunit.cache
+.phpunit.result.cache
+/bootstrap/cache/*.php
+/public/build
+/public/hot
+
+# IDE and OS files
+.DS_Store
+.fleet
+.idea
+.nova
+.phpactor.json
+.vscode
+.zed
+Thumbs.db
+
+# Log files
+*.log
+npm-debug.log
+yarn-error.log
+
+# Laravel specific ignores
+/auth.json
+/public/storage
+/storage/*.key
+/storage/pail
+Homestead.json
+Homestead.yaml
+
+
+# GEMINI
+GEMINI.md
