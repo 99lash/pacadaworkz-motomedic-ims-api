@@ -56,8 +56,13 @@ class StocksController extends Controller
     public function showStockAdjustmentsById($id)
     {
         try {
-            $adjustment = $this->stocksService->showStockAdjustmentsById($id);
-            return (new StockAdjustmentResource($adjustment))->response();
+            $result = $this->stocksService->showStockAdjustmentsById($id);
+            //return (new StockAdjustmentResource($adjustment))->response();
+          return response()->json([
+                'success' => true,
+                 'data' => new StockAdjustmentResource($result)
+            ]);
+
         } catch (ModelNotFoundException $e) {
             return response()->json(['message' => 'Stock adjustment not found.'], 404);
         } catch (Exception $e) {

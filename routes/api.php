@@ -151,6 +151,7 @@ Route::prefix('v1')->group(function () {
              //stock-adjustment
              Route::prefix('stock-adjustments')->group(function(){
                  Route::get('/',[StocksController::class,'showStockAdjustments']);
+                 Route::get('/{id}',[StocksController::class,'showStockAdjustmentsById']);
              });
            
         });
