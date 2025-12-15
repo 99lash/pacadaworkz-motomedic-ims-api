@@ -14,6 +14,18 @@ class PurchaseOrdersResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        //return parent::toArray($request);
+
+        return [
+            'id' => $this->id,
+            'supplier' => $this->supplier->name,
+            'user' => $this->user->name,
+            'order_date' => $this->order_date,
+            'expected_delivery' => $this->order_delivery,
+            'total_amount' => $this->total_amount,
+            'status' => $this->status,
+             'notes' => $this->notes
+
+        ];
     }
 }
