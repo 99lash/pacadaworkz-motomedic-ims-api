@@ -14,6 +14,7 @@ use App\Http\Controllers\API\InventoryController;
 use App\Http\Controllers\API\PermissionController;
 use App\Http\Controllers\API\RolePermissionController;
 use App\Http\Controllers\API\PosController;
+use App\Http\Controllers\API\StocksController;
 
 Route::prefix('v1')->group(function () {
     // Public routes (Unauthenticated)
@@ -140,6 +141,20 @@ Route::prefix('v1')->group(function () {
                     Route::patch('/{id}', [SupplierController::class, 'update'])->middleware('permissions:Edit');
                     Route::delete('/{id}', [SupplierController::class, 'destroy'])->middleware('permissions:Delete');
                 });
+            });
+
+            // Stock-movements
+            Route::prefix('stock-movements')->group(function(){
+                Route::get('/', [StocksController::class, 'showStockMovements']);
+                Route::get('/{id}', [StocksController::class, 'showStockMovementsById']);
+                Route::get('/cv/export', [StocksController::class, 'exportStockMovements']);
+            });
+
+            // Stock-adjustments
+            Route::prefix('stock-adjustments')->group(function(){
+                Route::get('/', [StocksController::class, 'showStockAdjustments']);
+                Route::get('/{id}', [StocksController::class, 'showStockAdjustmentsById']);
+                Route::get('/cv/export', [StocksController::class, 'exportStockAdjustments']);
             });
 
             //POS

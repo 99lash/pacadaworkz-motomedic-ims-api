@@ -150,6 +150,7 @@ GET     /api/v1/stock-movements/:id (AP and WP only)
 GET     /api/v1/stock-movements/export (returns file, AP and WP only)
 GET     /api/v1/inventory/:productId/movements (specific product history, AP and WP only)
 ```
+Note: Stock movements include sales, purchases, and adjustments in one unified view.
 
 ### POS - Hold Cart Transaction (Drafts)
 
