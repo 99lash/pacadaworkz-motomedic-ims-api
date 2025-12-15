@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\API\Controller;
-use App\Http\Resources\Stocks\StockAdjustmentResource;
-use App\Http\Resources\Stocks\StockMovementResource;
+use App\Http\Resources\StockAdjustmentResource;
+use App\Http\Resources\StockMovementResource;
 use App\Services\StocksService;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
