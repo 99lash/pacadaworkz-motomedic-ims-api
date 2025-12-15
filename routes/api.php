@@ -15,7 +15,7 @@ use App\Http\Controllers\API\PermissionController;
 use App\Http\Controllers\API\RolePermissionController;
 use App\Http\Controllers\API\PosController;
 use App\Http\Controllers\API\StocksController;
-
+use App\Http\Controllers\API\PurchaseController;
 Route::prefix('v1')->group(function () {
     // Public routes (Unauthenticated)
     Route::middleware('guest.api')->group(function () {
@@ -171,6 +171,15 @@ Route::prefix('v1')->group(function () {
                 });
 
                 Route::post('/checkout', [PosController::class, 'checkoutCart'])->middleware('permissions:Create Transaction');
+            });
+
+            Route::prefix('purchases')->group(function(){
+              Route::get('/');
+              Route::get('/{id}');
+              Route::post('/');
+              Route::patch('/{id}');
+              Route::delete('/{id}');
+
             });
         });
     });
