@@ -12,6 +12,7 @@ use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\AttributeController;
 use App\Http\Controllers\API\InventoryController;
 use App\Http\Controllers\API\SupplierController;
+use App\Http\Controllers\API\StocksController;
 use App\Http\Controllers\GoogleAuthController;
 
 Route::prefix('v1')->group(function () {
@@ -140,6 +141,21 @@ Route::prefix('v1')->group(function () {
                     Route::delete('/{id}', [SupplierController::class,'destroy'])->middleware('permissions:Delete');
                 });
            });
+
+             // Stock-movements
+             Route::prefix('stock-movements')->group(function(){
+                Route::get('/',[StocksController::class,'showStockMovements']);
+                Route::get('/{id}',[StocksController::class,'showStockMovementsById']);
+                Route::get('/cv/export',[StocksController::class,'exportStockMovements']);
+             });
+
+             //stock-adjustment
+             Route::prefix('stock-adjustments')->group(function(){
+                 Route::get('/',[StocksController::class,'showStockAdjustments']);
+                 Route::get('/{id}',[StocksController::class,'showStockAdjustmentsById']);
+                Route::get('/cv/export',[StocksController::class,'exportStockAdjustments']);
+             });
+           
         });
 
       
