@@ -143,21 +143,20 @@ Route::prefix('v1')->group(function () {
             });
 
             //POS
-            Route::prefix('pos')->group(function () {
+            Route::prefix('pos')->middleware('modules:POS')->group(function () {
                 //Cart
                 Route::prefix('cart')->group(function () {
                     //pos module middleware
-                    Route::middleware('modules:POS')->group(function () {
-                        Route::get('/', [PosController::class, 'show']);
-                        Route::post('/add-item', [PosController::class, 'store']);
-                        Route::patch('/update-item/{id}', [PosController::class, 'update']);
-                        Route::delete('/remove-item/{id}', [PosController::class, 'delete']);
-                        Route::post('/clear', [PosController::class, 'clearCart']);
-                        Route::post('/apply-discount', [PosController::class, 'applyDiscount']);
-                    });
+                    Route::get('/', [PosController::class, 'show'])->middleware('permissions:Access');
+                    Route::post('/add-item', [PosController::class, 'store'])->middleware('permissions:Access');
+                    Route::patch('/update-item/{id}', [PosController::class, 'update'])->middleware('permissions:Access');
+                    Route::delete('/remove-item/{id}', [PosController::class, 'delete'])->middleware('permissions:Access');
+                    Route::post('/clear', [PosController::class, 'clearCart'])->middleware('permissions:Access');
+                    Route::post('/apply-discount', [PosController::class, 'applyDiscount'])->middleware('permissions:Access');
                 });
-            });
 
+                Route::post('/checkout', [PosController::class, 'checkoutCart'])->middleware('permissions:Create Transaction');
+            });
         });
     });
 });

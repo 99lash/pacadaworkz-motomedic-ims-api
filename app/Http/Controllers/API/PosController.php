@@ -2,17 +2,21 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Exceptions\POS\Cart\CartItemNotFoundException;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use App\Http\Controllers\API\Controller;
+use App\Exceptions\POS\Cart\CartItemNotFoundException;
+use App\Exceptions\Inventory\InsufficientStockException;
+use App\Exceptions\POS\Cart\EmptyCartException;
 use App\Http\Requests\POS\Cart\ApplyDiscountRequest;
+use App\Http\Requests\POS\CheckoutRequest;
 use App\Http\Requests\POS\Cart\StoreCartItemRequest;
 use App\Http\Requests\POS\Cart\UpdateCartItemRequest;
 use App\Services\PosService;
 use App\Http\Resources\CartResource;
 use App\Http\Resources\CartItemResource;
-use App\Exceptions\POS\Cart\EmptyCartException;
+use App\Http\Resources\SalesTransactionResource;
+use App\Models\SalesTransaction;
 
 class PosController extends Controller
 {
@@ -204,6 +208,45 @@ class PosController extends Controller
                 'message' => 'Internal server error'
                 // 'message' => $e->getMessage(),
             ], $e->getCode());
+        }
+    }
+
+    public function checkoutCart(CheckoutRequest $request)
+    {
+        try {
+            $userId = Auth::id();
+            $validated = $request->validated();
+
+            $transaction = $this->posService->processCheckout($userId, $validated);
+
+            return response()->json([
+                'success' => true,
+                'data' => SalesTransactionResource::make($transaction),
+                'message' => 'Checkout successful'
+            ]);
+        } catch (InsufficientStockException $e) {
+            return response()->json([
+                'success' => false,
+                // 'message' => 'Internal server error'
+                'message' => $e->getMessage(),
+            ], $e->getCode());
+        } catch (EmptyCartException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], $e->getCode());
+        } catch (\Exception $e) {
+            \Log::error('POS Checkout Error: ' . $e->getMessage(), [
+                'user_id' => $userId,
+                'request' => $request->all(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                // 'message' => $e->getMessage(),
+                'message' => 'Internal server error'
+            ], 500);
         }
     }
 }
