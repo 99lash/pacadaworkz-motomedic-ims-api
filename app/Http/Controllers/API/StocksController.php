@@ -80,7 +80,7 @@ class StocksController extends Controller
     {
         try {
             $filePath = $this->stocksService->exportStockAdjustments();
-            return response()->json(['message' => 'Stock adjustments exported successfully.', 'file_path' => $filePath]);
+            return response()->download($filePath)->deleteFileAfterSend(true);
         } catch (Exception $e) {
             return response()->json(['message' => 'An unexpected error occurred during the export.'], 500);
         }

@@ -54,9 +54,40 @@ class StocksService
      * @param array $filters
      * @return mixed // Typically a file path or stream
      */
-    public function exportStockAdjustments(array $filters = [])
+    public function exportStockAdjustments()
     {
-        // Logic to export stock adjustments based on filters
+        $query = StockAdjustment::with('user');
+
+        $adjustments = $query->get();
+
+        $fileName = 'stock-adjustments-' . uniqid() . '.csv';
+        $filePath = storage_path('app/private/' . $fileName);
+
+        $handle = fopen($filePath, 'w');
+
+        // Add CSV headers
+        fputcsv($handle, [
+            'ID',
+            'User Name',
+            'Reason',
+            'Description',
+            'Created At',
+        ]);
+
+        // Add CSV rows
+        foreach ($adjustments as $adjustment) {
+            fputcsv($handle, [
+                $adjustment->id,
+                $adjustment->user->name,
+                $adjustment->reason,
+                $adjustment->description,
+                $adjustment->created_at,
+            ]);
+        }
+
+        fclose($handle);
+
+        return $filePath;
     }
 
     /**
