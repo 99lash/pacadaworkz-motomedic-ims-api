@@ -130,46 +130,7 @@ class StocksService
      */
     public function exportStockMovements(array $filters = [])
     {
-        $query = StockMovement::with(['product.brand', 'user']); // Eager load product.brand as well
-
-        if (isset($filters['product_id'])) {
-            $query->where('product_id', $filters['product_id']);
-        }
-
-        if (isset($filters['user_id'])) {
-            $query->where('user_id', $filters['user_id']);
-        }
-
-        if (isset($filters['product_name'])) {
-            $query->whereHas('product', function ($q) use ($filters) {
-                $q->where('name', 'like', '%' . $filters['product_name'] . '%');
-            });
-        }
-
-        if (isset($filters['user_name'])) {
-            $query->whereHas('user', function ($q) use ($filters) {
-                $q->where('name', 'like', '%' . $filters['user_name'] . '%');
-            });
-        }
-
-        // Add filtering by brand name
-        if (isset($filters['brand_name'])) {
-            $query->whereHas('product.brand', function ($q) use ($filters) {
-                $q->where('name', 'like', '%' . $filters['brand_name'] . '%');
-            });
-        }
-
-        if (isset($filters['movement_type'])) {
-            $query->where('movement_type', $filters['movement_type']);
-        }
-
-        if (isset($filters['start_date'])) {
-            $query->whereDate('created_at', '>=', $filters['start_date']);
-        }
-
-        if (isset($filters['end_date'])) {
-            $query->whereDate('created_at', '<=', $filters['end_date']);
-        }
+        $query = StockMovement::with(['product.brand', 'user']);
 
         $movements = $query->get();
 
