@@ -7,8 +7,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\ProductAttributeResource;
-use App\Http\Requests\ProductRequest;
-use App\Http\Requests\ProductAttributeRequest;
+use App\Http\Requests\Product\ProductRequest;
+use App\Http\Requests\Product\ProductAttributeRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 class ProductController

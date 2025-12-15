@@ -5,7 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Services\RoleService;
 use App\Http\Controllers\API\Controller;
 use App\Http\Resources\RoleResource;
-use App\Http\Requests\RoleRequest;
+use App\Http\Requests\Role\RoleRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class RoleController extends Controller
