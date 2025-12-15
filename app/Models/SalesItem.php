@@ -5,30 +5,27 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 class SalesItem extends Model
 {
-    use SoftDeletes;
-    
-    //
+    // use SoftDeletes;
 
-        // fillable is for mass assigment (allowed na ifill up)
-      protected $fillable = [
+    // fillable is for mass assigment (allowed na ifill up)
+    protected $fillable = [
         'sales_transactions_id',
         'product_id',
+        'quantity',
         'unit_price',
-        'subtotal',
-        'total'
     ];
 
-          //Entity Relationship to the sales_transaction
+    //Entity Relationship to the sales_transaction
     public function sales_transaction(): BelongsTo
     {
-        return $this->belongsTo(SalesTransaction::class);
+        return $this->belongsTo(SalesTransaction::class, 'sales_transactions_id');
     }
 
-    public function product():BelongsTo
+    public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
     }
-
 }

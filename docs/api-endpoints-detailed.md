@@ -178,7 +178,7 @@
 | -------- | ---------------------------------- | ------------------------------ | ------ | -------- |
 | `GET`    | `/api/v1/pos/cart`                 | Get current user's active cart | Auth   | -        |
 | `POST`   | `/api/v1/pos/cart/add-item`        | Add product to cart            | Auth   | -        |
-| `PUT`    | `/api/v1/pos/cart/update-item/:id` | Update cart item quantity      | Auth   | -        |
+| `PATCH`    | `/api/v1/pos/cart/update-item/:id` | Update cart item quantity      | Auth   | -        |
 | `DELETE` | `/api/v1/pos/cart/remove-item/:id` | Remove item from cart          | Auth   | -        |
 | `POST`   | `/api/v1/pos/cart/clear`           | Clear all items from cart      | Auth   | -        |
 | `POST`   | `/api/v1/pos/cart/apply-discount`  | Apply discount to cart         | Auth   | -        |

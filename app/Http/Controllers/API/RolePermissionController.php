@@ -4,8 +4,8 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\API\Controller;
 use Illuminate\Http\Request;
-use App\Http\Requests\RolesPermissionRequest; 
-use App\Services\RolePermissionService; 
+use App\Http\Requests\RolesPermissionRequest;
+use App\Services\RolePermissionService;
 use App\Http\Resources\RolePermissionResource;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 

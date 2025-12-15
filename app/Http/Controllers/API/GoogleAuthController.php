@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
 
 use App\Services\GoogleAuthService;
 use Illuminate\Support\Facades\Log;
@@ -28,7 +28,7 @@ class GoogleAuthController
                 'success' => true,
                 'data' => [
                     //remove niyo nalang 'tong UserResource::make and returns raw user data kung gusto niyo idebug
-                    'user' => UserResource::make($result['user']),
+                    // 'user' => UserResource::make($result['user']),
                     'access_token' => $result['access_token'],
                     'refresh_token' => $result['refresh_token']
                 ]
