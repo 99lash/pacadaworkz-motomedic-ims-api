@@ -23,6 +23,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => RoleMiddleware::class,
             'guest.api' => RejectIfAuthenticatedMiddleware::class,
+            'modules' => \App\Http\Middleware\ModuleMiddleware::class,
+            'permissions' => \App\Http\Middleware\PermissionMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
