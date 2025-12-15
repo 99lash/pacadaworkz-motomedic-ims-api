@@ -142,10 +142,11 @@ Route::prefix('v1')->group(function () {
                 });
            });
 
-            // Stock-movements
+             // Stock-movements
              Route::prefix('stock-movements')->group(function(){
                 Route::get('/',[StocksController::class,'showStockMovements']);
                 Route::get('/{id}',[StocksController::class,'showStockMovementsById']);
+                Route::get('/cv/export',[StocksController::class,'exportStockMovements']);
              });
 
              //stock-adjustment

@@ -120,7 +120,7 @@ class StocksController extends Controller
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function showStockMovementsById($id)
+    public function showStockMovementsById(int $id)
     {
         try {
             $result = $this->stocksService->showStockMovementsById($id);
@@ -147,28 +147,11 @@ class StocksController extends Controller
     {
         try {
             $filePath = $this->stocksService->exportStockMovements($request->all());
-            return response()->json(['message' => 'Stock movements exported successfully.', 'file_path' => $filePath]);
+            return response()->download($filePath)->deleteFileAfterSend(true);
         } catch (Exception $e) {
             return response()->json(['message' => 'An unexpected error occurred during the export.'], 500);
         }
     }
 
-    /**
-     * Display a listing of the stock movements for a specific product.
-     *
-     * @param Request $request
-     * @param int $productId
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function getStockMovementsbyProductId(Request $request, $productId)
-    {
-        try {
-            $movements = $this->stocksService->getStockMovementsbyProductId($productId, $request->all());
-            return StockMovementResource::collection($movements)->response();
-        } catch (ModelNotFoundException $e) {
-            return response()->json(['message' => 'Product not found.'], 404);
-        } catch (Exception $e) {
-            return response()->json(['message' => 'An unexpected error occurred.'], 500);
-        }
-    }
+ 
 }
