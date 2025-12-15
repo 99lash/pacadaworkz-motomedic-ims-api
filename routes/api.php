@@ -147,6 +147,11 @@ Route::prefix('v1')->group(function () {
                 Route::get('/',[StocksController::class,'showStockMovements']);
                 Route::get('/{id}',[StocksController::class,'showStockMovementsById']);
              });
+
+             //stock-adjustment
+             Route::prefix('stock-adjustments')->group(function(){
+                 Route::get('/',[StocksController::class,'showStockAdjustments']);
+             });
            
         });
 

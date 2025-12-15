@@ -28,10 +28,22 @@ class StocksController extends Controller
     public function showStockAdjustments(Request $request)
     {
         try {
-            $adjustments = $this->stocksService->showStockAdjustments($request->all());
-            return StockAdjustmentResource::collection($adjustments)->response();
+            $result = $this->stocksService->showStockAdjustments($request->all());
+            //return StockAdjustmentResource::collection($adjustments)->response();
+            return response()->json([
+                'success' => true,
+                 'data' => StockAdjustmentResource::collection($result),
+                  'meta' => [
+                    'current_page' => $result->currentPage(),
+                    'per_page' => $result->perPage(),
+                    'total' => $result->total(),
+                    'last_page' => $result->lastPage(),
+                ],
+                 
+            ]);
         } catch (Exception $e) {
-            return response()->json(['message' => 'An unexpected error occurred.'], 500);
+            // return response()->json(['message' => 'An unexpected error occurred.'], 500);
+             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 

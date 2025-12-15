@@ -7,9 +7,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class StockAdjustment extends Model
 {
-    use SoftDeletes;
-    
-    //
     
      // fillable is for mass assigment (allowed na ifill up)
       protected $fillable = [

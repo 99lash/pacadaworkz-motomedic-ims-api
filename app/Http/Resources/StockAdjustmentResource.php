@@ -16,12 +16,9 @@ class StockAdjustmentResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'user_id' => $this->user_id,
-            'adjustment_no' => $this->adjustment_no,
+            'user' => $this->user->name,
             'reason' => $this->reason,
             'notes' => $this->notes,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
         ];
     }
 }
