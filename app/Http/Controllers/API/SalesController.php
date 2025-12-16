@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Exceptions\Sales\SalesTransactionNotFoundException;
 use App\Http\Controllers\API\Controller;
 use Illuminate\Http\Request;
 use App\Services\SalesService;
@@ -23,7 +24,7 @@ class SalesController extends Controller
             $search = $request->query('search');
             // Extract specific filters
             $filters = $request->only(['user_id', 'payment_method', 'start_date', 'end_date']);
-            
+
             // Call service
             $result = $this->salesService->getAllSales($search, $filters);
 
@@ -56,15 +57,18 @@ class SalesController extends Controller
                 'success' => true,
                 'data' => new SalesTransactionResource($result)
             ]);
-        } catch (ModelNotFoundException $e) {
-             return response()->json([
-                'success' => false,
-                'message' => 'Sales transaction not found'
-            ], 404);
-        } catch (\Exception $e) {
+        } catch (SalesTransactionNotFoundException $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'Sales transaction not found'
+            ], $e->getCode());
+        } catch (\Exception $e) {
+            \Log::error('Sales Get All Error: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal server error',
+                // 'message' => $e->getMessage()
             ], 500);
         }
     }

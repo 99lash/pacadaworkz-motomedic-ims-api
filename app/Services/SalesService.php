@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\Sales\SalesTransactionNotFoundException;
 use App\Models\SalesTransaction;
 
 class SalesService
@@ -38,6 +39,11 @@ class SalesService
 
     public function getSalesById($id)
     {
-        return SalesTransaction::with(['user', 'sales_items.product'])->findOrFail($id);
+        $salesTransaction = SalesTransaction::with(['user', 'sales_items.product'])->find($id);
+
+        if (!$salesTransaction)
+            throw new SalesTransactionNotFoundException();
+
+        return $salesTransaction;
     }
 }
