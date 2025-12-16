@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\API\Controller;
 use App\Services\PurchaseService;
 use App\Http\Resources\PurchaseOrdersResource;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -18,12 +18,19 @@ class PurchaseController extends Controller
         $this->purchaseService = $purchaseService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
         try {
-            //
+             //$search = $request->query('search', null);
+            $result = $this->purchaseService->getPurchases();
+             
+            return response()->json([
+                'success' => true,
+                 'data' => PurchaseOrdersResource::collection($result)
+            ]);
+
         } catch (Exception $e) {
-            //
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
     }
 
@@ -32,7 +39,7 @@ class PurchaseController extends Controller
         try {
             //
         } catch (Exception $e) {
-            //
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
     }
 
@@ -41,9 +48,9 @@ class PurchaseController extends Controller
         try {
             //
         } catch (ModelNotFoundException $e) {
-            //
+            return response()->json(['success' => false, 'error' => 'Purchase order not found.'], 404);
         } catch (Exception $e) {
-            //
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
     }
 
@@ -52,9 +59,9 @@ class PurchaseController extends Controller
         try {
             //
         } catch (ModelNotFoundException $e) {
-            //
+            return response()->json(['success' => false, 'error' => 'Purchase order not found.'], 404);
         } catch (Exception $e) {
-            //
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
     }
 
@@ -63,9 +70,9 @@ class PurchaseController extends Controller
         try {
             //
         } catch (ModelNotFoundException $e) {
-            //
+            return response()->json(['success' => false, 'error' => 'Purchase order not found.'], 404);
         } catch (Exception $e) {
-            //
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
     }
 }
