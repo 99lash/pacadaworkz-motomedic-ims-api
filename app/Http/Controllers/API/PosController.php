@@ -16,7 +16,6 @@ use App\Services\PosService;
 use App\Http\Resources\CartResource;
 use App\Http\Resources\CartItemResource;
 use App\Http\Resources\SalesTransactionResource;
-use App\Models\SalesTransaction;
 
 class PosController extends Controller
 {
