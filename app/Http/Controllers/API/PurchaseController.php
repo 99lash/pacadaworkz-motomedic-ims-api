@@ -21,8 +21,8 @@ class PurchaseController extends Controller
     public function index(Request $request)
     {
         try {
-             //$search = $request->query('search', null);
-            $result = $this->purchaseService->getPurchases();
+             $search = $request->query('search', null);
+            $result = $this->purchaseService->getPurchases($search);
              
             return response()->json([
                 'success' => true,
