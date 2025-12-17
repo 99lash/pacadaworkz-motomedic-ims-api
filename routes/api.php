@@ -172,13 +172,13 @@ Route::prefix('v1')->group(function () {
 
                 Route::post('/checkout', [PosController::class, 'checkoutCart'])->middleware('permissions:Create Transaction');
             });
-
+            //purchase
             Route::prefix('purchases')->group(function(){
               Route::get('/', [PurchaseController::class, 'index']);
               Route::get('/{id}',[PurchaseController::class, 'show']);
               Route::post('/',[PurchaseController::class,'store']);
-              Route::patch('/{id}', [PurchaseController::class, 'update']);
-              Route::delete('/{id}');
+              Route::patch('/{id}',[PurchaseController::class, 'update']);
+              Route::delete('/{id}',[PurchaseController::class,'destroy']);
 
             });
         });

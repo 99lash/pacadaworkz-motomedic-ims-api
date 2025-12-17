@@ -50,16 +50,20 @@ public function getPurchases($search = null)
     }
 
 
-    //update purchase
+    //update purchase service
     public function updatePurchase($id, array $data)
     {
         $purchase = $this->findPurchase($id);
         $purchase->update($data);
         return $purchase;
     }
+   
 
+  // delete purchase service
     public function deletePurchase($id)
     {
-        //
+        $purchase = PurchaseOrder::findOrFail($id);
+
+        return $purchase->delete();
     }
 }

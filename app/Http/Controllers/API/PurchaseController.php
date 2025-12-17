@@ -85,10 +85,17 @@ class PurchaseController extends Controller
         }
     }
 
+    //Delete purchase
     public function destroy($id)
     {
         try {
-            //
+            $result = $this->purchaseService->deletePurchase($id);
+             return response()->json([
+                'success' => true,
+                'data' => [
+                    'message' => 'Product deleted successfully']
+                ]
+            );
         } catch (ModelNotFoundException $e) {
             return response()->json(['success' => false, 'error' => 'Purchase order not found.'], 404);
         } catch (Exception $e) {
