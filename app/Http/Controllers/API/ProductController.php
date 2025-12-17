@@ -26,9 +26,9 @@ class ProductController
      
     try{
     $search = $request->query('search',null);
-    $filter = $request->query('filter',null);   
+  
      
-    $result = $this->productService->getAllProducts($search,$filter);
+    $result = $this->productService->getAllProducts($search);
      return response()->json([
         'success' => true,
         'data' => ProductResource::collection($result),
