@@ -40,7 +40,7 @@ class BrandController
     }catch(\Exception $e){
           return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An error is occurred'
             ], 401);
     }
    }
@@ -69,7 +69,7 @@ class BrandController
       } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An error is occurred'
             ], 500);
       }
 
@@ -92,7 +92,7 @@ class BrandController
      }catch(\Exception $e){
            return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An error is occurred'
             ], 500);
      }
 
@@ -118,7 +118,7 @@ class BrandController
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An error is occurred'
             ], 500);
         }
     }
@@ -147,7 +147,7 @@ class BrandController
         }catch(\Exception $e){
                return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An error is occurred'
             ], 500);
         }
 
