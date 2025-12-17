@@ -22,7 +22,13 @@ class PurchaseOrdersRequest extends FormRequest
     public function rules(): array
     {
         return [
-            
+            'supplier_id' => 'required',
+            'user_id' => 'required',
+            'order_date' => 'required|date',
+            'expected_delivery' =>'nullable|date',
+            'total_amount' => 'required',
+            'status' => 'nullable',
+             'notes' => 'nullable'
         ];
     }
 }

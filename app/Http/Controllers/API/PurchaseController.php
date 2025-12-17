@@ -7,6 +7,8 @@ use App\Services\PurchaseService;
 use App\Http\Resources\PurchaseOrdersResource;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use App\Http\Requests\Product\ProductAttributeRequest;
+use App\Http\Requests\Purchase\PurchaseOrdersRequest;
 use Exception;
 
 class PurchaseController extends Controller
@@ -36,10 +38,15 @@ class PurchaseController extends Controller
         }
     }
 
-    public function store(Request $request)
+    //store new Purchase
+    public function store(PurchaseOrdersRequest $request)
     {
         try {
-            //
+            $result = $this->purchaseService->createPurchase($request->validated());
+            return response()->json([
+                'success' => true,
+                'data' => new PurchaseOrdersResource($result)
+            ]);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }

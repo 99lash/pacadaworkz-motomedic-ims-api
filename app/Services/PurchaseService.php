@@ -4,7 +4,7 @@ namespace App\Services;
 use App\Models\PurchaseOrder;
 class PurchaseService
 {
-
+//get purchase service
 public function getPurchases($search = null)
 {
     $query = PurchaseOrder::with(['supplier', 'user']);
@@ -37,10 +37,10 @@ public function getPurchases($search = null)
 
 
 
-
+// create purchase service
     public function createPurchase(array $data)
     {
-        //
+         return PurchaseOrder::create($data);
     }
 
     public function findPurchase($id)
