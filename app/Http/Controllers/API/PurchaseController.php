@@ -17,7 +17,9 @@ class PurchaseController extends Controller
     {
         $this->purchaseService = $purchaseService;
     }
+ 
 
+    // show all purchase
     public function index(Request $request)
     {
         try {
@@ -42,11 +44,18 @@ class PurchaseController extends Controller
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
     }
-
+ // get by id 
     public function show($id)
     {
         try {
-            //
+            
+            $result = $this->purchaseService->findPurchase($id);
+             
+            return [
+                'success' => true,
+                'data' => new PurchaseOrdersResource($result)
+            ];
+
         } catch (ModelNotFoundException $e) {
             return response()->json(['success' => false, 'error' => 'Purchase order not found.'], 404);
         } catch (Exception $e) {

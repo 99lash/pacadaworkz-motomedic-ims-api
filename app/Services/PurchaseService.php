@@ -45,7 +45,8 @@ public function getPurchases($search = null)
 
     public function findPurchase($id)
     {
-        //
+        
+        return PurchaseOrder::findOrFail($id);
     }
 
     public function updatePurchase($id, array $data)
