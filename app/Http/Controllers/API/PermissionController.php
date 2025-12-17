@@ -30,7 +30,7 @@ class PermissionController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An error occured',
             ], 500);
         }
     }

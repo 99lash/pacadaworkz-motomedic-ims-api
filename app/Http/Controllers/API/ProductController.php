@@ -26,9 +26,9 @@ class ProductController
      
     try{
     $search = $request->query('search',null);
-    $filter = $request->query('filter',null);   
+  
      
-    $result = $this->productService->getAllProducts($search,$filter);
+    $result = $this->productService->getAllProducts($search);
      return response()->json([
         'success' => true,
         'data' => ProductResource::collection($result),
@@ -43,7 +43,7 @@ class ProductController
     }catch(\Exception $e){
          return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' =>'An error occured',
             ], 500);
 
 
@@ -76,7 +76,7 @@ class ProductController
       }catch(\Exception $e){
                  return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' =>'An error occured',
             ], 500);
 
       }
@@ -109,7 +109,7 @@ class ProductController
       }catch(\Exception $e){
                  return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An error occured',
             ], 500);
 
       }
@@ -140,7 +140,7 @@ class ProductController
       }catch(\Exception $e){
                  return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An error occured',
             ], 500);
 
       }
@@ -173,7 +173,7 @@ public function destroy($id){
       }catch(\Exception $e){
                  return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' =>'An error occured',
             ], 500);
 
       }
@@ -205,7 +205,7 @@ public function destroy($id){
       }catch(\Exception $e){
                  return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' =>'An error occured',
             ], 500);
 
       }
@@ -235,7 +235,7 @@ public function destroy($id){
       }catch(\Exception $e){
                  return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' =>'An error occured',
             ], 500);
 
       }

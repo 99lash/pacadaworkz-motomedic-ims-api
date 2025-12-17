@@ -37,12 +37,12 @@ class InventoryController extends Controller
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Inventory not found',
+                'message' => 'Inventory item not found',
             ], 404);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => 'An error occured',
             ], 500);
         }
     }
@@ -59,7 +59,7 @@ class InventoryController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => 'An error occured',
             ], 500);
         }
     }
@@ -81,7 +81,7 @@ class InventoryController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => 'An error occured',
             ], 500);
         }
     }
@@ -103,7 +103,7 @@ class InventoryController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => 'An error is occurred',
             ], 500);
         }
     }
@@ -125,7 +125,7 @@ class InventoryController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' =>'An error occured',
             ], 500);
         }
     }

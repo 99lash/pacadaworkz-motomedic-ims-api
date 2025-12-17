@@ -29,7 +29,7 @@ class RoleController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An error occured',
             ], 500);
         }
     }
@@ -48,6 +48,11 @@ class RoleController extends Controller
                 'success' => false,
                 'message' => 'Role not found'
             ], 404);
+        }catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occured',
+            ], 500);
         }
     }
 
@@ -64,7 +69,7 @@ class RoleController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An error occured',
             ], 500);
         }
     }
@@ -87,7 +92,7 @@ class RoleController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An error occured',
             ], 500);
         }
     }
@@ -111,7 +116,7 @@ class RoleController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' =>  'An error occured',
             ], 500);
         }
     }

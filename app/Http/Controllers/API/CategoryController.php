@@ -6,6 +6,7 @@ use App\Http\Controllers\API\Controller;
 use App\Http\Requests\CategoryRequest;
 use App\Services\CategoryService;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 class CategoryController extends Controller
 {
 
@@ -33,7 +34,7 @@ class CategoryController extends Controller
        }catch(\Exception $e){
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An error is occurred'
             ], 500);
        }
 
@@ -52,7 +53,7 @@ class CategoryController extends Controller
     }catch(\Exception $e){
          return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An error is occurred'
             ], 500);
     }
     }
@@ -68,11 +69,16 @@ class CategoryController extends Controller
                 'data' => new CategoryResource($result)
             ]);
 
+        }catch(ModelNotFoundException $e){
+               return response()->json([
+                'success' => false,
+                'message' => 'Category not found'
+            ], 404);
         }catch(\Exception $e){
                return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
-            ], 404);
+                'message' => 'An error is occurred'
+            ], 500);
         }
     }
 
@@ -88,11 +94,16 @@ class CategoryController extends Controller
              'data' => new CategoryResource($result)
            ]);
 
+        }catch(ModelNotFoundException $e){
+                return response()->json([
+                'success' => false,
+                'message' => 'Category not found'
+            ], 404);
         }catch(\Exception $e){
                 return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
-            ], 404);
+                'message' => 'An error is occurred'
+            ], 500);
         }
        
     }
@@ -109,11 +120,17 @@ class CategoryController extends Controller
                     'message' => 'Role deleted successfully']
                 ]);
 
+      }catch(ModelNotFoundException $e){
+              
+                   return response()->json([
+                'success' => false,
+                'message' => 'Category not found'
+            ], 404);
       }catch(\Exception $e){
               
                    return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An error is occurred'
             ], 500);
       }
 

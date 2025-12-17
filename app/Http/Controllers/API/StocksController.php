@@ -19,16 +19,12 @@ class StocksController extends Controller
         $this->stocksService = $stocksService;
     }
 
-    /**
-     * Display a listing of the stock adjustments.
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
+     // show stocks adjustments
     public function showStockAdjustments(Request $request)
     {
         try {
-            $result = $this->stocksService->showStockAdjustments($request->all());
+             $search = $request->query('search', null);
+            $result = $this->stocksService->showStockAdjustments($search);
             //return StockAdjustmentResource::collection($adjustments)->response();
             return response()->json([
                 'success' => true,
@@ -110,7 +106,7 @@ class StocksController extends Controller
                 ]
             );
         } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            return response()->json(['message' =>  'An error occured',], 500);
         }
     }
 

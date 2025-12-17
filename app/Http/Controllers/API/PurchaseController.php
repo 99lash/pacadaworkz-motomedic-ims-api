@@ -34,7 +34,7 @@ class PurchaseController extends Controller
             ]);
 
         } catch (Exception $e) {
-            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+            return response()->json(['success' => false, 'error' => 'An error occured',], 500);
         }
     }
 
@@ -48,7 +48,7 @@ class PurchaseController extends Controller
                 'data' => new PurchaseOrdersResource($result)
             ]);
         } catch (Exception $e) {
-            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+            return response()->json(['success' => false, 'error' => 'An error occured',], 500);
         }
     }
  // get by id 
@@ -66,7 +66,7 @@ class PurchaseController extends Controller
         } catch (ModelNotFoundException $e) {
             return response()->json(['success' => false, 'error' => 'Purchase order not found.'], 404);
         } catch (Exception $e) {
-            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+            return response()->json(['success' => false, 'error' => 'An error occured',], 500);
         }
     }
    //update purchase order
@@ -81,7 +81,7 @@ class PurchaseController extends Controller
         } catch (ModelNotFoundException $e) {
             return response()->json(['success' => false, 'error' => 'Purchase order not found.'], 404);
         } catch (Exception $e) {
-            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+            return response()->json(['success' => false, 'error' => 'An error occured',], 500);
         }
     }
 
@@ -99,7 +99,7 @@ class PurchaseController extends Controller
         } catch (ModelNotFoundException $e) {
             return response()->json(['success' => false, 'error' => 'Purchase order not found.'], 404);
         } catch (Exception $e) {
-            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+            return response()->json(['success' => false, 'error' => 'An error occured',], 500);
         }
     }
 }
