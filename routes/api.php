@@ -177,7 +177,7 @@ Route::prefix('v1')->group(function () {
               Route::get('/', [PurchaseController::class, 'index']);
               Route::get('/{id}',[PurchaseController::class, 'show']);
               Route::post('/',[PurchaseController::class,'store']);
-              Route::patch('/{id}');
+              Route::patch('/{id}', [PurchaseController::class, 'update']);
               Route::delete('/{id}');
 
             });

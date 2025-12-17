@@ -21,7 +21,7 @@ class PurchaseOrdersResource extends JsonResource
             'supplier' => $this->supplier->name,
             'user' => $this->user->name,
             'order_date' => $this->order_date,
-            'expected_delivery' => $this->order_delivery,
+            'expected_delivery' => $this->expected_delivery,
             'total_amount' => $this->total_amount,
             'status' => $this->status,
              'notes' => $this->notes

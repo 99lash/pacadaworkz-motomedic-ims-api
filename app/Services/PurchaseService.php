@@ -49,9 +49,13 @@ public function getPurchases($search = null)
         return PurchaseOrder::findOrFail($id);
     }
 
+
+    //update purchase
     public function updatePurchase($id, array $data)
     {
-        //
+        $purchase = $this->findPurchase($id);
+        $purchase->update($data);
+        return $purchase;
     }
 
     public function deletePurchase($id)

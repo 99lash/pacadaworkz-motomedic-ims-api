@@ -21,14 +21,26 @@ class PurchaseOrdersRequest extends FormRequest
      */
     public function rules(): array
     {
+        if ($this->isMethod('put') || $this->isMethod('patch')) {
+            return [
+                'supplier_id' => 'sometimes|required',
+                'user_id' => 'sometimes|required',
+                'order_date' => 'sometimes|required|date',
+                'expected_delivery' => 'nullable|date',
+                'total_amount' => 'sometimes|required',
+                'status' => 'nullable',
+                'notes' => 'nullable'
+            ];
+        }
+
         return [
             'supplier_id' => 'required',
             'user_id' => 'required',
             'order_date' => 'required|date',
-            'expected_delivery' =>'nullable|date',
+            'expected_delivery' => 'nullable|date',
             'total_amount' => 'required',
             'status' => 'nullable',
-             'notes' => 'nullable'
+            'notes' => 'nullable'
         ];
     }
 }

@@ -69,11 +69,15 @@ class PurchaseController extends Controller
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
     }
-
-    public function update(Request $request, $id)
+   //update purchase order
+    public function update(PurchaseOrdersRequest $request, $id)
     {
         try {
-            //
+            $result = $this->purchaseService->updatePurchase($id, $request->validated());
+            return response()->json([
+                'success' => true,
+                'data' => new PurchaseOrdersResource($result)
+            ]);
         } catch (ModelNotFoundException $e) {
             return response()->json(['success' => false, 'error' => 'Purchase order not found.'], 404);
         } catch (Exception $e) {
