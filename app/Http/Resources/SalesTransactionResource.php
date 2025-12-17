@@ -26,8 +26,8 @@ class SalesTransactionResource extends JsonResource
             'discount_type' => $this->discount_type,
             'total_amount' => $this->total_amount,
             'payment_method' => $this->payment_method,
+            'created_at' => $this->created_at,
             'sales_item' => SalesItemResource::collection($this->whenLoaded('sales_items'))
-
         ];
     }
 }

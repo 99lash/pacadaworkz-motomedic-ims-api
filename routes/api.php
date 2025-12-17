@@ -1,21 +1,25 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\PosController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\RoleController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\BrandController;
-use App\Http\Controllers\API\GoogleAuthController;
+use App\Http\Controllers\API\StocksController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\SupplierController;
 use App\Http\Controllers\API\AttributeController;
 use App\Http\Controllers\API\InventoryController;
+use App\Http\Controllers\API\GoogleAuthController;
 use App\Http\Controllers\API\PermissionController;
 use App\Http\Controllers\API\RolePermissionController;
 use App\Http\Controllers\API\PosController;
 use App\Http\Controllers\API\StocksController;
 use App\Http\Controllers\API\PurchaseController;
+use App\Http\Controllers\API\SalesController;
+
 Route::prefix('v1')->group(function () {
     // Public routes (Unauthenticated)
     Route::middleware('guest.api')->group(function () {
@@ -144,14 +148,14 @@ Route::prefix('v1')->group(function () {
             });
 
             // Stock-movements
-            Route::prefix('stock-movements')->group(function(){
+            Route::prefix('stock-movements')->group(function () {
                 Route::get('/', [StocksController::class, 'showStockMovements']);
                 Route::get('/{id}', [StocksController::class, 'showStockMovementsById']);
                 Route::get('/cv/export', [StocksController::class, 'exportStockMovements']);
             });
 
             // Stock-adjustments
-            Route::prefix('stock-adjustments')->group(function(){
+            Route::prefix('stock-adjustments')->group(function () {
                 Route::get('/', [StocksController::class, 'showStockAdjustments']);
                 Route::get('/{id}', [StocksController::class, 'showStockAdjustmentsById']);
                 Route::get('/cv/export', [StocksController::class, 'exportStockAdjustments']);
@@ -180,6 +184,11 @@ Route::prefix('v1')->group(function () {
               Route::patch('/{id}',[PurchaseController::class, 'update'])->middleware('permissions:Edit');
               Route::delete('/{id}',[PurchaseController::class,'destroy'])->middleware('permissions:Delete');
 
+
+            //Sales
+            Route::prefix('sales')->group(function () {
+                Route::get('/', [SalesController::class, 'index']);
+                Route::get('/{id}', [SalesController::class, 'show']);
             });
         });
     });
