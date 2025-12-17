@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 class PurchaseOrder extends Model
 {
-    use SoftDeletes;
+    
     
     //
 
@@ -33,5 +33,11 @@ class PurchaseOrder extends Model
       public function purchase_items(): HasMany
     {
         return $this->hasMany(PurchaseItem::class);
+    }
+
+            //Entity Reletionship to the user
+       public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }

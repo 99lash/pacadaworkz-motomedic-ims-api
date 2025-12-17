@@ -15,6 +15,9 @@ use App\Http\Controllers\API\InventoryController;
 use App\Http\Controllers\API\GoogleAuthController;
 use App\Http\Controllers\API\PermissionController;
 use App\Http\Controllers\API\RolePermissionController;
+use App\Http\Controllers\API\PosController;
+use App\Http\Controllers\API\StocksController;
+use App\Http\Controllers\API\PurchaseController;
 use App\Http\Controllers\API\SalesController;
 
 Route::prefix('v1')->group(function () {
@@ -173,6 +176,14 @@ Route::prefix('v1')->group(function () {
 
                 Route::post('/checkout', [PosController::class, 'checkoutCart'])->middleware('permissions:Create Transaction');
             });
+            //purchase
+            Route::prefix('purchases')->middleware('modules:Purchases')->group(function(){
+              Route::get('/', [PurchaseController::class, 'index'])->middleware('permissions:View');
+              Route::get('/{id}',[PurchaseController::class, 'show'])->middleware('permissions:View');
+              Route::post('/',[PurchaseController::class,'store'])->middleware('permissions:Create');
+              Route::patch('/{id}',[PurchaseController::class, 'update'])->middleware('permissions:Edit');
+              Route::delete('/{id}',[PurchaseController::class,'destroy'])->middleware('permissions:Delete');
+
 
             //Sales
             Route::prefix('sales')->group(function () {

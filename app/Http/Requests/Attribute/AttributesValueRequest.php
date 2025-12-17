@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Attribute;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ProductAttributeRequest extends FormRequest
+class AttributesValueRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,8 +21,11 @@ class ProductAttributeRequest extends FormRequest
      */
     public function rules(): array
     {
+        
+        $id = $this->route('id');
         return [
-            'attribute_value_id' => 'required'
+          //  'attribute_id' => 'required',
+            'value' => 'required|unique:attributes_values,value'
         ];
     }
 }
