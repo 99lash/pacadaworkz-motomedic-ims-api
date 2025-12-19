@@ -17,6 +17,7 @@ use App\Http\Controllers\API\PermissionController;
 use App\Http\Controllers\API\RolePermissionController;
 use App\Http\Controllers\API\PurchaseController;
 use App\Http\Controllers\API\SalesController;
+use App\Http\Controllers\API\DashboardController;
 
 Route::prefix('v1')->group(function () {
     // Public routes (Unauthenticated)
@@ -188,6 +189,12 @@ Route::prefix('v1')->group(function () {
             Route::prefix('sales')->group(function () {
                 Route::get('/', [SalesController::class, 'index']);
                 Route::get('/{id}', [SalesController::class, 'show']);
+            });
+
+
+            //Dashboard
+            Route::prefix('dashboard')->group(function(){
+                Route::get('/stats',[DashboardController::class,'showStats']);
             });
         });
     });
