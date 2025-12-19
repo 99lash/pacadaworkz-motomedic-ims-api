@@ -5,6 +5,7 @@ use App\Models\SalesTransaction;
 use App\Models\User;
 use App\Models\SalesItem;
 use App\Models\Inventory;
+use Carbon\Carbon;
 class DashboardService{
     
 
@@ -27,5 +28,23 @@ class DashboardService{
            'active_users' => $userCount
         ];
 
+
     }
+
+
+      public function getSalesTrend(){
+            $sales = [];
+
+            for($i = 6; $i >= 0; $i--){
+                $date = Carbon::now()->subDays($i)->format('Y-m-d');
+                 $dateConvert = Carbon::now()->subDays($i)->format('M d');  
+                $total = SalesTransaction::whereDate('created_at',$date)->sum('subtotal');
+
+                $sales[$dateConvert] = $total;
+            }
+
+
+
+            return $sales;
+        }
 }

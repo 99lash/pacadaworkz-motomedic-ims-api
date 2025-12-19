@@ -26,15 +26,21 @@ class DashboardController
 
 
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => 'An error occured'], 500);
         }
     }
 
     public function showSalesTrend(){
         try {
-            // Your logic here
+            $result = $this->dashboardService->getSalesTrend();
+
+            return response()->json([
+                'success' => true,
+                 'data' => $result
+            ]);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(
+                ['error' => $e->getMessage()], 500);
         }
     }
 
