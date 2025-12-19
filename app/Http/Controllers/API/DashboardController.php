@@ -61,10 +61,17 @@ class DashboardController
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+   
 
-    public function showRevenuePerCategory(){
+    // show revenue per category 
+    public function showRevenueByCategory(){
         try {
-            // Your logic here
+            $result = $this->dashboardService->getRevenueByCategory();
+
+            return response()->json([
+                'success' => true,
+                'data' => $result
+            ]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
