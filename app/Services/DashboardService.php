@@ -47,4 +47,23 @@ class DashboardService{
 
             return $sales;
         }
+
+
+
+        public function getTopProducts(){
+           $products = Product::count(); 
+           $topProducts = [];
+           $productsName  = Product::pluck('name')->toArray();
+            
+          for($i = 1; $i <= $products; $i++){
+
+            $total = SalesItem::where('product_id',$i)->count();
+            $topProducts[$productsName[$i-1]] = $total;
+          }
+             
+
+          return $topProducts;
+
+        
+        }
 }

@@ -14,6 +14,7 @@ class DashboardController
         $this->dashboardService = $dashboardService;
      }
 
+     //show statistics dashboard
     public function showStats(){
         try {
         
@@ -30,23 +31,32 @@ class DashboardController
         }
     }
 
+
+    //show sales trend
     public function showSalesTrend(){
         try {
             $result = $this->dashboardService->getSalesTrend();
-
+               
             return response()->json([
                 'success' => true,
                  'data' => $result
             ]);
         } catch (\Exception $e) {
             return response()->json(
-                ['error' => $e->getMessage()], 500);
+                ['error' => 'An error occured'], 500);
         }
     }
 
+
+    //show top products
     public function showTopProducts(){
         try {
-            // Your logic here
+        $result = $this->dashboardService->getTopProducts();
+
+        return response()->json([
+            'success' => true,
+            'data' => $result
+        ]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
