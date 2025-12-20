@@ -198,6 +198,7 @@ Route::prefix('v1')->group(function () {
                 Route::get('/charts/sales-trend',[DashboardController::class,'showSalesTrend']);
                 Route::get('/charts/top-products',[DashboardController::class,'showTopProducts']);
                 Route::get('/charts/revenue-by-category',[DashboardController::class,'showRevenueByCategory']);
+                Route::get('/charts/inventory-overview',[DashboardController::class,'showInventoryOverview']);
             });
         });
     });

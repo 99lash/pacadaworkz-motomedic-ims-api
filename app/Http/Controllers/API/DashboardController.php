@@ -4,7 +4,6 @@ namespace App\Http\Controllers\API;
 use App\Services\DashboardService;
 use App\Http\Controllers\API\Controller;
 use Illuminate\Http\Request;
-
 class DashboardController
 {
 
@@ -77,9 +76,17 @@ class DashboardController
         }
     }
 
+    // show inventory overview
     public function showInventoryOverview(){
         try {
-            // Your logic here
+             $result = $this->dashboardService->getInventoryOverview();
+
+             
+            return response()->json([
+                'success' => true,
+                'data' => $result
+            ]);
+
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }

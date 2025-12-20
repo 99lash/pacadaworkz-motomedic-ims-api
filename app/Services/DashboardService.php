@@ -7,6 +7,8 @@ use App\Models\SalesItem;
 use App\Models\Inventory;
 use App\Models\Category;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+
 class DashboardService{
     
 // get dashboard stats
@@ -80,5 +82,31 @@ class DashboardService{
 
         return $revenueByCategory->pluck('total_revenue', 'category_name');
         
+      }
+
+
+      //get inventory Overview
+
+      public function getInventoryOverview(){
+        $totalInventoryValue = Inventory::join('products','inventory.product_id','=','products.id')
+        ->where('inventory.quantity','>',0)
+        ->sum(\Illuminate\Support\Facades\DB::raw('inventory.quantity * products.cost_price'));
+
+        $totalInStocksProducts =  Inventory::join('products','inventory.product_id','=','products.id')
+        ->where('inventory.quantity','>',0)
+        ->count();
+
+
+        $reOrderStock =  Inventory::join('products','inventory.product_id','=','products.id')
+        ->where('inventory.quantity','=',0)
+        ->count();
+
+
+
+        return [
+          'total_inventory_value' => $totalInventoryValue,
+          'in_stock_products' => $totalInStocksProducts,
+           'need_reorder' => $reOrderStock
+        ];
       }
 }
