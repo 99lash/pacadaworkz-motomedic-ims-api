@@ -21,7 +21,12 @@ class DashboardService{
         $lowstock = Inventory::where('quantity','<',10)->count();
        $outOfStock = Inventory::where('quantity', 0)->count();
 
-        return [
+
+
+         $user = auth('api')->user();
+   
+         if($user->role->role_name == 'admin' || $user->role->role_name == 'superadmin' ){
+                 return [
           'total_products' => $productCount,
           'total_revenue' => $revenue,
           'total_transactions' => $transactionCount,
@@ -30,6 +35,16 @@ class DashboardService{
            'out_of_stock' => $outOfStock,
            'active_users' => $userCount
         ];
+         }else if( $user->role->role_name == 'staff' ) {
+
+            return [
+          'total_products' => $productCount,
+           'low_stock'=> $lowstock,
+           'out_of_stock' => $outOfStock,
+        ];
+         }
+          
+      
 
 
     }

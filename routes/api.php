@@ -191,15 +191,20 @@ Route::prefix('v1')->group(function () {
                 Route::get('/{id}', [SalesController::class, 'show']);
             });
 
+              //Dashboard
+            Route::prefix('dashboard')->group(function(){
+                Route::get('/charts/inventory-overview',[DashboardController::class,'showInventoryOverview'])->middleware('permissions:View');
+                Route::get('/charts/revenue-by-category',[DashboardController::class,'showRevenueByCategory'])->middleware('permissions:View');;
+            });
 
-            //Dashboard
+        });
+
+
+         //Dashboard
             Route::prefix('dashboard')->group(function(){
                 Route::get('/stats',[DashboardController::class,'showStats']);
-                Route::get('/charts/sales-trend',[DashboardController::class,'showSalesTrend']);
-                Route::get('/charts/top-products',[DashboardController::class,'showTopProducts']);
-                Route::get('/charts/revenue-by-category',[DashboardController::class,'showRevenueByCategory']);
-                Route::get('/charts/inventory-overview',[DashboardController::class,'showInventoryOverview']);
+                Route::get('/charts/sales-trend',[DashboardController::class,'showSalesTrend'])->middleware('permissions:View');;
+                Route::get('/charts/top-products',[DashboardController::class,'showTopProducts'])->middleware('permissions:View');;
             });
-        });
     });
 });
