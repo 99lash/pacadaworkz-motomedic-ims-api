@@ -16,4 +16,4 @@ Act as a developer that finish the task and needed to create a documented PR. Cr
 
     - Checklist
 
-NOTE: I did push 23+ commits
+NOTE: I did push 13+ commits
