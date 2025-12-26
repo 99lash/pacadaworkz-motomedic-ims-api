@@ -27,7 +27,7 @@ class GoogleAuthController
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'user' => UserResource::make($result['user']),
+                    // 'user' => UserResource::make($result['user']),
                     'access_token' => $result['access_token'],
                     'refresh_token' => $result['refresh_token']
                 ]
