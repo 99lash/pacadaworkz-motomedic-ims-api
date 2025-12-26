@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\API;
 
 use App\Services\GoogleAuthService;
-use Illuminate\Support\Facades\Log;
-use App\Http\Resources\UserResource;
 use App\Http\Requests\Auth\GoogleAuthRequest;
 use App\Exceptions\Auth\UserNotFoundException;
 use App\Exceptions\Auth\InvalidGoogleTokenException;
