@@ -6,6 +6,7 @@ use App\Services\GoogleAuthService;
 use App\Http\Requests\Auth\GoogleAuthRequest;
 use App\Exceptions\Auth\UserNotFoundException;
 use App\Exceptions\Auth\InvalidGoogleTokenException;
+use App\Http\Resources\UserResource;
 
 class GoogleAuthController
 {
@@ -25,8 +26,7 @@ class GoogleAuthController
             return response()->json([
                 'success' => true,
                 'data' => [
-                    //remove niyo nalang 'tong UserResource::make and returns raw user data kung gusto niyo idebug
-                    // 'user' => UserResource::make($result['user']),
+                    'user' => UserResource::make($result['user']),
                     'access_token' => $result['access_token'],
                     'refresh_token' => $result['refresh_token']
                 ]
