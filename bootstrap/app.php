@@ -10,6 +10,7 @@ use App\Http\Middleware\ForceJsonResponseMiddleware;
 use Illuminate\Auth\AuthenticationException;
 use App\Http\Middleware\RejectIfAuthenticatedMiddleware;
 use App\Http\Middleware\RoleMiddleware;
+use App\Http\Middleware\CoopMiddleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -20,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append(ForceJsonResponseMiddleware::class);
+        $middleware->append(CoopMiddleware::class);
         $middleware->alias([
             'role' => RoleMiddleware::class,
             'guest.api' => RejectIfAuthenticatedMiddleware::class,
