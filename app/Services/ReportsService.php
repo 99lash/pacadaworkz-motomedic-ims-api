@@ -5,10 +5,13 @@ use App\Models\SalesItem;
 use App\Models\SalesTransaction;
 use App\Models\PurchaseItem;
 use App\Models\PurchaseOrder;
+use App\Models\Product;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+
 class ReportsService
 {
-
+ // sales report
     public function getSalesReport($start = null,$end = null){
    
 
@@ -42,7 +45,7 @@ $end = $end ?? Carbon::now()->format('Y-m-d');
     }
 
 
-
+// purchase report 
     public function getPurchases($start = null, $end = null){
     $start = $start ?? Carbon::now()->format('Y-m-d');
     $end = $end ?? Carbon::now()->format('Y-m-d');
@@ -67,6 +70,50 @@ $end = $end ?? Carbon::now()->format('Y-m-d');
        'trend' => $trend
     ];
     }
+
+//inventory report 
+    public function getInventory($start = null, $end = null){
+         $start = $start ?? Carbon::now()->format('Y-m-d');
+         $end = $end ?? Carbon::now()->format('Y-m-d');
+   // query of product
+         $productsQuery = Product::query();
+  //inventory
+  $inventory = DB::table('inventory');
+// inventory value
+     $totalInventoryValue = $inventory
+          ->join('products','inventory.product_id','=','products.id')
+          ->select(DB::raw('SUM(products.cost_price * inventory.quantity) as total_value'))
+          ->value('total_value');     
+
+// low stock
+ $lowStock = $inventory->where('quantity','<',10)->count();
+// no stock
+ $noStock =  $inventory->where('quantity','=', 0)->count();
+
+ //product distribution by category
+ $distCategory= DB::table('categories as a')
+    ->join('products as b', 'b.category_id', '=', 'a.id')
+    ->select('a.name', DB::raw('COUNT(b.category_id) as total'))
+    ->groupBy('a.name')
+    ->get();
+// inventory value by category
+  $valCategory = DB::table('categories as a')
+   ->join('products as b', 'b.category_id','=','a.id')
+   ->join('inventory as c', 'c.product_id','=','b.id')
+   ->select('a.name',DB::raw('SUM(c.quantity * b.unit_price) as inventory_value'))
+   ->groupBy('a.name')
+   ->get();
+         return [
+          'total_products' => $productsQuery->count(),
+          'total_value' => $totalInventoryValue,
+           'low_stock' => $lowStock,
+           'out_of_stock' => $noStock,
+           'ditribution_category' => $distCategory,
+           'inventory_value_category' => $valCategory
+         ];
+
+    }
+
     public function getProfitLossReport()
     {
         // will implement later

@@ -202,6 +202,7 @@ Route::prefix('v1')->group(function () {
              Route::prefix('reports')->group(function(){
                 Route::get('/sales',[ReportsController::class,'showSalesReport']);
                 Route::get('/purchases',[ReportsController::class,'showPurchases']);
+                Route::get('/inventory',[ReportsController::class,'showInventory']);
                 Route::get('/profit-loss', [ReportsController::class, 'getProfitLossReport'])->middleware('permissions:View');
              });
  
