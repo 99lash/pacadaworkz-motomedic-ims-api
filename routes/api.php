@@ -189,6 +189,8 @@ Route::prefix('v1')->group(function () {
             Route::prefix('sales')->group(function () {
                 Route::get('/', [SalesController::class, 'index']);
                 Route::get('/{id}', [SalesController::class, 'show']);
+                Route::post('/{id}/void', [SalesController::class, 'void']);
+                Route::post('/{id}/refund', [SalesController::class, 'refund']);
             });
 
             //Dashboard
