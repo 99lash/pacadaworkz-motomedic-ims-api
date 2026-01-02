@@ -43,12 +43,8 @@ class StocksController extends Controller
         }
     }
 
-    /**
-     * Display the specified stock adjustment.
-     *
-     * @param int $id
-     * @return \Illuminate\Http\JsonResponse
-     */
+   // Display the specified stock adjustment.
+
     public function showStockAdjustmentsById($id)
     {
         try {
@@ -66,12 +62,8 @@ class StocksController extends Controller
         }
     }
 
-    /**
-     * Export stock adjustments to a file.
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
+    // Export stock adjustments to a file.
+ 
     public function exportStockAdjustments()
     {
         try {
@@ -82,16 +74,13 @@ class StocksController extends Controller
         }
     }
 
-    /**
-     * Display a listing of the stock movements.
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
+    // Display a listing of the stock movements.
+    
     public function showStockMovements(Request $request)
     {
         try {
-        $result = $this->stocksService->getStockMovements($request->all());
+            $search = $request->query('search', null);
+        $result = $this->stocksService->getStockMovements($search);
             //  return StockMovementResource::collection($movements)->response();
             return response()->json(
                 [
@@ -110,17 +99,13 @@ class StocksController extends Controller
         }
     }
 
-    /**
-     * Display the specified stock movement.
-     *
-     * @param int $id
-     * @return \Illuminate\Http\JsonResponse
-     */
+  // Display the specified stock movement.
+   
     public function showStockMovementsById(int $id)
     {
         try {
             $result = $this->stocksService->showStockMovementsById($id);
-            //return (new StockMovementResource($movement))->response();
+           
 
             return response()->json([
                 'success' => true,
@@ -132,13 +117,8 @@ class StocksController extends Controller
             return response()->json(['message' => 'An unexpected error occurred.'], 500);
         }
     }
+// Export stock movements to a file.
 
-    /**
-     * Export stock movements to a file.
-     *
-        * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function exportStockMovements(Request $request)
     {
         try {
