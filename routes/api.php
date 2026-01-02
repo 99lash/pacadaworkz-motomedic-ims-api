@@ -176,12 +176,12 @@ Route::prefix('v1')->group(function () {
                 Route::post('/checkout', [PosController::class, 'checkoutCart'])->middleware('permissions:Create Transaction');
             });
             //purchase
-            Route::prefix('purchases')->middleware('modules:Purchases')->group(function(){
-              Route::get('/', [PurchaseController::class, 'index'])->middleware('permissions:View');
-              Route::get('/{id}',[PurchaseController::class, 'show'])->middleware('permissions:View');
-              Route::post('/',[PurchaseController::class,'store'])->middleware('permissions:Create');
-              Route::patch('/{id}',[PurchaseController::class, 'update'])->middleware('permissions:Edit');
-              Route::delete('/{id}',[PurchaseController::class,'destroy'])->middleware('permissions:Delete');
+            Route::prefix('purchases')->middleware('modules:Purchases')->group(function () {
+                Route::get('/', [PurchaseController::class, 'index'])->middleware('permissions:View');
+                Route::get('/{id}', [PurchaseController::class, 'show'])->middleware('permissions:View');
+                Route::post('/', [PurchaseController::class, 'store'])->middleware('permissions:Create');
+                Route::patch('/{id}', [PurchaseController::class, 'update'])->middleware('permissions:Edit');
+                Route::delete('/{id}', [PurchaseController::class, 'destroy'])->middleware('permissions:Delete');
             });
 
 
@@ -191,20 +191,19 @@ Route::prefix('v1')->group(function () {
                 Route::get('/{id}', [SalesController::class, 'show']);
             });
 
-              //Dashboard
-            Route::prefix('dashboard')->group(function(){
-                Route::get('/charts/inventory-overview',[DashboardController::class,'showInventoryOverview'])->middleware('permissions:View');
-                Route::get('/charts/revenue-by-category',[DashboardController::class,'showRevenueByCategory'])->middleware('permissions:View');;
+            //Dashboard
+            Route::prefix('dashboard')->group(function () {
+                Route::get('/charts/inventory-overview', [DashboardController::class, 'showInventoryOverview'])->middleware('permissions:View');
+                Route::get('/charts/revenue-by-category', [DashboardController::class, 'showRevenueByCategory'])->middleware('permissions:View');;
             });
-
         });
 
 
-         //Dashboard
-            Route::prefix('dashboard')->group(function(){
-                Route::get('/stats',[DashboardController::class,'showStats']);
-                Route::get('/charts/sales-trend',[DashboardController::class,'showSalesTrend'])->middleware('permissions:View');;
-                Route::get('/charts/top-products',[DashboardController::class,'showTopProducts'])->middleware('permissions:View');;
-            });
+        //Dashboard
+        Route::prefix('dashboard')->group(function () {
+            Route::get('/stats', [DashboardController::class, 'showStats']);
+            Route::get('/charts/sales-trend', [DashboardController::class, 'showSalesTrend'])->middleware('permissions:View');;
+            Route::get('/charts/top-products', [DashboardController::class, 'showTopProducts'])->middleware('permissions:View');;
+        });
     });
 });
