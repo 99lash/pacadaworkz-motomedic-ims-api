@@ -5,7 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Exceptions\Sales\InvalidRefundSalesTransactionException;
 use App\Exceptions\Sales\SalesTransactionNotFoundException;
 use App\Http\Controllers\API\Controller;
-use App\Http\Requests\Sales\VoidTransactionRequest;
+// use App\Http\Requests\Sales\VoidTransactionRequest;
 use App\Http\Requests\Sales\RefundTransactionRequest;
 use Illuminate\Http\Request;
 use App\Services\SalesService;
@@ -98,8 +98,8 @@ class SalesController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
-                // 'message' => 'Internal server error'
+                'message' => 'Internal server error'
+                // 'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -119,19 +119,20 @@ class SalesController extends Controller
         } catch (InvalidRefundSalesTransactionException $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => $e->getMessage() ?? 'Invalid refund sales transaction',
             ], $e->getCode());
         } catch (SalesTransactionNotFoundException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Sales transaction not found'
+                'message' => $e->getMessage() ?? 'Sales transaction not found'
             ], $e->getCode());
         } catch (\Exception $e) {
             \Log::error('Sales Refund Transaction Error: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => 'Internal server error',
+                // 'message' => $e->getMessage(),
             ], 500);
         }
     }

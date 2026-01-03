@@ -69,6 +69,10 @@ class SalesService
                 return $salesTransaction;
             }
 
+            if (in_array($salesTransaction->status, ['refunded', 'partially_refunded'], true)) {
+                throw new InvalidRefundSalesTransactionException();
+            }
+
             // Restore stock
             foreach ($salesTransaction->sales_items as $item) {
                 $inventory = Inventory::where('product_id', $item->product_id)->first();
@@ -88,7 +92,10 @@ class SalesService
     {
         return DB::transaction(function () use ($userId, $salesId, $data) {
             $salesTransaction = SalesTransaction::with('sales_items')
-                ->where('id', $salesId)
+                ->where([
+                    'id' => $salesId,
+                    'user_id' => $userId
+                ])
                 ->first();
 
             if (!$salesTransaction) {
@@ -133,8 +140,7 @@ class SalesService
                     }
                 }
                 $refundAmount = $salesTransaction->total_amount - $salesTransaction->refund_amount;
-                $salesTransaction->status = 'refunded';
-
+                // $salesTransaction->status = 'refunded';
             } else {
                 // Partial
                 foreach ($data['refund_items'] as $refundItem) {
