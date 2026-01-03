@@ -152,10 +152,12 @@
 
 ### Stock Adjustments
 
-| Method | Endpoint                           | Description                     | Access | Features              |
-| ------ | ---------------------------------- | ------------------------------- | ------ | --------------------- |
-| `GET`  | `/api/v1/stock-adjustments`        | List all stock adjustments      | AP, WP | Paginated, Filterable |
-| `GET`  | `/api/v1/stock-adjustments/:id`    | Get specific adjustment details | AP, WP | -                     |
+| Method | Endpoint                        | Description                     | Access | Features              |
+| ------ | ------------------------------- | ------------------------------- | ------ | --------------------- |
+| `GET`  | `/api/v1/stock-adjustments`     | List all stock adjustments      | AP, WP | Paginated, Filterable |
+| `POST` | `/api/v1/stock-adjustments`     | Create new stock adjustment     | AP, WP | Updates inventory     |
+| `GET`  | `/api/v1/stock-adjustments/:id` | Get specific adjustment details | AP, WP | -                     |
+| `PATCH`| `/api/v1/stock-adjustments/:id` | Update adjustment details       | AP, WP | -                     |
 | `GET`  | `/api/v1/stock-adjustments/export` | Export adjustments to CSV/Excel | AP, WP | File Download         |
 
 ---

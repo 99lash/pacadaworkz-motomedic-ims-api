@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Exceptions\Sales\InvalidRefundSalesTransactionException;
 use App\Exceptions\Sales\SalesTransactionNotFoundException;
 use App\Http\Controllers\API\Controller;
+// use App\Http\Requests\Sales\VoidTransactionRequest;
+use App\Http\Requests\Sales\RefundTransactionRequest;
 use Illuminate\Http\Request;
 use App\Services\SalesService;
 use App\Http\Resources\SalesTransactionResource;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Auth;
 
 class SalesController extends Controller
 {
@@ -63,12 +66,73 @@ class SalesController extends Controller
                 'message' => 'Sales transaction not found'
             ], $e->getCode());
         } catch (\Exception $e) {
-            \Log::error('Sales Get All Error: ' . $e->getMessage());
+            \Log::error('Sales Get Error: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
                 'message' => 'Internal server error',
                 // 'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function void(int $id)
+    {
+        try {
+            $userId = Auth::id();
+            // $validated = $request->validated();
+
+            $result = $this->salesService->voidTransaction($userId, $id);
+            return response()->json([
+                'success' => true,
+                'data' => $result,
+                'message' => 'Sales transaction void successfully'
+            ], 200);
+        } catch (SalesTransactionNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sales transaction not found'
+            ], $e->getCode());
+        } catch (\Exception $e) {
+            \Log::error('Sales Void Transaction Error: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal server error'
+                // 'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function refund(RefundTransactionRequest $request, int $id)
+    {
+        try {
+            $userId = Auth::id();
+            $data = $request->validated();
+
+            $result = $this->salesService->refundTransaction($userId, $id, $data);
+            return response()->json([
+                'success' => true,
+                'data' => new SalesTransactionResource($result),
+                'message' => 'Sales transaction refunded successfully'
+            ], 200);
+        } catch (InvalidRefundSalesTransactionException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage() ?? 'Invalid refund sales transaction',
+            ], $e->getCode());
+        } catch (SalesTransactionNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage() ?? 'Sales transaction not found'
+            ], $e->getCode());
+        } catch (\Exception $e) {
+            \Log::error('Sales Refund Transaction Error: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal server error',
+                // 'message' => $e->getMessage(),
             ], 500);
         }
     }
