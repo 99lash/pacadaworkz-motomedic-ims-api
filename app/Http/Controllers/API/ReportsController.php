@@ -32,7 +32,7 @@ class ReportsController extends Controller
         } catch (ModelNotFoundException $e) {
             return response()->json(['message' => 'Report not found'], 404);
         } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            return response()->json(['message' => 'An error occured'], 500);
         }
      }
 
@@ -52,7 +52,7 @@ class ReportsController extends Controller
         } catch (ModelNotFoundException $e) {
             return response()->json(['message' => 'Report not found'], 404);
         } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+              return response()->json(['message' => 'An error occured'], 500);
         }
 
      }
@@ -95,7 +95,28 @@ class ReportsController extends Controller
         }
 
    }
-  
+
+   
+   
+//show stock adjustments
+   public function showStockAdjustments(Request $request){
+                try {
+           $start = $request->query('start_date',null);
+             $end  = $request->query('end_date',null);
+
+             $result = $this->reportsService->getStockAdjustments($start,$end);
+
+               return response()->json([
+                'success' => true,
+                'data' => $result
+             ]); 
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => 'Report not found'], 404);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'An error occured'], 500);
+        }
+
+   }
 
     public function getProfitLossReport()
     {

@@ -159,6 +159,45 @@ return [
        
      }
 
+
+
+public function getStockAdjustments($start = null, $end = null){
+
+    if (!isset($start)) {
+    $start = DB::table('sales_items')->min('created_at'); // returns earliest datetime or null
+    $start = $start ? Carbon::parse($start)->startOfDay() : Carbon::today()->startOfDay();
+     }
+// Kung walang $end, default today
+   $end = $end ?? Carbon::today()->endOfDay();
+//total adjustment count
+$totalAdjustments = DB::table('stock_adjustments')->whereBetween('created_at',[$start,$end])->count();
+
+// adjustment value
+ $adjustmentValue = DB::table('stock_adjustments as a')
+    ->join('stock_movements as b', 'a.id', '=', 'b.reference_id')
+    ->join('products as c', 'c.id', '=', 'b.product_id')
+    ->where('b.reference_type', 'adjustment')
+    ->select(DB::raw("
+        SUM(
+            CASE
+                WHEN b.movement_type = 'in' THEN b.quantity * c.cost_price
+                WHEN b.movement_type = 'out' THEN -b.quantity * c.cost_price
+            END
+        ) as adjustment_value
+    "))
+    ->value('adjustment_value');
+//reasons
+$reasonCounts = DB::table('stock_adjustments')
+    ->select('reason', DB::raw('COUNT(reason) as num_reasons'))
+    ->groupBy('reason')
+    ->get();
+
+return [
+  'total_adjustments' => $totalAdjustments,
+  'adjustments_value' => $adjustmentValue,
+  'adjustments_by_reason' => $reasonCounts
+];
+}
     public function getProfitLossReport()
     {
         // will implement later
