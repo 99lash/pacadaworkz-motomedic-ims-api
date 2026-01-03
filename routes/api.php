@@ -18,6 +18,7 @@ use App\Http\Controllers\API\RolePermissionController;
 use App\Http\Controllers\API\PurchaseController;
 use App\Http\Controllers\API\SalesController;
 use App\Http\Controllers\API\DashboardController;
+use App\Http\Controllers\API\ReportsController;
 
 Route::prefix('v1')->group(function () {
     // Public routes (Unauthenticated)
@@ -198,6 +199,18 @@ Route::prefix('v1')->group(function () {
                 Route::get('/charts/inventory-overview', [DashboardController::class, 'showInventoryOverview'])->middleware('permissions:View');
                 Route::get('/charts/revenue-by-category', [DashboardController::class, 'showRevenueByCategory'])->middleware('permissions:View');;
             });
+
+            //Reports
+             Route::prefix('reports')->group(function(){
+                Route::get('/sales',[ReportsController::class,'showSalesReport'])->middleware('permissions:View');
+                Route::get('/purchases',[ReportsController::class,'showPurchases'])->middleware('permissions:View');
+                Route::get('/inventory',[ReportsController::class,'showInventory'])->middleware('permissions:View');
+                Route::get('/product-performance',[ReportsController::class,'showPerformance'])->middleware('permissions:View');
+                Route::get('/stock-adjustments',[ReportsController::class,'showStockAdjustments'])->middleware('permissions:View');
+                Route::get('/profit-loss', [ReportsController::class, 'getProfitLossReport'])->middleware('permissions:View');
+             });
+ 
+
         });
 
 
