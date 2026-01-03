@@ -88,6 +88,11 @@ class SalesController extends Controller
                 'data' => $result,
                 'message' => 'Sales transaction void successfully'
             ], 200);
+        } catch (InvalidRefundSalesTransactionException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], $e->getCode());
         } catch (SalesTransactionNotFoundException $e) {
             return response()->json([
                 'success' => false,
@@ -99,7 +104,6 @@ class SalesController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Internal server error'
-                // 'message' => $e->getMessage(),
             ], 500);
         }
     }
