@@ -114,6 +114,51 @@ $end = $end ?? Carbon::now()->format('Y-m-d');
 
     }
 
+
+    // get Performance
+
+     public function getPerformance($start = null, $end = null){
+     if (!isset($start)) {
+    $start = DB::table('sales_items')->min('created_at'); // returns earliest datetime or null
+    $start = $start ? Carbon::parse($start)->startOfDay() : Carbon::today()->startOfDay();
+     }
+
+// Kung walang $end, default today
+$end = $end ?? Carbon::today()->endOfDay();
+      $revenueByCategory = DB::table('categories as a')
+      ->leftJoin('products as b' , 'a.id', '=', 'b.category_id')
+      ->leftJoin('sales_items as c', function($join) use ($start,$end){
+        $join->on('b.id','=','c.product_id')
+             ->whereBetween('c.created_at',[$start,$end]);
+      }) ->select(
+        'a.name',
+        DB::raw('COALESCE(SUM(c.unit_price * c.quantity), 0) as total')
+    )
+    ->groupBy('a.name')
+    ->orderBy('a.name')
+    ->get();
+ 
+
+   $revenueByBrand = DB::table('brands as a')
+      ->leftJoin('products as b' , 'a.id', '=', 'b.brand_id')
+      ->leftJoin('sales_items as c', function($join) use ($start,$end){
+        $join->on('b.id','=','c.product_id')
+             ->whereBetween('c.created_at',[$start,$end]);
+      }) ->select(
+        'a.name',
+        DB::raw('COALESCE(SUM(c.unit_price * c.quantity), 0) as total')
+    )
+    ->groupBy('a.name')
+    ->orderBy('a.name')
+    ->get();
+
+return [
+  'revenue_by_category' => $revenueByCategory,
+  'revenue_by_brand' => $revenueByBrand
+];
+       
+     }
+
     public function getProfitLossReport()
     {
         // will implement later
