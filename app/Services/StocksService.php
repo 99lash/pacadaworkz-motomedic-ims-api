@@ -16,9 +16,8 @@ class StocksService
 
     if ($search) {
         $query->where(function ($q) use ($search) {
-            $q->where('reason', 'LIKE', "%{$search}%")
-              ->orWhere('user_id', 'LIKE', "%{$search}%")
-              ->orWhereDate('created_at', $search);
+            $q->where('reason', 'ILIKE', "%{$search}%")
+              ->orWhere('user_id', 'ILIKE', "%{$search}%");
         });
     }
 
@@ -81,24 +80,23 @@ class StocksService
 
             // product name
             $q->whereHas('product', function ($p) use ($search) {
-                $p->where('name', 'LIKE', "%{$search}%");
+                $p->where('name', 'ILIKE', "%{$search}%");
             })
 
             // brand name
             ->orWhereHas('product.brand', function ($b) use ($search) {
-                $b->where('name', 'LIKE', "%{$search}%");
+                $b->where('name', 'ILIKE', "%{$search}%");
             })
 
             // user name
             ->orWhereHas('user', function ($u) use ($search) {
-                $u->where('name', 'LIKE', "%{$search}%");
+                $u->where('name', 'ILIKE', "%{$search}%");
             })
 
             // movement type (in / out / adjustment)
-            ->orWhere('movement_type', 'LIKE', "%{$search}%")
+            ->orWhere('movement_type', 'ILIKE', "%{$search}%");
 
-            // date search (YYYY-MM-DD)
-            ->orWhereDate('created_at', $search);
+           
         });
     }
 

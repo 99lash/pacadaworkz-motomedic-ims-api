@@ -10,7 +10,9 @@ class StockMovement extends Model
 {
    // use SoftDeletes;
     
-    //
+    // Disable timestamps because table only has created_at
+    public $timestamps = false;
+
      // fillable is for mass assigment (allowed na ifill up)
       protected $fillable = [
         'product_id',
