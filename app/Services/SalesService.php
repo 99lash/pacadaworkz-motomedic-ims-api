@@ -6,6 +6,7 @@ use App\Exceptions\Sales\SalesTransactionNotFoundException;
 use App\Exceptions\Sales\InvalidRefundSalesTransactionException;
 use App\Models\Inventory;
 use App\Models\SalesTransaction;
+use App\Models\SystemSetting;
 use Illuminate\Support\Facades\DB;
 
 use App\Models\StockMovement;
@@ -195,5 +196,67 @@ class SalesService
 
             return $salesTransaction;
         });
+    }
+
+    public function getReceiptData($id)
+    {
+        $transaction = SalesTransaction::with(['user', 'sales_items.product'])->find($id);
+
+        if (!$transaction) {
+            throw new SalesTransactionNotFoundException();
+        }
+
+        // Fetch System Settings
+        $settings = SystemSetting::whereIn('setting_key', [
+            'business_name',
+            'business_address',
+            'contact_info',
+            'logo_url',
+            'tax_id',
+            'footer_message',
+            'return_policy'
+        ])->pluck('setting_value', 'setting_key');
+
+        return [
+            'business_info' => [
+                'name' => $settings['business_name'] ?? 'Pacadaworkz Moto Medic',
+                // 'address' => $settings['business_address'] ?? '[Business Address Not Set - Please Configure]',
+                'address' => $settings['business_address'] ?? '10A 5th St East Grace Park, Caloocan, Philippines',
+                // 'contact_info' => $settings['contact_info'] ?? '[Contact No. Not Set]',
+                'contact_info' => $settings['contact_info'] ?? 'pacadaworkz2021@gmail.com',
+                'logo_url' => $settings['logo_url'] ?? null, // Keep null to avoid broken image links
+                // 'tax_id' => $settings['tax_id'] ?? '[TIN/Tax ID Not Set]',
+            ],
+            'transaction_info' => [
+                'reference_number' => $transaction->transaction_no,
+                'date' => $transaction->created_at->format('Y-m-d'),
+                'time' => $transaction->created_at->format('H:i:s'),
+                'cashier_name' => $transaction->user ? $transaction->user->name : 'N/A',
+                'station_id' => 'Main Counter',
+            ],
+            'items' => $transaction->sales_items->map(function ($item) {
+                return [
+                    'name' => $item->product->name,
+                    'quantity' => (float) $item->quantity,
+                    'price' => (float) $item->unit_price,
+                    'subtotal' => (float) ($item->quantity * $item->unit_price),
+                ];
+            }),
+            'totals' => [
+                'subtotal' => (float) $transaction->subtotal,
+                'discount_amount' => (float) $transaction->discount,
+                'tax_amount' => (float) $transaction->tax,
+                'grand_total' => (float) $transaction->total_amount,
+            ],
+            'payment' => [
+                'payment_method' => $transaction->payment_method,
+                'amount_tendered' => (float) $transaction->amount_tendered,
+                'change_due' => (float) $transaction->change,
+            ],
+            'footer' => [
+                'message' => $settings['footer_message'] ?? 'Thank you for your business!',
+                'return_policy' => $settings['return_policy'] ?? 'No return, no exchange.',
+            ]
+        ];
     }
 }

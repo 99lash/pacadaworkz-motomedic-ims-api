@@ -140,4 +140,27 @@ class SalesController extends Controller
             ], 500);
         }
     }
+
+    public function receipt(int $id) {
+        try {
+            $data = $this->salesService->getReceiptData($id);
+
+            return response()->json([
+                'success' => true,
+                'data' => $data
+            ]);
+        } catch (SalesTransactionNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sales transaction not found'
+            ], 404);
+        } catch (\Exception $e) {
+            \Log::error('Sales Transaction Receipt Error: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal server error',
+            ], 500);
+        }
+    }
 }

@@ -192,6 +192,7 @@ Route::prefix('v1')->group(function () {
                 Route::get('/{id}', [SalesController::class, 'show']);
                 Route::post('/{id}/void', [SalesController::class, 'void']);
                 Route::post('/{id}/refund', [SalesController::class, 'refund']);
+                Route::get('/{id}/receipt', [SalesController::class, 'receipt']);
             });
 
             //Dashboard

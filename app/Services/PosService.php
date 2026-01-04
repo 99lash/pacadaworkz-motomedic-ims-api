@@ -11,6 +11,7 @@ use App\Models\Inventory;
 use App\Exceptions\POS\Cart\CartItemNotFoundException;
 use App\Exceptions\POS\Cart\EmptyCartException;
 use App\Exceptions\Inventory\InsufficientStockException;
+use App\Exceptions\POS\InsufficientPaymentException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -167,6 +168,14 @@ class PosService
 
             $totalAmount = max(0, $subtotal - $discountAmount);
 
+            // Calculate change
+            $amountTendered = isset($paymentDetails['amount_tendered']) ? floatval($paymentDetails['amount_tendered']) : $totalAmount;
+
+            if ($amountTendered < $totalAmount)
+                throw new InsufficientPaymentException("Payment is less than the total amount of {$totalAmount}");
+
+            $change = max(0, $amountTendered - $totalAmount);
+
             //create sales transaction
             $transaction = SalesTransaction::create([
                 'user_id' => $userId,
@@ -177,6 +186,8 @@ class PosService
                 'discount_type' => $cart->discount_type,
                 'total_amount' => $totalAmount,
                 'payment_method' => Str::lower($paymentDetails['payment_method']),
+                'amount_tendered' => $amountTendered,
+                'change' => $change,
             ]);
 
             //create sales items and deduct inventory stock
