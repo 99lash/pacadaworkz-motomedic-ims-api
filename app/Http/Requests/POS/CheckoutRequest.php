@@ -23,6 +23,7 @@ class CheckoutRequest extends FormRequest
     {
         return [
             'payment_method' => ['required', 'string'],
+            'amount_tendered' => ['required', 'numeric', 'min:0'],
         ];
     }
 }

@@ -21,6 +21,8 @@ class SalesTransaction extends Model
         'discount_type',
         'total_amount',
         'payment_method',
+        'amount_tendered',
+        'change',
     ];
 
 
