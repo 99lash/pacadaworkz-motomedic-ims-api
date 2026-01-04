@@ -8,6 +8,7 @@ use App\Http\Controllers\API\Controller;
 use App\Exceptions\POS\Cart\CartItemNotFoundException;
 use App\Exceptions\Inventory\InsufficientStockException;
 use App\Exceptions\POS\Cart\EmptyCartException;
+use App\Exceptions\POS\InsufficientPaymentException;
 use App\Http\Requests\POS\Cart\ApplyDiscountRequest;
 use App\Http\Requests\POS\CheckoutRequest;
 use App\Http\Requests\POS\Cart\StoreCartItemRequest;
@@ -227,6 +228,11 @@ class PosController extends Controller
             return response()->json([
                 'success' => false,
                 // 'message' => 'Internal server error'
+                'message' => $e->getMessage(),
+            ], $e->getCode());
+        } catch (InsufficientPaymentException $e) {
+            return response()->json([
+                'success' => false,
                 'message' => $e->getMessage(),
             ], $e->getCode());
         } catch (EmptyCartException $e) {

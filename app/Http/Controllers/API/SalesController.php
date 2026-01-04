@@ -88,6 +88,11 @@ class SalesController extends Controller
                 'data' => $result,
                 'message' => 'Sales transaction void successfully'
             ], 200);
+        } catch (InvalidRefundSalesTransactionException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], $e->getCode());
         } catch (SalesTransactionNotFoundException $e) {
             return response()->json([
                 'success' => false,
@@ -99,7 +104,6 @@ class SalesController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Internal server error'
-                // 'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -133,6 +137,29 @@ class SalesController extends Controller
                 'success' => false,
                 'message' => 'Internal server error',
                 // 'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function receipt(int $id) {
+        try {
+            $data = $this->salesService->getReceiptData($id);
+
+            return response()->json([
+                'success' => true,
+                'data' => $data
+            ]);
+        } catch (SalesTransactionNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sales transaction not found'
+            ], 404);
+        } catch (\Exception $e) {
+            \Log::error('Sales Transaction Receipt Error: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal server error',
             ], 500);
         }
     }
