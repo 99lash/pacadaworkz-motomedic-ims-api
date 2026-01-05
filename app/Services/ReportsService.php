@@ -11,12 +11,16 @@ use Illuminate\Support\Facades\DB;
 
 class ReportsService
 {
+ 
+ 
+ 
+
  // sales report
     public function getSalesReport($start = null,$end = null){
    
 
     $start = $start ?? Carbon::now()->format('Y-m-d');
-$end = $end ?? Carbon::now()->format('Y-m-d');
+    $end = $end ?? Carbon::now()->format('Y-m-d');
 
 
         $query = SalesTransaction::query();
@@ -32,7 +36,6 @@ $end = $end ?? Carbon::now()->format('Y-m-d');
         $query->whereBetween('created_at',[$start,$end]);
       }
 
-    // return $totalSales->sum('total_amount');
 
      return [
         'total_sales' => $query->sum('total_amount'),
@@ -160,46 +163,106 @@ return [
      }
 
 
+public function getStockAdjustments($start = null, $end = null)
+{
+    // Set start date
+    if (!$start) {
+        $start = DB::table('stock_adjustments')->min('created_at');
+        $start = $start
+            ? Carbon::parse($start)->startOfDay()
+            : Carbon::today()->startOfDay();
+    } else {
+        $start = Carbon::parse($start)->startOfDay();
+    }
 
-public function getStockAdjustments($start = null, $end = null){
+    // Set end date
+    $end = $end
+        ? Carbon::parse($end)->endOfDay()
+        : Carbon::today()->endOfDay();
 
-    if (!isset($start)) {
-    $start = DB::table('sales_items')->min('created_at'); // returns earliest datetime or null
+    // Total adjustments count
+    $totalAdjustments = DB::table('stock_adjustments')
+        ->whereBetween('created_at', [$start, $end])
+        ->count();
+
+    // Adjustment value
+    $adjustmentValue = DB::table('stock_adjustments as a')
+        ->join('stock_movements as b', 'a.id', '=', 'b.reference_id')
+        ->join('products as c', 'c.id', '=', 'b.product_id')
+        ->where('b.reference_type', 'adjustment')
+        ->whereBetween('a.created_at', [$start, $end])
+        ->select(DB::raw("
+            SUM(
+                CASE
+                    WHEN b.movement_type = 'in' THEN b.quantity * c.cost_price
+                    WHEN b.movement_type = 'out' THEN -b.quantity * c.cost_price
+                END
+            ) as adjustment_value
+        "))
+        ->value('adjustment_value') ?? 0;
+
+    // Adjustments by reason
+    $reasonCounts = DB::table('stock_adjustments')
+        ->whereBetween('created_at', [$start, $end])
+        ->select('reason', DB::raw('COUNT(*) as num_reasons'))
+        ->groupBy('reason')
+        ->get();
+
+    return [
+        'total_adjustments'       => $totalAdjustments,
+        'adjustments_value'       => $adjustmentValue,
+        'adjustments_by_reason'   => $reasonCounts
+    ];
+}
+
+
+public function getProfitLossReport($start = null, $end = null)
+{
+   if (!isset($start)) {
+    $start = DB::table('stock_movements')->min('created_at'); // returns earliest datetime or null
     $start = $start ? Carbon::parse($start)->startOfDay() : Carbon::today()->startOfDay();
      }
 // Kung walang $end, default today
    $end = $end ?? Carbon::today()->endOfDay();
-//total adjustment count
-$totalAdjustments = DB::table('stock_adjustments')->whereBetween('created_at',[$start,$end])->count();
 
-// adjustment value
- $adjustmentValue = DB::table('stock_adjustments as a')
-    ->join('stock_movements as b', 'a.id', '=', 'b.reference_id')
-    ->join('products as c', 'c.id', '=', 'b.product_id')
-    ->where('b.reference_type', 'adjustment')
-    ->select(DB::raw("
-        SUM(
-            CASE
-                WHEN b.movement_type = 'in' THEN b.quantity * c.cost_price
-                WHEN b.movement_type = 'out' THEN -b.quantity * c.cost_price
-            END
-        ) as adjustment_value
-    "))
-    ->value('adjustment_value');
-//reasons
-$reasonCounts = DB::table('stock_adjustments')
-    ->select('reason', DB::raw('COUNT(reason) as num_reasons'))
-    ->groupBy('reason')
-    ->get();
+    // Revenue
+    $revenue = SalesTransaction::whereBetween('created_at', [$start, $end])
+        ->sum('total_amount');
 
-return [
-  'total_adjustments' => $totalAdjustments,
-  'adjustments_value' => $adjustmentValue,
-  'adjustments_by_reason' => $reasonCounts
-];
+    // Cost of goods sold
+    $costOfGoods = DB::table('sales_items as a')
+        ->join('products as b', 'b.id', '=', 'a.product_id')
+        ->whereBetween('a.created_at', [$start, $end])
+        ->select(DB::raw('SUM(a.quantity * b.cost_price) as cost_of_goods'))
+        ->value('cost_of_goods') ?? 0;
+
+    // Gross profit
+    $grossProfit = $revenue - $costOfGoods;
+
+
+
+$adjustmentLoss = DB::table('stock_adjustments as a')
+->join('stock_movements as b', 'a.id', '=', 'b.reference_id') 
+->join('products as c', 'c.id', '=', 'b.product_id') ->where('reference_type', 'adjustment') 
+->where('movement_type', 'out')  ->whereBetween('a.created_at', [$start, $end])->select(DB::raw('SUM(b.quantity * c.cost_price) as total_cost')) 
+->value('total_cost') ?? 0;
+        
+    // Net profit
+    $netProfit = $grossProfit - $adjustmentLoss;
+
+    // Profit margin (%)
+    $profitMargin = $revenue > 0
+        ? round(($netProfit / $revenue) * 100, 2)
+        : 0;
+
+    return [
+    
+        'revenue'         => $revenue,
+        'cost_of_goods'   => $costOfGoods,
+        'gross_profit'    => $grossProfit,
+        'adjustment_loss' => $adjustmentLoss,
+        'net_profit'      => $netProfit,
+        'profit_margin'   => $profitMargin,
+    ];
 }
-    public function getProfitLossReport()
-    {
-        // will implement later
-    }
 }
