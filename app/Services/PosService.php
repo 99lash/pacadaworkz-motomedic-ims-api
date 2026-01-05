@@ -12,6 +12,7 @@ use App\Exceptions\POS\Cart\CartItemNotFoundException;
 use App\Exceptions\POS\Cart\EmptyCartException;
 use App\Exceptions\Inventory\InsufficientStockException;
 use App\Exceptions\POS\InsufficientPaymentException;
+use App\Models\StockMovement;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -137,7 +138,6 @@ class PosService
 
     public function processCheckout(int $userId, array $paymentDetails)
     {
-        // TODO: Review logic implementation.
         return DB::transaction(function () use ($userId, $paymentDetails) {
             $cart = Cart::where('user_id', $userId)->with('cart_items')->firstOrFail();
 
@@ -190,13 +190,23 @@ class PosService
                 'change' => $change,
             ]);
 
-            //create sales items and deduct inventory stock
+            //create sales items along with its stock movement and deduct inventory stock
             foreach ($cartItems as $item) {
                 SalesItem::create([
                     'sales_transactions_id' => $transaction->id,
                     'product_id' => $item->product_id,
                     'quantity' => $item->quantity,
                     'unit_price' => $item->unit_price,
+                ]);
+
+                StockMovement::create([
+                    'product_id' => $item->product_id,
+                    'user_id' => $userId,
+                    'movement_type' => 'out',
+                    'quantity' => $item->quantity,
+                    'reference_type' => 'sale',
+                    'reference_id' => $transaction->id,
+                    'notes' => "POS Checkout - Transaction # {$transaction->transaction_no}",
                 ]);
 
                 //deduct inventory
