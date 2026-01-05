@@ -118,10 +118,8 @@ class PosController extends Controller
 
     public function delete(int $id)
     {
-
+        $userId = Auth::id();
         try {
-            $userId = Auth::id();
-
             $this->posService->removeCartItem($userId, $id);
 
             return response()->json([
@@ -150,10 +148,8 @@ class PosController extends Controller
 
     public function clearCart()
     {
+        $userId = Auth::id();
         try {
-
-            $userId = Auth::id();
-
             $this->posService->clearCart($userId);
 
             return response()->json([
