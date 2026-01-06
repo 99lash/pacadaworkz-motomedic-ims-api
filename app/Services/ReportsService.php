@@ -8,19 +8,34 @@ use App\Models\PurchaseOrder;
 use App\Models\Product;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-
+use App\Services\ReportCSVService;
 class ReportsService
 {
  
+    protected $reportCSVService;
  
- 
+ public function __construct(ReportCSVService $reportCSVService){
+     $this->reportCSVService = $reportCSVService;
+ }
 
  // sales report
     public function getSalesReport($start = null,$end = null){
    
 
-    $start = $start ?? Carbon::now()->format('Y-m-d');
-    $end = $end ?? Carbon::now()->format('Y-m-d');
+  // Set start date
+    if (!$start) {
+        $start = DB::table('sales_transactions')->min('created_at');
+        $start = $start
+            ? Carbon::parse($start)->startOfDay()
+            : Carbon::today()->startOfDay();
+    } else {
+        $start = Carbon::parse($start)->startOfDay();
+    }
+
+    // Set end date
+    $end = $end
+        ? Carbon::parse($end)->endOfDay()
+        : Carbon::today()->endOfDay();
 
 
         $query = SalesTransaction::query();
@@ -40,7 +55,7 @@ class ReportsService
      return [
         'total_sales' => $query->sum('total_amount'),
         'transactions' => $query->count(),
-        'average_transaction' => $query->avg('total_amount'),
+        'average_transaction' => round($query->avg('total_amount'),2),
         'trend' => $trend
      ];
 
@@ -56,7 +71,7 @@ class ReportsService
   //  $itemsQuery = PurchaseItem::query(); baka magamit soon
     $ordersQuery = PurchaseOrder::query();
     $ordersQuery->whereBetween('created_at',[$start,$end]);
-    $averageOrder = $ordersQuery->avg('total_amount') ?? 0;
+    $averageOrder = round($ordersQuery->avg('total_amount'),2) ?? 0;
 
     $trend = PurchaseOrder::selectRaw('DATE(created_at) as date, SUM(total_amount)as total')
     ->when($start && $end, function($x) use($start,$end){ 
@@ -265,4 +280,31 @@ $adjustmentLoss = DB::table('stock_adjustments as a')
         'profit_margin'   => $profitMargin,
     ];
 }
+
+
+public function getReportCSV($start, $end, $type)
+    {
+        switch ($type) {
+            case 'sales':
+                $data = $this->getSalesReport($start, $end);
+                return $this->reportCSVService->exportSales($data);
+            case 'purchase':
+                $data = $this->getPurchases($start, $end);
+                return $this->reportCSVService->exportPurchase($data);
+            case 'inventory':
+                $data = $this->getInventory($start, $end);
+                return $this->reportCSVService->exportInventory($data);
+            case 'performance':
+                $data = $this->getPerformance($start, $end);
+                return $this->reportCSVService->exportPerformance($data);
+            case 'adjustments':
+                $data = $this->getStockAdjustments($start, $end);
+                return $this->reportCSVService->exportAdjustments($data);
+            case 'profitloss':
+                $data = $this->getProfitLossReport($start, $end);
+                return $this->reportCSVService->exportProfitAndLoss($data);
+        }
+    }
+
+
 }

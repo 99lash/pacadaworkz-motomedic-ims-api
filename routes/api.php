@@ -209,6 +209,7 @@ Route::prefix('v1')->group(function () {
                 Route::get('/product-performance', [ReportsController::class, 'showPerformance'])->middleware('permissions:View');
                 Route::get('/stock-adjustments', [ReportsController::class, 'showStockAdjustments'])->middleware('permissions:View');
                 Route::get('/profit-loss', [ReportsController::class, 'showProfitLossReport'])->middleware('permissions:View');
+                Route::get('/{type}/export',[ReportsController::class,'showReportCSV'])->middleware('permissions:View');
             });
         });
 

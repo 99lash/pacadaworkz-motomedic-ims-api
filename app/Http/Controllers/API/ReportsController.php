@@ -117,7 +117,7 @@ class ReportsController extends Controller
         }
 
    }
-
+ // profit loss
     public function showProfitLossReport(Request $request)
     {
         try {
@@ -135,4 +135,21 @@ class ReportsController extends Controller
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
-}
+
+
+    // export as csv 
+      public function showReportCSV($type,Request $request){
+         try {
+             $start = $request->query('start_date',null);
+             $end  = $request->query('end_date',null);
+             
+             $result = $this->reportsService->getReportCSV($start,$end,$type);
+             return $result; 
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => 'Report not found'], 404);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+      }
+
+    }
