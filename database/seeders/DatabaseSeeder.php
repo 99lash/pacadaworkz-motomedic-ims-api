@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
         // 1. Core Foundations (No dependencies)
         RoleSeeder::class,
         PermissionSeeder::class,
+        RolePermissionSeeder::class,
         CategorySeeder::class,
         BrandSeeder::class,
         SupplierSeeder::class, // <-- CRITICAL: Must be before Purchase Orders
