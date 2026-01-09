@@ -285,6 +285,8 @@
 | `PUT`  | `/api/v1/settings/profile`        | Update user profile      | Auth   | -               |
 | `PUT`  | `/api/v1/settings/password`       | Change user password     | Auth   | -               |
 | `PUT`  | `/api/v1/settings/theme`          | Update theme preference  | Auth   | Light/Dark mode |
+| `GET`  | `/api/v1/settings/system`         | Get global system config | AP, WP | -               |
+| `PUT`  | `/api/v1/settings/system`         | Update global config     | AP, WP | -               |
 | `GET`  | `/api/v1/settings/system/backup`  | Create system backup     | AP, WP | File Download   |
 | `PUT`  | `/api/v1/settings/system/restore` | Restore from backup      | AP, WP | File Upload     |
 
