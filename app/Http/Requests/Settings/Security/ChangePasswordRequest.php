@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Profile;
+namespace App\Http\Requests\Settings\Security;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateProfileRequest extends FormRequest
+class ChangePasswordRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,17 +23,11 @@ class UpdateProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name' => 'sometimes|string|max:50',
-            'last_name' => 'sometimes|string|max:50',
-            'name' => 'sometimes|string|min:1|max:50', //this is user.name hahaha xD!
-            'email' => [
-                'sometimes',
-                'email',
-                Rule::unique('users', 'email')->ignore($this->user()->id),
-            ],
+            'current_password' => 'required|string|current_password',
+            'new_password' => 'required|string|min:8|different:current_password',
+            'confirm_new_password' => 'required|string|same:new_password'
         ];
     }
-
     public function withValidator(Validator $validator)
     {
         $validator->after(function ($validator) {

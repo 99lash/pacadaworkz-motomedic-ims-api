@@ -6,19 +6,20 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\RoleController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\BrandController;
+use App\Http\Controllers\API\SalesController;
 use App\Http\Controllers\API\StocksController;
 use App\Http\Controllers\API\ProductController;
+use App\Http\Controllers\API\ReportsController;
 use App\Http\Controllers\API\CategoryController;
+use App\Http\Controllers\API\PurchaseController;
 use App\Http\Controllers\API\SupplierController;
 use App\Http\Controllers\API\AttributeController;
+use App\Http\Controllers\API\DashboardController;
 use App\Http\Controllers\API\InventoryController;
 use App\Http\Controllers\API\GoogleAuthController;
 use App\Http\Controllers\API\PermissionController;
 use App\Http\Controllers\API\RolePermissionController;
-use App\Http\Controllers\API\PurchaseController;
-use App\Http\Controllers\API\SalesController;
-use App\Http\Controllers\API\DashboardController;
-use App\Http\Controllers\API\ReportsController;
+use App\Http\Controllers\API\ProfileController;
 
 Route::prefix('v1')->group(function () {
     // Public routes (Unauthenticated)
@@ -219,6 +220,12 @@ Route::prefix('v1')->group(function () {
             Route::get('/stats', [DashboardController::class, 'showStats']);
             Route::get('/charts/sales-trend', [DashboardController::class, 'showSalesTrend'])->middleware('permissions:View');;
             Route::get('/charts/top-products', [DashboardController::class, 'showTopProducts'])->middleware('permissions:View');;
+        });
+
+        Route::prefix('settings')->group(function () {
+            Route::get('/profile', [ProfileController::class, 'showProfile']);
+            Route::patch('/profile', [ProfileController::class, 'updateProfile']);
+            Route::patch('/password', [ProfileController::class, 'updatePassword']);
         });
     });
 });

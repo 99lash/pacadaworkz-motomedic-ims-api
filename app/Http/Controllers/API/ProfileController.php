@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\API;
 
 use App\Exceptions\Auth\UserNotFoundException;
-use App\Http\Requests\Profile\UpdateProfileRequest;
+use App\Http\Requests\Settings\Profile\UpdateProfileRequest;
+use App\Http\Requests\Settings\Security\ChangePasswordRequest;
 use App\Http\Resources\ProfileResource;
 use App\Services\UserService;
 
@@ -19,9 +20,6 @@ class ProfileController
         $this->userService = $userService;
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function showProfile()
     {
         $userId = Auth::id();
@@ -52,9 +50,7 @@ class ProfileController
         }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+
     public function updateProfile(UpdateProfileRequest $request)
     {
         $userId = Auth::id();
@@ -66,11 +62,49 @@ class ProfileController
                 'data' => $response,
                 'message' => 'User profile updated successfully'
             ]);
+        } catch (UserNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], $e->getCode());
         } catch (\Exception $e) {
             \Log::error('Settings Profile [PATCH] Error: ' . $e->getMessage(), [
                 'user_id' => $userId,
                 'trace' => $e->getTraceAsString(),
             ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal server error'
+            ], 500);
+        }
+    }
+
+    public function updatePassword(ChangePasswordRequest $request)
+    {
+        $userId = Auth::id();
+        try {
+            $response = $this->userService->changePasswordById($userId, $request->validated());
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Password changed successfully',
+            ]);
+        } catch (UserNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], $e->getCode());
+        } catch (\Exception $e) {
+            \Log::error('Settings Profile Password [PATCH] Error: ' . $e->getMessage(), [
+                'user_id' => $userId,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal server error'
+            ], 500);
         }
     }
 }
