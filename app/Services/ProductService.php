@@ -8,12 +8,13 @@ class ProductService{
 
 
   // get all products
-public function getAllProducts($search = null)
+public function getAllProducts($search = null, $categoryId = null, $brandId = null)
 {
     $query = Product::query()
         ->leftJoin('categories', 'categories.id', '=', 'products.category_id')
         ->leftJoin('brands', 'brands.id', '=', 'products.brand_id')
-        ->select('products.*');
+        ->leftJoin('inventory', 'inventory.product_id', '=', 'products.id')
+        ->select('products.*', 'inventory.quantity as current_stock');
 
     if ($search) {
         $query->where(function ($q) use ($search) {
@@ -23,6 +24,14 @@ public function getAllProducts($search = null)
               ->orWhere('categories.name', 'ILIKE', "%{$search}%")
               ->orWhere('brands.name', 'ILIKE', "%{$search}%");
         });
+    }
+
+    if (!empty($categoryId)) {
+        $query->where('products.category_id', $categoryId);
+    }
+
+    if (!empty($brandId)) {
+        $query->where('products.brand_id', $brandId);
     }
 
     return $query->paginate(10)->withQueryString();
