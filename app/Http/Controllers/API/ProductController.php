@@ -26,9 +26,11 @@ class ProductController
      
     try{
     $search = $request->query('search',null);
+    $categoryId = $request->query('category_id', null);
+    $brandId = $request->query('brand_id', null);
   
      
-    $result = $this->productService->getAllProducts($search);
+    $result = $this->productService->getAllProducts($search, $categoryId, $brandId);
      return response()->json([
         'success' => true,
         'data' => ProductResource::collection($result),
