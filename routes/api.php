@@ -19,10 +19,6 @@ use App\Http\Controllers\API\InventoryController;
 use App\Http\Controllers\API\GoogleAuthController;
 use App\Http\Controllers\API\PermissionController;
 use App\Http\Controllers\API\RolePermissionController;
-use App\Http\Controllers\API\PurchaseController;
-use App\Http\Controllers\API\SalesController;
-use App\Http\Controllers\API\DashboardController;
-use App\Http\Controllers\API\ReportsController;
 use App\Http\Controllers\API\ActivityLogController;
 use App\Http\Controllers\API\ProfileController;
 
