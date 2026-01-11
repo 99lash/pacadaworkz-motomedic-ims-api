@@ -34,7 +34,7 @@ public function log(
     ]);
 }
 
-public function getLogs(?string $search = null)
+public function getLogs(?string $search = null,?int $userId = null)
 {
     // Start query with user relationship
     $query = ActivityLog::with('user');
@@ -45,10 +45,13 @@ public function getLogs(?string $search = null)
             $q->where('module', 'ILIKE', "%{$search}%")
               ->orWhere('action', 'ILIKE', "%{$search}%")
               ->orWhere('description', 'ILIKE', "%{$search}%")
+              ->orWhere('id','ILIKE', "%{$search}%")
               ->orWhereHas('user', function($q2) use ($search) {
                   $q2->where('name', 'ILIKE', "%{$search}%");
               });
         });
+    }else if($userId){
+         $query->where('user_id', $userId);
     }
 
     return $query->orderBy('created_at', 'desc')->paginate(10);
