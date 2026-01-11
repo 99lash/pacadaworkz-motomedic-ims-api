@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
+use App\Exceptions\Auth\UserNotFoundException;
 use App\Http\Controllers\API\Controller;
 use App\Http\Requests\User\ResetPasswordUserRequest;
 use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Services\UserService;
 use App\Http\Resources\UserResource;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 // use App\Models\User;
 
@@ -59,12 +59,20 @@ class UserController extends Controller
                 'success' => true,
                 'data' => UserResource::make($user)
             ]);
-        } catch (ModelNotFoundException $e) {
+        } catch (UserNotFoundException $e) {
             return response()->json([
                 'success' => false,
-                'data' => [],
-                'message' => 'User not found'
-            ], 404);
+                'message' => $e->getMessage()
+            ], $e->getCode());
+        } catch (UserNotFoundException $e) {
+            \Log::error('Settings Profile [GET] Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal server error'
+            ], 500);
         }
     }
 
@@ -92,11 +100,20 @@ class UserController extends Controller
                 'success' => true,
                 'data' => UserResource::make($user)
             ]);
-        } catch (ModelNotFoundException $e) {
+        } catch (UserNotFoundException $e) {
             return response()->json([
                 'success' => false,
-                'message' => "User not found"
-            ], 404);
+                'message' => $e->getMessage()
+            ], $e->getCode());
+        } catch (UserNotFoundException $e) {
+            \Log::error('Settings Profile [GET] Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal server error'
+            ], 500);
         }
     }
 
@@ -130,11 +147,20 @@ class UserController extends Controller
                 'success' => $response,
                 'message' => "User with an id of [{$id}] is deleted successfully"
             ]);
-        } catch (ModelNotFoundException $e) {
+        } catch (UserNotFoundException $e) {
             return response()->json([
                 'success' => false,
-                'message' => "User not found"
-            ], 404);
+                'message' => $e->getMessage()
+            ], $e->getCode());
+        } catch (UserNotFoundException $e) {
+            \Log::error('Settings Profile [GET] Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal server error'
+            ], 500);
         }
     }
 
@@ -146,11 +172,20 @@ class UserController extends Controller
                 'success' => $response,
                 'message' => "Password reset successfully"
             ], 200);
-        } catch (ModelNotFoundException $e) {
+        } catch (UserNotFoundException $e) {
             return response()->json([
                 'success' => false,
-                'message' => "User not found"
-            ], 404);
+                'message' => $e->getMessage()
+            ], $e->getCode());
+        } catch (UserNotFoundException $e) {
+            \Log::error('Settings Profile [GET] Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal server error'
+            ], 500);
         }
     }
 }
