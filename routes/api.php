@@ -19,7 +19,7 @@ use App\Http\Controllers\API\PurchaseController;
 use App\Http\Controllers\API\SalesController;
 use App\Http\Controllers\API\DashboardController;
 use App\Http\Controllers\API\ReportsController;
-
+use App\Http\Controllers\API\ActivityLogController;
 Route::prefix('v1')->group(function () {
     // Public routes (Unauthenticated)
     Route::middleware('guest.api')->group(function () {
@@ -40,7 +40,10 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::middleware('role:superadmin,admin')->group(function () {
-
+             // activity-logs
+            Route::prefix('activity-logs')->group(function(){
+                Route::get('',[ActivityLogController::class,'showLogs']);
+            });
             // Users
             Route::prefix('users')->group(function () {
                 Route::get('/', [UserController::class, 'index']);
@@ -211,6 +214,10 @@ Route::prefix('v1')->group(function () {
                 Route::get('/profit-loss', [ReportsController::class, 'showProfitLossReport'])->middleware('permissions:View');
                 Route::get('/{type}/export',[ReportsController::class,'showReportCSV'])->middleware('permissions:View');
             });
+
+            
+
+
         });
 
 
