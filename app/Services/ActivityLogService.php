@@ -57,5 +57,7 @@ public function getLogs(?string $search = null,?int $userId = null)
     return $query->orderBy('created_at', 'desc')->paginate(10);
 }
 
-   
+   public function getExport(){
+    return ActivityLog::with('user')->orderBy('created_at','desc')->get();
+   }
 }

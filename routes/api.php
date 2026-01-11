@@ -43,6 +43,7 @@ Route::prefix('v1')->group(function () {
              // activity-logs
             Route::prefix('activity-logs')->group(function(){
                 Route::get('',[ActivityLogController::class,'showLogs']);
+                Route::get('/export',[ActivityLogController::class,'export']);
             });
             // Users
             Route::prefix('users')->group(function () {

@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Services\ActivityLogService;
 use App\Http\Resources\ActivityLogResource;
 
+use Symfony\Component\HttpFoundation\StreamedResponse;
+
 class ActivityLogController
 {
       protected $logservice;
@@ -14,7 +16,7 @@ class ActivityLogController
         $this->logservice = $logservice;
     }
 
-
+// show logs
     public function showLogs(Request $request){
       try{
          $search = $request->query('search',null);
@@ -39,4 +41,31 @@ class ActivityLogController
       }
     }
 
+
+// export activity logs
+    public function export(){
+        $logs = $this->logservice->getExport();
+
+        $response = new StreamedResponse(function() use ($logs) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['Timestamp', 'User', 'Module', 'Action', 'Details']);
+
+            foreach ($logs as $log) {
+                fputcsv($handle, [
+                    $log->created_at,
+                    $log->user->name,
+                    $log->module,
+                    $log->action,
+                    $log->description,
+                ]);
+            }
+
+            fclose($handle);
+        });
+
+        $response->headers->set('Content-Type', 'text/csv');
+        $response->headers->set('Content-Disposition', 'attachment; filename="activity-logs.csv"');
+
+        return $response;
+    }
 }

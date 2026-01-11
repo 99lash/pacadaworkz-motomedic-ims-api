@@ -19,7 +19,7 @@ class ActivityLogResource extends JsonResource
         return [
           'timestamp' => $this->created_at,
           'user' => $this->user->name,
-          'moduie' => $this->module,
+          'module' => $this->module,
           'action' => $this->action,
            'details' => $this->description
         ];
