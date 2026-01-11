@@ -42,7 +42,7 @@ Route::prefix('v1')->group(function () {
         Route::middleware('role:superadmin,admin')->group(function () {
              // activity-logs
             Route::prefix('activity-logs')->group(function(){
-                Route::get('',[ActivityLogController::class,'showLogs']);
+                Route::get('',[ActivityLogController::class,'showLogs'])->middleware('permissions:View All');
                 Route::get('/export',[ActivityLogController::class,'export']);
             });
             // Users
