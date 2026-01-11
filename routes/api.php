@@ -19,6 +19,11 @@ use App\Http\Controllers\API\InventoryController;
 use App\Http\Controllers\API\GoogleAuthController;
 use App\Http\Controllers\API\PermissionController;
 use App\Http\Controllers\API\RolePermissionController;
+use App\Http\Controllers\API\PurchaseController;
+use App\Http\Controllers\API\SalesController;
+use App\Http\Controllers\API\DashboardController;
+use App\Http\Controllers\API\ReportsController;
+use App\Http\Controllers\API\ActivityLogController;
 use App\Http\Controllers\API\ProfileController;
 
 Route::prefix('v1')->group(function () {
@@ -41,7 +46,11 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::middleware('role:superadmin,admin')->group(function () {
-
+             // activity-logs
+            Route::prefix('activity-logs')->group(function(){
+                Route::get('',[ActivityLogController::class,'showLogs'])->middleware('permissions:View All');
+                Route::get('/export',[ActivityLogController::class,'export']);
+            });
             // Users
             Route::prefix('users')->group(function () {
                 Route::get('/', [UserController::class, 'index']);
@@ -212,6 +221,10 @@ Route::prefix('v1')->group(function () {
                 Route::get('/profit-loss', [ReportsController::class, 'showProfitLossReport'])->middleware('permissions:View');
                 Route::get('/{type}/export',[ReportsController::class,'showReportCSV'])->middleware('permissions:View');
             });
+
+            
+
+
         });
 
 

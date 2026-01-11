@@ -10,16 +10,17 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Log;
 use App\Exceptions\Auth\UserNotFoundException;
 use App\Exceptions\Auth\InvalidGoogleTokenException;
-
+use App\Services\ActivityLogService;
 class GoogleAuthService
 {
     private Google_Client $googleClient;
-
+    protected ActivityLogService $activityLog;
     public function __construct()
     {
         $this->googleClient = new Google_Client([
             'client_id' => config('services.google.client_id')
         ]);
+        $this->activityLog = $activityLog; // activitylog service
     }
 
     public function authenticate(string $credential)
@@ -43,7 +44,12 @@ class GoogleAuthService
         ]);
 
         $tokens = $this->generateJWTTokens($user);
-
+    $this->activityLog->log(
+            module: 'Authentication',
+            action: 'login',
+            description: 'User logged in via Google',
+            userId: $user->id
+        );
         return [
             'user' => $user,
             'access_token' => $tokens['access_token'],
