@@ -18,8 +18,8 @@ class ActivityLogController
     public function showLogs(Request $request){
       try{
          $search = $request->query('search',null);
-
-         $result = $this->logservice->getLogs($search);
+          $userId = $request->query('user_id',null);
+         $result = $this->logservice->getLogs($search,$userId);
 
             return response()->json([
             'success' =>true,
