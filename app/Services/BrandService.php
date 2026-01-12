@@ -4,7 +4,7 @@ use App\Models\Brand;
 class BrandService{
 
 //get all brands
-public function getAllBrands($search = null){
+public function getAllBrands($search = null, $perPage = 10){
    
     $query = Brand::query();
 
@@ -14,7 +14,7 @@ public function getAllBrands($search = null){
     }
 
 
-    return $query->paginate(10)->withQueryString();
+    return $query->paginate($perPage)->withQueryString();
 
 }
 
