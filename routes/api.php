@@ -235,6 +235,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/profile', [ProfileController::class, 'showProfile']);
             Route::patch('/profile', [ProfileController::class, 'updateProfile']);
             Route::patch('/password', [ProfileController::class, 'updatePassword']);
+            Route::patch('/theme', [ProfileController::class, 'updateTheme']);
         });
     });
 });
