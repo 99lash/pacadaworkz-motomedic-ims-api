@@ -163,7 +163,9 @@ Route::prefix('v1')->group(function () {
             // Stock-adjustments
             Route::prefix('stock-adjustments')->group(function () {
                 Route::get('/', [StocksController::class, 'showStockAdjustments']);
+                Route::post('/', [StocksController::class, 'store']);
                 Route::get('/{id}', [StocksController::class, 'showStockAdjustmentsById']);
+                Route::patch('/{id}', [StocksController::class, 'update']);
                 Route::get('/cv/export', [StocksController::class, 'exportStockAdjustments']);
             });
 

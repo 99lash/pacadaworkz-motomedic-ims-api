@@ -6,6 +6,7 @@ use App\Http\Controllers\API\Controller;
 use App\Http\Resources\StockAdjustmentResource;
 use App\Http\Resources\StockMovementResource;
 use App\Services\StocksService;
+use App\Http\Requests\Stocks\StockAdjustmentRequest;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -40,6 +41,38 @@ class StocksController extends Controller
         } catch (Exception $e) {
             // return response()->json(['message' => 'An unexpected error occurred.'], 500);
              return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+    // Store a newly created stock adjustment in storage.
+    public function store(StockAdjustmentRequest $request)
+    {
+        try {
+            $result = $this->stocksService->createStockAdjustment($request->validated());
+            return response()->json([
+                'success' => true,
+                'data' => new StockAdjustmentResource($result)
+            ], 201);
+        } catch (ModelNotFoundException $e) {
+             return response()->json(['message' => 'Product inventory not found.'], 404);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+    // Update the specified stock adjustment in storage.
+    public function update(StockAdjustmentRequest $request, $id)
+    {
+        try {
+            $result = $this->stocksService->updateStockAdjustment($id, $request->validated());
+            return response()->json([
+                'success' => true,
+                'data' => new StockAdjustmentResource($result)
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => 'Stock adjustment not found.'], 404);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'An unexpected error occurred.'], 500);
         }
     }
 
