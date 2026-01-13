@@ -4,7 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\API\Controller;
 use Illuminate\Http\Request;
-use App\Http\Requests\RolesPermissionRequest;
+use App\Http\Requests\Role\RolesPermissionRequest;
 use App\Services\RolePermissionService;
 use App\Http\Resources\RolePermissionResource;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -48,7 +48,7 @@ class RolePermissionController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' =>  'An error occured',
             ], 500);
         }
     }

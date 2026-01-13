@@ -5,26 +5,45 @@ namespace App\Services;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
-
+use App\Services\ActivityLogService;
 class AuthService
 {
-    // Login user and return token
-    public function login(array $credentials)
+
+    protected $activityLog;
+
+    public function __construct(ActivityLogService $activityLog)
     {
-        // access token 60 mins
-        $accessToken = auth('api')->setTTL(60)->attempt($credentials);
-
-        if (!$accessToken)
-            return false;
-
-        $user = auth('api')->user();
-        //refresh token 15 days
-        $refreshToken = auth('api')->setTTL(21600)->fromUser($user);
-        return [
-            'access_token' => $accessToken,
-            'refresh_token' => $refreshToken
-        ];
+        $this->activityLog = $activityLog;
     }
+    // Login user and return token
+public function login(array $credentials)
+{
+    // Attempt login
+    $accessToken = auth('api')->setTTL(60)->attempt($credentials);
+
+    if (!$accessToken) {
+        return false;
+    }
+
+    // Get authenticated user
+    $user = auth('api')->user();
+
+    // Refresh token 15 days
+    $refreshToken = auth('api')->setTTL(21600)->fromUser($user);
+
+    // Log activity 
+    $this->activityLog->log(
+        module: 'Authentication',
+        action: 'login',
+        description: 'User logged in',
+        userId: $user->id
+    );
+
+    return [
+        'access_token' => $accessToken,
+        'refresh_token' => $refreshToken
+    ];
+}
 
 
     public function refresh()
@@ -41,11 +60,22 @@ class AuthService
         ];
     }
 
-    public function logout()
-    {
-        JWTAuth::invalidate(JWTAuth::getToken());
-        return true;
-    }
+  public function logout()
+{
+    $user = auth('api')->user(); // Save user BEFORE invalidating token
+
+    JWTAuth::invalidate(JWTAuth::getToken());
+
+    // Log logout
+    $this->activityLog->log(
+        module: 'Authentication',
+        action: 'logout',
+        description: 'User logged out',
+        userId: $user->id
+    );
+
+    return true;
+}
 
     // Get authenticated user
     public function me()

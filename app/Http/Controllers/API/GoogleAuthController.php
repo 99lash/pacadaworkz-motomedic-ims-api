@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\API;
 
 use App\Services\GoogleAuthService;
-use Illuminate\Support\Facades\Log;
-use App\Http\Resources\UserResource;
 use App\Http\Requests\Auth\GoogleAuthRequest;
 use App\Exceptions\Auth\UserNotFoundException;
 use App\Exceptions\Auth\InvalidGoogleTokenException;
+use App\Http\Resources\UserResource;
+use Illuminate\Support\Facades\Log;
 
 class GoogleAuthController
 {
@@ -27,7 +27,6 @@ class GoogleAuthController
             return response()->json([
                 'success' => true,
                 'data' => [
-                    //remove niyo nalang 'tong UserResource::make and returns raw user data kung gusto niyo idebug
                     // 'user' => UserResource::make($result['user']),
                     'access_token' => $result['access_token'],
                     'refresh_token' => $result['refresh_token']
@@ -45,10 +44,10 @@ class GoogleAuthController
             ], $e->getCode());
         } catch (\Exception $e) {
             // Uncomment niyo for debugging
-            // Log::error('Google login failed', [
-            //     'error' => $e->getMessage(),
-            //     'trace' => $e->getTraceAsString()
-            // ]);
+            Log::error('Google login failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'Authentication failed. Please try again.'

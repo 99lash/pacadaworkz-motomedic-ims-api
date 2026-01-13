@@ -37,7 +37,7 @@ class SupplierController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' =>  'An error occured',
             ], 500);
         }
     }
@@ -53,7 +53,7 @@ class SupplierController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' =>  'An error occured',
             ], 500);
         }
     }
@@ -74,7 +74,7 @@ class SupplierController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An error occured',
             ], 500);
         }
     }
@@ -95,7 +95,7 @@ class SupplierController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An error occured',
             ], 500);
         }
     }
@@ -116,7 +116,7 @@ class SupplierController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' =>  'An error occured',
             ], 500);
         }
     }

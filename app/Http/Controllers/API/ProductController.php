@@ -7,8 +7,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\ProductAttributeResource;
-use App\Http\Requests\ProductRequest;
-use App\Http\Requests\ProductAttributeRequest;
+use App\Http\Requests\Product\ProductRequest;
+use App\Http\Requests\Product\ProductAttributeRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 class ProductController
@@ -26,9 +26,11 @@ class ProductController
      
     try{
     $search = $request->query('search',null);
-    $filter = $request->query('filter',null);   
+    $categoryId = $request->query('category_id', null);
+    $brandId = $request->query('brand_id', null);
+  
      
-    $result = $this->productService->getAllProducts($search,$filter);
+    $result = $this->productService->getAllProducts($search, $categoryId, $brandId);
      return response()->json([
         'success' => true,
         'data' => ProductResource::collection($result),
@@ -43,7 +45,7 @@ class ProductController
     }catch(\Exception $e){
          return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' =>'An error occured',
             ], 500);
 
 
@@ -76,7 +78,7 @@ class ProductController
       }catch(\Exception $e){
                  return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' =>'An error occured',
             ], 500);
 
       }
@@ -109,7 +111,7 @@ class ProductController
       }catch(\Exception $e){
                  return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An error occured',
             ], 500);
 
       }
@@ -140,7 +142,7 @@ class ProductController
       }catch(\Exception $e){
                  return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An error occured',
             ], 500);
 
       }
@@ -173,7 +175,7 @@ public function destroy($id){
       }catch(\Exception $e){
                  return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' =>'An error occured',
             ], 500);
 
       }
@@ -205,7 +207,7 @@ public function destroy($id){
       }catch(\Exception $e){
                  return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' =>'An error occured',
             ], 500);
 
       }
@@ -235,7 +237,7 @@ public function destroy($id){
       }catch(\Exception $e){
                  return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' =>'An error occured',
             ], 500);
 
       }

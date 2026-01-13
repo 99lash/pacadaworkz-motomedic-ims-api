@@ -8,6 +8,7 @@ use App\Http\Controllers\API\Controller;
 use App\Exceptions\POS\Cart\CartItemNotFoundException;
 use App\Exceptions\Inventory\InsufficientStockException;
 use App\Exceptions\POS\Cart\EmptyCartException;
+use App\Exceptions\POS\InsufficientPaymentException;
 use App\Http\Requests\POS\Cart\ApplyDiscountRequest;
 use App\Http\Requests\POS\CheckoutRequest;
 use App\Http\Requests\POS\Cart\StoreCartItemRequest;
@@ -16,7 +17,6 @@ use App\Services\PosService;
 use App\Http\Resources\CartResource;
 use App\Http\Resources\CartItemResource;
 use App\Http\Resources\SalesTransactionResource;
-use App\Models\SalesTransaction;
 
 class PosController extends Controller
 {
@@ -118,10 +118,8 @@ class PosController extends Controller
 
     public function delete(int $id)
     {
-
+        $userId = Auth::id();
         try {
-            $userId = Auth::id();
-
             $this->posService->removeCartItem($userId, $id);
 
             return response()->json([
@@ -150,10 +148,8 @@ class PosController extends Controller
 
     public function clearCart()
     {
+        $userId = Auth::id();
         try {
-
-            $userId = Auth::id();
-
             $this->posService->clearCart($userId);
 
             return response()->json([
@@ -228,6 +224,11 @@ class PosController extends Controller
             return response()->json([
                 'success' => false,
                 // 'message' => 'Internal server error'
+                'message' => $e->getMessage(),
+            ], $e->getCode());
+        } catch (InsufficientPaymentException $e) {
+            return response()->json([
+                'success' => false,
                 'message' => $e->getMessage(),
             ], $e->getCode());
         } catch (EmptyCartException $e) {

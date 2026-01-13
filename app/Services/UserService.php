@@ -3,6 +3,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\Auth\UserNotFoundException;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -47,8 +48,8 @@ class UserService
     public function getUserById(int $id)
     {
         // return User::find($id);
-        $user = User::findOrFail($id);
-        if (!$user) throw new ModelNotFoundException("User not found");
+        $user = User::with('role')->find($id);
+        if (!$user) throw new UserNotFoundException($id, 'id');
         return $user;
     }
 
@@ -78,7 +79,8 @@ class UserService
 
     public function updateUserById(int $id, array $fields)
     {
-        $user = User::findOrFail($id);
+        $user = User::find($id);
+        if (!$user) throw new UserNotFoundException($id, 'id');
         // if (isset($fields['password'])) {
         //     unset($fields['password']);
         // }
@@ -92,15 +94,17 @@ class UserService
     public function deleteUserById(int $id)
     {
         // return User::destroy($id);
-        $user = User::findOrFail($id);
-        if ($user)
-            return $user->delete();
-        return false;
+        $user = User::find($id);
+        if (!$user) throw new UserNotFoundException($id, 'id');
+
+        return $user->delete();
     }
 
     public function resetPasswordById(int $id, array $fields)
     {
-        $user = User::findOrFail($id);
+        $user = User::find($id);
+
+        if (!$user) throw new UserNotFoundException($id, 'id');
 
         if ($user) {
             $isDefaultPassword = $fields['is_default_password'];
@@ -110,7 +114,7 @@ class UserService
              * NOTE: set niyo yung USER_DEFAULT_PASSWORD sa .env
              *
              **/
-            $newPassword = $isDefaultPassword ? env('USER_DEFAULT_PASSWORD', 'Password@2025!') : $fields['new_password'];
+            $newPassword = $isDefaultPassword ? env('USER_DEFAULT_PASSWORD', 'Password@2026!') : $fields['new_password'];
 
             $user->update([
                 'password' => Hash::make($newPassword)
@@ -119,5 +123,36 @@ class UserService
         }
 
         return false;
+    }
+
+    public function changePasswordById(int $id, array $fields) {
+        $user = User::find($id);
+
+        if (!$user) throw new UserNotFoundException($id, 'id');
+
+        // $currentPassword = $fields['current_password'];
+        $newPassword = $fields['new_password'];
+
+        // NOTE: current_password validation is handled by ChangePasswordRequest.php
+        // di ko na chineck dito kasi sa ChangePasswordRequest.php palang ay vinalidate na, haha wow laravels
+        // if (!Hash::check($currentPassword, $user->password))
+
+        $user->update([
+            'password' => Hash::make($newPassword)
+        ]);
+
+        return true;
+    }
+
+    public function updateThemeById(int $id, array $fields)
+    {
+        $user = User::find($id);
+        if (!$user) throw new UserNotFoundException($id, 'id');
+
+        $user->update([
+            'theme' => $fields['theme']
+        ]);
+
+        return $user;
     }
 }

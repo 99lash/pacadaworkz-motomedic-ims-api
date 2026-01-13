@@ -4,56 +4,36 @@ namespace App\Services;
 
 use App\Models\StockAdjustment;
 use App\Models\StockMovement;
+use App\Models\Inventory;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class StocksService
 {
-    /**
-     * Retrieve and filter stock adjustments.
-     *
-     * @param array $filters
-     * @return LengthAwarePaginator
-     */
-    public function showStockAdjustments(array $filters = []): LengthAwarePaginator
-    {
-        $query = StockAdjustment::query();
+   
+    //show stock adjustments service
+  public function showStockAdjustments(?string $search = null, int $perPage = 15): LengthAwarePaginator
+{
+    $query = StockAdjustment::query();
 
-        if (isset($filters['user_id'])) {
-            $query->where('user_id', $filters['user_id']);
-        }
-
-        if (isset($filters['reason'])) {
-            $query->where('reason', 'like', '%' . $filters['reason'] . '%');
-        }
-
-        if (isset($filters['start_date'])) {
-            $query->whereDate('created_at', '>=', $filters['start_date']);
-        }
-
-        if (isset($filters['end_date'])) {
-            $query->whereDate('created_at', '<=', $filters['end_date']);
-        }
-
-        return $query->paginate($filters['per_page'] ?? 15);
+    if ($search) {
+        $query->where(function ($q) use ($search) {
+            $q->where('reason', 'ILIKE', "%{$search}%")
+              ->orWhere('user_id', 'ILIKE', "%{$search}%");
+        });
     }
 
-    /**
-     * Find a specific stock adjustment by ID.
-     *
-     * @param int $id
-     * @return StockAdjustment
-     */
+    return $query->paginate($perPage)->withQueryString();
+}
+
+    // get specific stock adjustment
     public function showStockAdjustmentsById(int $id): StockAdjustment
     {
         return StockAdjustment::findOrFail($id);
     }
 
-    /**
-     * Export stock adjustment data.
-     *
-     * @param array $filters
-     * @return mixed // Typically a file path or stream
-     */
+    // Export stock adjustment data.
+    
     public function exportStockAdjustments()
     {
         $query = StockAdjustment::with('user');
@@ -90,75 +70,52 @@ class StocksService
         return $filePath;
     }
 
-    /**
-     * Retrieve and filter stock movements.
-     *
-     * @param array $filters
-     * @return LengthAwarePaginator
-     */
-    public function getStockMovements(array $filters = []): LengthAwarePaginator
-    {
-        $query = StockMovement::with(['product.brand', 'user']); // Eager load product.brand as well
+    
+    //  Retrieve and filter stock movements.
+     
+  public function getStockMovements(?string $search = null, int $perPage = 15): LengthAwarePaginator
+{
+    $query = StockMovement::with(['product.brand', 'user']);
 
-        if (isset($filters['product_id'])) {
-            $query->where('product_id', $filters['product_id']);
-        }
+    if ($search) {
+        $query->where(function ($q) use ($search) {
 
-        if (isset($filters['user_id'])) {
-            $query->where('user_id', $filters['user_id']);
-        }
+            // product name
+            $q->whereHas('product', function ($p) use ($search) {
+                $p->where('name', 'ILIKE', "%{$search}%");
+            })
 
-        if (isset($filters['product_name'])) {
-            $query->whereHas('product', function ($q) use ($filters) {
-                $q->where('name', 'like', '%' . $filters['product_name'] . '%');
-            });
-        }
+            // brand name
+            ->orWhereHas('product.brand', function ($b) use ($search) {
+                $b->where('name', 'ILIKE', "%{$search}%");
+            })
 
-        if (isset($filters['user_name'])) {
-            $query->whereHas('user', function ($q) use ($filters) {
-                $q->where('name', 'like', '%' . $filters['user_name'] . '%');
-            });
-        }
+            // user name
+            ->orWhereHas('user', function ($u) use ($search) {
+                $u->where('name', 'ILIKE', "%{$search}%");
+            })
 
-        // Add filtering by brand name
-        if (isset($filters['brand_name'])) {
-            $query->whereHas('product.brand', function ($q) use ($filters) {
-                $q->where('name', 'like', '%' . $filters['brand_name'] . '%');
-            });
-        }
+            // movement type (in / out / adjustment)
+            ->orWhere('movement_type', 'ILIKE', "%{$search}%");
 
-        if (isset($filters['movement_type'])) {
-            $query->where('movement_type', $filters['movement_type']);
-        }
-
-        if (isset($filters['start_date'])) {
-            $query->whereDate('created_at', '>=', $filters['start_date']);
-        }
-
-        if (isset($filters['end_date'])) {
-            $query->whereDate('created_at', '<=', $filters['end_date']);
-        }
-
-        return $query->paginate($filters['per_page'] ?? 15);
+           
+        });
     }
 
-    /**
-     * Find a specific stock movement by ID.
-     *
-     * @param int $id
-     * @return StockMovement
-     */
+    return $query->paginate($perPage)->withQueryString();
+}
+
+
+    // Find a specific stock movement by ID.
+   
     public function showStockMovementsById(int $id): StockMovement
     {
         return StockMovement::findOrFail($id);
     }
 
-    /**
-     * Export stock movements data.
-     *
-     * @param array $filters
-     * @return mixed // Typically a file path or stream
-     */
+    
+     // Export stock movements data.
+  
     public function exportStockMovements(array $filters = [])
     {
         $query = StockMovement::with(['product.brand', 'user']);
@@ -199,16 +156,51 @@ class StocksService
         return $filePath;
     }
 
-    /**
-     * Retrieve stock movements by product ID.
-     *
-     * @param int $productId
-     * @param array $filters
-     * @return LengthAwarePaginator
-     */
+    // Retrieve stock movements by product ID.
+    
     public function getStockMovementsbyProductId(int $productId, array $filters = []): LengthAwarePaginator
     {
         $filters['product_id'] = $productId;
         return $this->getStockMovements($filters);
+    }
+
+    // Create a new stock adjustment
+    public function createStockAdjustment(array $data): StockAdjustment
+    {
+        return DB::transaction(function () use ($data) {
+            // 1. Create StockAdjustment
+            $adjustment = StockAdjustment::create([
+                'user_id' => auth()->id(),
+                'reason' => $data['reason'],
+                'notes' => $data['notes'] ?? null,
+            ]);
+
+            // 2. Update Inventory
+            $inventory = Inventory::where('product_id', $data['product_id'])->firstOrFail();
+            
+            $inventory->quantity += $data['quantity'];
+            $inventory->save();
+
+            // 3. Create StockMovement
+            StockMovement::create([
+                'product_id' => $data['product_id'],
+                'user_id' => auth()->id(),
+                'movement_type' => $data['quantity'] > 0 ? 'in' : 'out',
+                'quantity' => abs($data['quantity']),
+                'reference_type' => 'adjustment',
+                'reference_id' => $adjustment->id,
+                'notes' => $data['notes'] ?? null,
+            ]);
+
+            return $adjustment;
+        });
+    }
+
+    // Update an existing stock adjustment
+    public function updateStockAdjustment(int $id, array $data): StockAdjustment
+    {
+        $adjustment = StockAdjustment::findOrFail($id);
+        $adjustment->update($data);
+        return $adjustment;
     }
 }

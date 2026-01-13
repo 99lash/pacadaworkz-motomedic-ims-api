@@ -23,24 +23,16 @@ class BrandController
     try{ 
          
         $search = $request->query('search',null);
-        $result = $this->brandService->getAllBrands($search);
+        $perPage = $request->query('per_page', 10);
+        $result = $this->brandService->getAllBrands($search, $perPage);
          
-        return response()->json([
-            'success' => true,
-            'data' =>  BrandResource::collection($result),
-             'meta' => [
-                'current_page' => $result->currentPage(),
-                'per_page' => $result->perPage(),
-                 'total' => $result->total(),
-                 'total_pages' => $result->lastPage()
-             ]
-        ]);
+        return BrandResource::collection($result);
         
 
     }catch(\Exception $e){
           return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An error is occurred'
             ], 401);
     }
    }
@@ -69,7 +61,7 @@ class BrandController
       } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An error is occurred'
             ], 500);
       }
 
@@ -92,7 +84,7 @@ class BrandController
      }catch(\Exception $e){
            return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An error is occurred'
             ], 500);
      }
 
@@ -118,7 +110,7 @@ class BrandController
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An error is occurred'
             ], 500);
         }
     }
@@ -147,7 +139,7 @@ class BrandController
         }catch(\Exception $e){
                return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An error is occurred'
             ], 500);
         }
 

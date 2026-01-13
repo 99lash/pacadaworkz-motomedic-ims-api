@@ -152,10 +152,12 @@
 
 ### Stock Adjustments
 
-| Method | Endpoint                           | Description                     | Access | Features              |
-| ------ | ---------------------------------- | ------------------------------- | ------ | --------------------- |
-| `GET`  | `/api/v1/stock-adjustments`        | List all stock adjustments      | AP, WP | Paginated, Filterable |
-| `GET`  | `/api/v1/stock-adjustments/:id`    | Get specific adjustment details | AP, WP | -                     |
+| Method | Endpoint                        | Description                     | Access | Features              |
+| ------ | ------------------------------- | ------------------------------- | ------ | --------------------- |
+| `GET`  | `/api/v1/stock-adjustments`     | List all stock adjustments      | AP, WP | Paginated, Filterable |
+| `POST` | `/api/v1/stock-adjustments`     | Create new stock adjustment     | AP, WP | Updates inventory     |
+| `GET`  | `/api/v1/stock-adjustments/:id` | Get specific adjustment details | AP, WP | -                     |
+| `PATCH`| `/api/v1/stock-adjustments/:id` | Update adjustment details       | AP, WP | -                     |
 | `GET`  | `/api/v1/stock-adjustments/export` | Export adjustments to CSV/Excel | AP, WP | File Download         |
 
 ---
@@ -280,11 +282,13 @@
 | Method | Endpoint                          | Description              | Access | Features        |
 | ------ | --------------------------------- | ------------------------ | ------ | --------------- |
 | `GET`  | `/api/v1/settings/profile`        | Get current user profile | Auth   | -               |
-| `PUT`  | `/api/v1/settings/profile`        | Update user profile      | Auth   | -               |
-| `PUT`  | `/api/v1/settings/password`       | Change user password     | Auth   | -               |
-| `PUT`  | `/api/v1/settings/theme`          | Update theme preference  | Auth   | Light/Dark mode |
+| `PATCH`  | `/api/v1/settings/profile`        | Update user profile      | Auth   | -               |
+| `PATCH`  | `/api/v1/settings/password`       | Change user password     | Auth   | -               |
+| `PATCH`  | `/api/v1/settings/theme`          | Update theme preference  | Auth   | Light/Dark mode |
+| `GET`  | `/api/v1/settings/system`         | Get global system config | AP, WP | -               |
+| `PATCH`  | `/api/v1/settings/system`         | Update global config     | AP, WP | -               |
 | `GET`  | `/api/v1/settings/system/backup`  | Create system backup     | AP, WP | File Download   |
-| `PUT`  | `/api/v1/settings/system/restore` | Restore from backup      | AP, WP | File Upload     |
+| `PATCH`  | `/api/v1/settings/system/restore` | Restore from backup      | AP, WP | File Upload     |
 
 ---
 

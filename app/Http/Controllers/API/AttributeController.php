@@ -5,9 +5,9 @@ use App\Services\AttributeService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\AttributeResource;
-use App\Http\Requests\AttributeRequest;
+use App\Http\Requests\Attribute\AttributeRequest;
 use App\Http\Resources\AttributesValueResource;
-use App\Http\Requests\AttributesValueRequest;
+use App\Http\Requests\Attribute\AttributesValueRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class AttributeController

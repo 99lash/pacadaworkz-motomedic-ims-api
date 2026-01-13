@@ -7,21 +7,36 @@ class ProductService{
 
 
 
-  //get all products
-  public function getAllProducts($search = null,$filter = null){
-    
-    $query = Product::query();
-    
-    if ($search) 
-     $query->where('name','Ilike',"%{$search}%")->orWhere('description','Ilike',"%{$search}%")->orWhere('sku','Ilike',"%{$search}%");
-    else if($filter)
- $query->join('categories', 'categories.id', '=', 'products.category_id')->join('brands','brands.id','=','products.brand_id')
-->where('categories.name', 'ILIKE', "%{$filter}%")->orwhere('brands.name','ILike',"%{$filter}%");
+  // get all products
+public function getAllProducts($search = null, $categoryId = null, $brandId = null)
+{
+    $query = Product::query()
+        ->leftJoin('categories', 'categories.id', '=', 'products.category_id')
+        ->leftJoin('brands', 'brands.id', '=', 'products.brand_id')
+        ->leftJoin('inventory', 'inventory.product_id', '=', 'products.id')
+        ->select('products.*', 'inventory.quantity as current_stock');
 
-    
+    if ($search) {
+        $query->where(function ($q) use ($search) {
+            $q->where('products.name', 'ILIKE', "%{$search}%")
+              ->orWhere('products.description', 'ILIKE', "%{$search}%")
+              ->orWhere('products.sku', 'ILIKE', "%{$search}%")
+              ->orWhere('categories.name', 'ILIKE', "%{$search}%")
+              ->orWhere('brands.name', 'ILIKE', "%{$search}%");
+        });
+    }
 
-      return $query->paginate(10)->withQueryString();
-  }
+    if (!empty($categoryId)) {
+        $query->where('products.category_id', $categoryId);
+    }
+
+    if (!empty($brandId)) {
+        $query->where('products.brand_id', $brandId);
+    }
+
+    return $query->paginate(10)->withQueryString();
+}
+
   
  //get products by if
   public function getProductById($id){

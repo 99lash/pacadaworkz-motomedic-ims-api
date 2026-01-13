@@ -5,7 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Services\RoleService;
 use App\Http\Controllers\API\Controller;
 use App\Http\Resources\RoleResource;
-use App\Http\Requests\RoleRequest;
+use App\Http\Requests\Role\RoleRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class RoleController extends Controller
@@ -29,7 +29,7 @@ class RoleController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An error occured',
             ], 500);
         }
     }
@@ -48,6 +48,11 @@ class RoleController extends Controller
                 'success' => false,
                 'message' => 'Role not found'
             ], 404);
+        }catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occured',
+            ], 500);
         }
     }
 
@@ -64,7 +69,7 @@ class RoleController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An error occured',
             ], 500);
         }
     }
@@ -87,7 +92,7 @@ class RoleController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An error occured',
             ], 500);
         }
     }
@@ -111,7 +116,7 @@ class RoleController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' =>  'An error occured',
             ], 500);
         }
     }

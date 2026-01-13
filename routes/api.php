@@ -1,20 +1,26 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\PosController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\RoleController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\BrandController;
-use App\Http\Controllers\API\GoogleAuthController;
+use App\Http\Controllers\API\SalesController;
+use App\Http\Controllers\API\StocksController;
 use App\Http\Controllers\API\ProductController;
+use App\Http\Controllers\API\ReportsController;
 use App\Http\Controllers\API\CategoryController;
+use App\Http\Controllers\API\PurchaseController;
 use App\Http\Controllers\API\SupplierController;
 use App\Http\Controllers\API\AttributeController;
+use App\Http\Controllers\API\DashboardController;
 use App\Http\Controllers\API\InventoryController;
+use App\Http\Controllers\API\GoogleAuthController;
 use App\Http\Controllers\API\PermissionController;
 use App\Http\Controllers\API\RolePermissionController;
-use App\Http\Controllers\API\PosController;
-use App\Http\Controllers\API\StocksController;
+use App\Http\Controllers\API\ActivityLogController;
+use App\Http\Controllers\API\ProfileController;
 
 Route::prefix('v1')->group(function () {
     // Public routes (Unauthenticated)
@@ -36,7 +42,11 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::middleware('role:superadmin,admin')->group(function () {
-
+             // activity-logs
+            Route::prefix('activity-logs')->group(function(){
+                Route::get('',[ActivityLogController::class,'showLogs'])->middleware('permissions:View All');
+                Route::get('/export',[ActivityLogController::class,'export']);
+            });
             // Users
             Route::prefix('users')->group(function () {
                 Route::get('/', [UserController::class, 'index']);
@@ -144,16 +154,18 @@ Route::prefix('v1')->group(function () {
             });
 
             // Stock-movements
-            Route::prefix('stock-movements')->group(function(){
+            Route::prefix('stock-movements')->group(function () {
                 Route::get('/', [StocksController::class, 'showStockMovements']);
                 Route::get('/{id}', [StocksController::class, 'showStockMovementsById']);
                 Route::get('/cv/export', [StocksController::class, 'exportStockMovements']);
             });
 
             // Stock-adjustments
-            Route::prefix('stock-adjustments')->group(function(){
+            Route::prefix('stock-adjustments')->group(function () {
                 Route::get('/', [StocksController::class, 'showStockAdjustments']);
+                Route::post('/', [StocksController::class, 'store']);
                 Route::get('/{id}', [StocksController::class, 'showStockAdjustmentsById']);
+                Route::patch('/{id}', [StocksController::class, 'update']);
                 Route::get('/cv/export', [StocksController::class, 'exportStockAdjustments']);
             });
 
@@ -172,6 +184,60 @@ Route::prefix('v1')->group(function () {
 
                 Route::post('/checkout', [PosController::class, 'checkoutCart'])->middleware('permissions:Create Transaction');
             });
+            //purchase
+            Route::prefix('purchases')->middleware('modules:Purchases')->group(function () {
+                Route::get('/', [PurchaseController::class, 'index'])->middleware('permissions:View');
+                Route::get('/{id}', [PurchaseController::class, 'show'])->middleware('permissions:View');
+                Route::post('/', [PurchaseController::class, 'store'])->middleware('permissions:Create');
+                Route::patch('/{id}', [PurchaseController::class, 'update'])->middleware('permissions:Edit');
+                Route::delete('/{id}', [PurchaseController::class, 'destroy'])->middleware('permissions:Delete');
+            });
+
+
+            //Sales
+            Route::prefix('sales')->group(function () {
+                Route::get('/', [SalesController::class, 'index']);
+                Route::get('/{id}', [SalesController::class, 'show']);
+                Route::post('/{id}/void', [SalesController::class, 'void']);
+                Route::post('/{id}/refund', [SalesController::class, 'refund']);
+                Route::get('/{id}/receipt', [SalesController::class, 'receipt']);
+            });
+
+            //Dashboard
+            Route::prefix('dashboard')->group(function () {
+                Route::get('/charts/inventory-overview', [DashboardController::class, 'showInventoryOverview'])->middleware('permissions:View');
+                Route::get('/charts/revenue-by-category', [DashboardController::class, 'showRevenueByCategory'])->middleware('permissions:View');;
+            });
+
+            //Reports
+            Route::prefix('reports')->group(function () {
+                Route::get('/sales', [ReportsController::class, 'showSalesReport'])->middleware('permissions:View');
+                Route::get('/purchases', [ReportsController::class, 'showPurchases'])->middleware('permissions:View');
+                Route::get('/inventory', [ReportsController::class, 'showInventory'])->middleware('permissions:View');
+                Route::get('/product-performance', [ReportsController::class, 'showPerformance'])->middleware('permissions:View');
+                Route::get('/stock-adjustments', [ReportsController::class, 'showStockAdjustments'])->middleware('permissions:View');
+                Route::get('/profit-loss', [ReportsController::class, 'showProfitLossReport'])->middleware('permissions:View');
+                Route::get('/{type}/export',[ReportsController::class,'showReportCSV'])->middleware('permissions:View');
+            });
+
+            
+
+
+        });
+
+
+        //Dashboard
+        Route::prefix('dashboard')->group(function () {
+            Route::get('/stats', [DashboardController::class, 'showStats']);
+            Route::get('/charts/sales-trend', [DashboardController::class, 'showSalesTrend'])->middleware('permissions:View');;
+            Route::get('/charts/top-products', [DashboardController::class, 'showTopProducts'])->middleware('permissions:View');;
+        });
+
+        Route::prefix('settings')->group(function () {
+            Route::get('/profile', [ProfileController::class, 'showProfile']);
+            Route::patch('/profile', [ProfileController::class, 'updateProfile']);
+            Route::patch('/password', [ProfileController::class, 'updatePassword']);
+            Route::patch('/theme', [ProfileController::class, 'updateTheme']);
         });
     });
 });

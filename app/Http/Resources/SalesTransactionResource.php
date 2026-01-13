@@ -20,14 +20,17 @@ class SalesTransactionResource extends JsonResource
             'id' => $this->id,
             'user_id' => $this->user_id,
             'transaction_no' => $this->transaction_no,
-            'subtotal' => $this->subtotal,
-            'tax' => $this->tax,
-            'discount' => $this->discount,
+            'subtotal' => (float) $this->subtotal,
+            'tax' => (float) $this->tax,
+            'discount' => (float) $this->discount,
             'discount_type' => $this->discount_type,
-            'total_amount' => $this->total_amount,
+            'total_amount' => (float) $this->total_amount,
             'payment_method' => $this->payment_method,
+            'amount_tendered' => (float) $this->amount_tendered,
+            'change' => (float) $this->change,
+            'status' => $this->status,
+            'created_at' => $this->created_at,
             'sales_item' => SalesItemResource::collection($this->whenLoaded('sales_items'))
-
         ];
     }
 }
