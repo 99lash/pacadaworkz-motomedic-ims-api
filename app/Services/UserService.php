@@ -143,4 +143,16 @@ class UserService
 
         return true;
     }
+
+    public function updateThemeById(int $id, array $fields)
+    {
+        $user = User::find($id);
+        if (!$user) throw new UserNotFoundException($id, 'id');
+
+        $user->update([
+            'theme' => $fields['theme']
+        ]);
+
+        return $user;
+    }
 }

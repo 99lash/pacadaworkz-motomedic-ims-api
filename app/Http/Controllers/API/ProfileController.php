@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Exceptions\Auth\UserNotFoundException;
 use App\Http\Requests\Settings\Profile\UpdateProfileRequest;
+use App\Http\Requests\Settings\Profile\UpdateThemeRequest;
 use App\Http\Requests\Settings\Security\ChangePasswordRequest;
 use App\Http\Resources\ProfileResource;
 use App\Services\UserService;
@@ -97,6 +98,34 @@ class ProfileController
             ], $e->getCode());
         } catch (\Exception $e) {
             \Log::error('Settings Profile Password [PATCH] Error: ' . $e->getMessage(), [
+                'user_id' => $userId,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal server error'
+            ], 500);
+        }
+    }
+
+    public function updateTheme(UpdateThemeRequest $request)
+    {
+        $userId = Auth::id();
+        try {
+            $this->userService->updateThemeById($userId, $request->validated());
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Theme updated successfully'
+            ]);
+        } catch (UserNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], $e->getCode());
+        } catch (\Exception $e) {
+            \Log::error('Settings Theme [PATCH] Error: ' . $e->getMessage(), [
                 'user_id' => $userId,
                 'trace' => $e->getTraceAsString(),
             ]);
