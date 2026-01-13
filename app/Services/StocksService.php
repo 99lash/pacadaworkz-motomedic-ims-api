@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\StockAdjustment;
 use App\Models\StockMovement;
+use App\Models\Inventory;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class StocksService
@@ -160,5 +162,45 @@ class StocksService
     {
         $filters['product_id'] = $productId;
         return $this->getStockMovements($filters);
+    }
+
+    // Create a new stock adjustment
+    public function createStockAdjustment(array $data): StockAdjustment
+    {
+        return DB::transaction(function () use ($data) {
+            // 1. Create StockAdjustment
+            $adjustment = StockAdjustment::create([
+                'user_id' => auth()->id(),
+                'reason' => $data['reason'],
+                'notes' => $data['notes'] ?? null,
+            ]);
+
+            // 2. Update Inventory
+            $inventory = Inventory::where('product_id', $data['product_id'])->firstOrFail();
+            
+            $inventory->quantity += $data['quantity'];
+            $inventory->save();
+
+            // 3. Create StockMovement
+            StockMovement::create([
+                'product_id' => $data['product_id'],
+                'user_id' => auth()->id(),
+                'movement_type' => $data['quantity'] > 0 ? 'in' : 'out',
+                'quantity' => abs($data['quantity']),
+                'reference_type' => 'adjustment',
+                'reference_id' => $adjustment->id,
+                'notes' => $data['notes'] ?? null,
+            ]);
+
+            return $adjustment;
+        });
+    }
+
+    // Update an existing stock adjustment
+    public function updateStockAdjustment(int $id, array $data): StockAdjustment
+    {
+        $adjustment = StockAdjustment::findOrFail($id);
+        $adjustment->update($data);
+        return $adjustment;
     }
 }
