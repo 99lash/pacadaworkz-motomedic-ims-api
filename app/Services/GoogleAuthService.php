@@ -15,7 +15,7 @@ class GoogleAuthService
 {
     private Google_Client $googleClient;
     protected ActivityLogService $activityLog;
-    public function __construct()
+    public function __construct(ActivityLogService $activityLog)
     {
         $this->googleClient = new Google_Client([
             'client_id' => config('services.google.client_id')
