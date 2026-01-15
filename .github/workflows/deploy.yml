@@ -1,0 +1,57 @@
+name: Deploy API to Hostinger
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  web-deploy:
+    name: 🎉 Deploy
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 🚚 Get latest code
+      uses: actions/checkout@v4
+
+    - name: 🐘 Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, intl, pdo, pdo_pgsql, pgsql
+
+    - name: 📦 Install Composer Dependencies
+      run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+    - name: ✨ Generate application key
+      run: php artisan key:generate --force
+
+    - name: ⚡ Cache configuration
+      run: |
+        php artisan config:cache
+        php artisan route:cache
+
+    - name: 📂 Sync files
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        server-dir: /public_html/
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/node_modules/**
+          **/tests/**
+          **/storage/*.key
+          .env
+          .env.example
+          .editorconfig
+          .gitattributes
+          .github/**
+          .styleci.yml
+          CHANGELOG.md
+          composer.json
+          composer.lock
+          phpunit.xml
+          README.md
