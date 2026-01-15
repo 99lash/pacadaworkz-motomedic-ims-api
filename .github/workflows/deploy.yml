@@ -23,14 +23,6 @@ jobs:
     - name: 📦 Install Composer Dependencies
       run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 
-    - name: ✨ Generate application key
-      run: php artisan key:generate --force
-
-    - name: ⚡ Cache configuration
-      run: |
-        php artisan config:cache
-        php artisan route:cache
-
     - name: 📂 Sync files
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
