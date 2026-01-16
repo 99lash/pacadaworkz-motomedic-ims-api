@@ -45,6 +45,7 @@ jobs:
           **/node_modules/**
           **/tests/**
           **/storage/*.key
+           **/vendor/**
           .env
           .env.example
           .editorconfig
@@ -56,8 +57,3 @@ jobs:
           composer.lock
           phpunit.xml
           README.md
-          vendor/**/test/
-          vendor/**/tests/
-          vendor/**/docs/
-          vendor/**/*.md
-          vendor/**/LICENSE
