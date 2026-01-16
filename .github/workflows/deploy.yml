@@ -44,7 +44,7 @@ jobs:
         password: ${{ secrets.FTP_PASSWORD }}
         
        
-        server-dir: ./public_html
+        server-dir: ./public_html/
         
 
         exclude: |
