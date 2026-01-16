@@ -9,7 +9,7 @@ jobs:
   web-deploy:
     name: 🎉 Deploy
     runs-on: ubuntu-latest
-
+    
     steps:
     - name: 🚚 Get latest code
       uses: actions/checkout@v4
@@ -20,14 +20,19 @@ jobs:
         php-version: '8.2'
         extensions: mbstring, intl, pdo, pdo_pgsql, pgsql
 
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-
+
     - name: 📦 Install Composer Dependencies
       run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 
-    # 👉 ZIP the vendor folder (KEY STEP)
-    - name: 🗜️ Zip vendor
-      run: zip -r vendor.zip vendor
-
-    - name: 📂 Sync files via FTP
+    - name: 📂 Sync files
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
         server: ${{ secrets.FTP_SERVER }}
@@ -35,7 +40,6 @@ jobs:
         password: ${{ secrets.FTP_PASSWORD }}
         server-dir: /public_html/
         exclude: |
-          vendor/**
           **/.git*
           **/.git*/**
           **/node_modules/**
@@ -52,3 +56,8 @@ jobs:
           composer.lock
           phpunit.xml
           README.md
+          vendor/**/test/
+          vendor/**/tests/
+          vendor/**/docs/
+          vendor/**/*.md
+          vendor/**/LICENSE
