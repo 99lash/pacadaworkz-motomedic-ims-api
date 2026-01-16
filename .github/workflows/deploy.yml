@@ -14,12 +14,14 @@ jobs:
     - name: 🚚 Get latest code
       uses: actions/checkout@v4
 
+# IBINALIK: Setup PHP (Kailangan ito para makapag-run ng Composer)
     - name: 🐘 Setup PHP
       uses: shivammathur/setup-php@v2
       with:
         php-version: '8.2'
-        extensions: mbstring, intl, pdo, pdo_pgsql, pgsql
+        extensions: mbstring, intl, pdo, pdo_mysql, mysqli
 
+    
     - name: Cache Composer packages
       id: composer-cache
       uses: actions/cache@v3
@@ -29,23 +31,30 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-php-
 
+   
     - name: 📦 Install Composer Dependencies
       run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 
-    - name: 📂 Sync files
+
+    - name: 📂 Deploy System Files (Root)
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        server-dir: /public_html/
+        
+       
+        server-dir: ./
+        
+
         exclude: |
+          **/vendor/**
+          **/public/**
+          **/node_modules/**
           **/.git*
           **/.git*/**
-          **/node_modules/**
           **/tests/**
           **/storage/*.key
-           **/vendor/**
           .env
           .env.example
           .editorconfig
@@ -57,3 +66,14 @@ jobs:
           composer.lock
           phpunit.xml
           README.md
+          
+
+    - name: 📂 Deploy Public Files
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        
+        local-dir: ./public/
+        server-dir: ./public_html/
