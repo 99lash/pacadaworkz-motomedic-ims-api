@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
         // 1. Core Foundations (No dependencies)
+        SystemSettingSeeder::class, // <-- Global Configurations
         RoleSeeder::class,
         PermissionSeeder::class,
         RolePermissionSeeder::class,
