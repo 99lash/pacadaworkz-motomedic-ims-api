@@ -62,8 +62,8 @@ jobs:
           .github/**
           .styleci.yml
           CHANGELOG.md
-          composer.json
-          composer.lock
+      #    composer.json
+      #    composer.lock
           phpunit.xml
           README.md
           
@@ -77,3 +77,5 @@ jobs:
         
         local-dir: ./public/
         server-dir: ./
+
+        
