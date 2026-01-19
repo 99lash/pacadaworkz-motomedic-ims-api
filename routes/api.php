@@ -228,6 +228,12 @@ Route::prefix('v1')->group(function () {
                     Route::middleware('modules:Settings')->group(function () {
                         Route::get('/', [SystemSettingController::class, 'index'])->middleware('permissions:View');
                         Route::patch('/', [SystemSettingController::class, 'update'])->middleware('permissions:Edit');
+                        
+                        // Backup & Restore (Superadmin only)
+                        Route::middleware('role:superadmin')->group(function () {
+                            Route::get('/backup', [SystemSettingController::class, 'backup']);
+                            Route::post('/restore', [SystemSettingController::class, 'restore']);
+                        });
                     });
                 });
             });
