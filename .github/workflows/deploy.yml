@@ -62,8 +62,6 @@ jobs:
           .github/**
           .styleci.yml
           CHANGELOG.md
-      #    composer.json
-      #    composer.lock
           phpunit.xml
           README.md
           
