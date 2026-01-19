@@ -27,7 +27,7 @@ class RestoreSystemSettingRequest extends FormRequest
                 'file',
                 // allowing common extensions for pg_dump custom format or plain text
                 'mimes:sql,gz,tar,dump,bin',
-                'max:102400', // Limit to 100MB (adjust as needed)
+                'max:' . (int) config('backup.max_upload_kb', 512000), // Configurable limit (default 500MB)
             ],
         ];
     }
