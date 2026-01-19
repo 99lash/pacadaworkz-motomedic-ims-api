@@ -21,6 +21,7 @@ use App\Http\Controllers\API\PermissionController;
 use App\Http\Controllers\API\RolePermissionController;
 use App\Http\Controllers\API\ActivityLogController;
 use App\Http\Controllers\API\ProfileController;
+use App\Http\Controllers\API\SystemSettingController;
 
 Route::prefix('v1')->group(function () {
     // Public routes (Unauthenticated)
@@ -220,9 +221,16 @@ Route::prefix('v1')->group(function () {
                 Route::get('/{type}/export',[ReportsController::class,'showReportCSV'])->middleware('permissions:View');
             });
 
-            
-
-
+            // Settings
+            Route::prefix('settings')->group(function () {
+                // System Settings
+                Route::prefix('system')->group(function () {
+                    Route::middleware('modules:Settings')->group(function () {
+                        Route::get('/', [SystemSettingController::class, 'index'])->middleware('permissions:View');
+                        Route::patch('/', [SystemSettingController::class, 'update'])->middleware('permissions:Edit');
+                    });
+                });
+            });
         });
 
 
@@ -233,6 +241,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/charts/top-products', [DashboardController::class, 'showTopProducts'])->middleware('permissions:View');;
         });
 
+        //Settings
         Route::prefix('settings')->group(function () {
             Route::get('/profile', [ProfileController::class, 'showProfile']);
             Route::patch('/profile', [ProfileController::class, 'updateProfile']);
