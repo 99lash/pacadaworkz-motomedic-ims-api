@@ -6,54 +6,74 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\ActivityLogService;
 use App\Http\Resources\ActivityLogResource;
-
+use Illuminate\Auth\Access\AuthorizationException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-class ActivityLogController
+class ActivityLogController extends Controller
 {
-      protected $logservice;
-    public function __construct(ActivityLogService $logservice){
+    protected $logservice;
+
+    public function __construct(ActivityLogService $logservice)
+    {
         $this->logservice = $logservice;
     }
 
-// show logs
-    public function showLogs(Request $request){
-      try{
-         $search = $request->query('search',null);
-          $userId = $request->query('user_id',null);
-         $result = $this->logservice->getLogs($search,$userId);
+    // show logs
+    public function showLogs(Request $request)
+    {
+        try {
+            // OPTIONAL: kung may policy
+            // $this->authorize('viewAny', ActivityLog::class);
+
+            $search = $request->query('search');
+            $userId = $request->query('user_id');
+
+            $result = $this->logservice->getLogs($search, $userId);
 
             return response()->json([
-            'success' =>true,
-            'data' => ActivityLogResource::collection($result),
-            'meta' => [
+                'success' => true,
+                'data' => ActivityLogResource::collection($result),
+                'meta' => [
                     'current_page' => $result->currentPage(),
                     'per_page' => $result->perPage(),
                     'total' => $result->total(),
                     'total_pages' => $result->lastPage(),
                 ],
-        ]);
-      }catch(\Exception $e){
-  return response()->json([
+            ]);
+
+        } catch (AuthorizationException $e) {
+            //  REAL 403
+            return response()->json([
                 'success' => false,
-                'message' => 'An Error occured'
-            ], 401);
-      }
+                'message' => 'Forbidden'
+            ], 403);
+
+        } catch (\Throwable $e) {
+            //  REAL server error
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred',
+                 'error' => $e->getMessage() // enable lang sa debug
+            ], 500);
+        }
     }
 
+    // export activity logs
+    public function export()
+    {
+        // OPTIONAL AUTH
+        // $this->authorize('export', ActivityLog::class);
 
-// export activity logs
-    public function export(){
         $logs = $this->logservice->getExport();
 
-        $response = new StreamedResponse(function() use ($logs) {
+        $response = new StreamedResponse(function () use ($logs) {
             $handle = fopen('php://output', 'w');
             fputcsv($handle, ['Timestamp', 'User', 'Module', 'Action', 'Details']);
 
             foreach ($logs as $log) {
                 fputcsv($handle, [
                     $log->created_at,
-                    $log->user->name,
+                    optional($log->user)->name,
                     $log->module,
                     $log->action,
                     $log->description,
@@ -64,7 +84,10 @@ class ActivityLogController
         });
 
         $response->headers->set('Content-Type', 'text/csv');
-        $response->headers->set('Content-Disposition', 'attachment; filename="activity-logs.csv"');
+        $response->headers->set(
+            'Content-Disposition',
+            'attachment; filename="activity-logs.csv"'
+        );
 
         return $response;
     }
