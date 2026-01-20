@@ -26,7 +26,7 @@ class ProductRequest extends FormRequest
         return [
              'category_id' => 'required',
              'brand_id' => 'required',
-             'sku' => 'unique:products,sku,'.$id.'|required',
+                'sku' => 'required|unique:products,sku',
              'name' => 'required',
              'description' => 'sometimes',
              'unit_price' => 'required',

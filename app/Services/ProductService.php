@@ -57,7 +57,7 @@ public function getAllProducts($search = null, $categoryId = null, $brandId = nu
        'description' => $data['description'] ?? null,
        'unit_price' => $data['unit_price'],
        'cost_price' => $data['cost_price'],
-      'reorder_level' =>$data['reoder_level'] ?? 10,
+      'reorder_level' =>$data['reorder_level'] ?? 10,
      ]);
      
    }
