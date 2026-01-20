@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Services\ActivityLogService;
+
 class ActivityLogMiddleware
 {
     /**
@@ -13,101 +14,79 @@ class ActivityLogMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-
- public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next): Response
     {
-        //  Execute controller first
+        // Execute controller first
         $response = $next($request);
 
-        //  Only log authenticated users
-      if (auth()->check()) {
-    // 1️⃣ Get all URL segments
-    $segments = $request->segments();
+        try {
+            // Use 'api' guard (JWT) to get authenticated user
+            $user = auth('api')->user();
 
-    // 2️⃣ Take last segment, skip numeric IDs
-    $lastSegment = end($segments);
-    $module = is_numeric($lastSegment) ? prev($segments) : $lastSegment;
+            if ($user) {
+                // 1️⃣ Get all URL segments
+                $segments = $request->segments();
 
-    // 3️⃣ Log activity
-    app(ActivityLogService::class)->log(
-        module: $module,
-        action: $this->mapAction($request->method()),
-        description: ucfirst($this->mapAction($request->method())) . ' ' . $module
-    );
-}
+                // 2️⃣ Take last segment, skip numeric IDs
+                $lastSegment = end($segments);
+                $module = is_numeric($lastSegment) ? prev($segments) : $lastSegment;
 
-   return $response;
+                // 3️⃣ Log activity
+                app(ActivityLogService::class)->log(
+                    module: $module,
+                    action: $this->mapAction($request->method()),
+                    description: ucfirst($this->mapAction($request->method())) . ' ' . $module,
+                    user_id: $user->id // optional
+                );
+            }
+        } catch (\Exception $e) {
+            // Log error but don't break API response
+            \Log::error('ActivityLogMiddleware failed: ' . $e->getMessage());
+        }
+
+        return $response;
     }
+
+    /**
+     * Map HTTP method to action name
+     */
     private function mapAction(string $method): string
-{
-    return match ($method) {
-        'GET'    => 'View',
-        'POST'   => 'Create',
-        'PUT',
-        'PATCH'  => 'Edit',
-        'DELETE' => 'Delete',
-        default  => 'performed',
-    };
-}
+    {
+        return match ($method) {
+            'GET'    => 'View',
+            'POST'   => 'Create',
+            'PUT',
+            'PATCH'  => 'Edit',
+            'DELETE' => 'Delete',
+            default  => 'performed',
+        };
+    }
 
-
-private function detectModule(string $path): string
-{
-    return match (true) {
-
-        // Authentication
-        str_starts_with($path, 'api/v1/auth') =>
-            'Authentication',
-
-        // Users & Access Control
-        str_starts_with($path, 'api/v1/users') =>
-            'Users',
-        str_starts_with($path, 'api/v1/roles') =>
-            'Roles',
-        str_starts_with($path, 'api/v1/permissions') =>
-            'Permissions',
-
-        // Master Data
-        str_starts_with($path, 'api/v1/categories') =>
-            'Categories',
-        str_starts_with($path, 'api/v1/brands') =>
-            'Brands',
-        str_starts_with($path, 'api/v1/attributes') =>
-            'Attributes',
-        str_starts_with($path, 'api/v1/products') =>
-            'Products',
-        str_starts_with($path, 'api/v1/suppliers') =>
-            'Suppliers',
-
-        // Inventory & Stocks
-        str_starts_with($path, 'api/v1/inventory') =>
-            'Inventory',
-        str_starts_with($path, 'api/v1/stock-movements') =>
-            'Stock Movements',
-        str_starts_with($path, 'api/v1/stock-adjustments') =>
-            'Stock Adjustments',
-
-        // POS & Transactions
-        str_starts_with($path, 'api/v1/pos') =>
-            'POS',
-        str_starts_with($path, 'api/v1/purchases') =>
-            'Purchases',
-        str_starts_with($path, 'api/v1/sales') =>
-            'Sales',
-
-        // Reports & Dashboard
-        str_starts_with($path, 'api/v1/reports') =>
-            'Reports',
-        str_starts_with($path, 'api/v1/dashboard') =>
-            'Dashboard',
-
-        // Activity Logs
-        str_starts_with($path, 'api/v1/activity-logs') =>
-            'Activity Logs',
-
-        default =>
-            'General',
-    };
-}
-
+    /**
+     * Detect module based on request path (optional, can be used if needed)
+     */
+    private function detectModule(string $path): string
+    {
+        return match (true) {
+            str_starts_with($path, 'api/v1/auth') => 'Authentication',
+            str_starts_with($path, 'api/v1/users') => 'Users',
+            str_starts_with($path, 'api/v1/roles') => 'Roles',
+            str_starts_with($path, 'api/v1/permissions') => 'Permissions',
+            str_starts_with($path, 'api/v1/categories') => 'Categories',
+            str_starts_with($path, 'api/v1/brands') => 'Brands',
+            str_starts_with($path, 'api/v1/attributes') => 'Attributes',
+            str_starts_with($path, 'api/v1/products') => 'Products',
+            str_starts_with($path, 'api/v1/suppliers') => 'Suppliers',
+            str_starts_with($path, 'api/v1/inventory') => 'Inventory',
+            str_starts_with($path, 'api/v1/stock-movements') => 'Stock Movements',
+            str_starts_with($path, 'api/v1/stock-adjustments') => 'Stock Adjustments',
+            str_starts_with($path, 'api/v1/pos') => 'POS',
+            str_starts_with($path, 'api/v1/purchases') => 'Purchases',
+            str_starts_with($path, 'api/v1/sales') => 'Sales',
+            str_starts_with($path, 'api/v1/reports') => 'Reports',
+            str_starts_with($path, 'api/v1/dashboard') => 'Dashboard',
+            str_starts_with($path, 'api/v1/activity-logs') => 'Activity Logs',
+            default => 'General',
+        };
+    }
 }
