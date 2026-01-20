@@ -42,6 +42,8 @@ Route::get('/test-permissions', function () {
             Route::post('/login', [AuthController::class, 'login']);
             Route::post('/login/google', [GoogleAuthController::class, 'login']);
         });
+
+        Route::get('test-activity-logs',[ActivityLogController::class,'showLogs']);
     });
 
     // Private routes (Authenticated)
@@ -53,10 +55,11 @@ Route::get('/test-permissions', function () {
             Route::post('/refresh', [AuthController::class, 'refresh']);
         });
 
+
         Route::middleware('role:superadmin,admin')->group(function () {
              // activity-logs
             Route::prefix('activity-logs')->group(function(){
-                Route::get('',[ActivityLogController::class,'showLogs'])->middleware('permissions:View All');
+                Route::get('/',[ActivityLogController::class,'showLogs'])->middleware('permissions:View All');
                 Route::get('/export',[ActivityLogController::class,'export']);
             });
             // Users
