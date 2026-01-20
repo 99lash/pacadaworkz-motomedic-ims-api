@@ -24,6 +24,17 @@ use App\Http\Controllers\API\ProfileController;
 use App\Http\Controllers\API\SystemSettingController;
 
 Route::prefix('v1')->group(function () {
+
+Route::get('/test-permissions', function () {
+    try {
+        \File::put(storage_path('test.txt'), 'ok');
+        return 'Storage writable!';
+    } catch (\Exception $e) {
+        return 'Error: '.$e->getMessage();
+    }
+});
+
+
     // Public routes (Unauthenticated)
     Route::middleware('guest.api')->group(function () {
         // Auth
