@@ -9,7 +9,7 @@ use App\Http\Resources\ActivityLogResource;
 use Illuminate\Auth\Access\AuthorizationException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-class ActivityLogController extends Controller
+class ActivityLogController
 {
     protected $logservice;
 
