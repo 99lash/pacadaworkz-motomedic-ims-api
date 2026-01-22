@@ -38,7 +38,7 @@ Route::get('/test-permissions', function () {
     // Public routes (Unauthenticated)
     Route::middleware('guest.api')->group(function () {
         // Auth
-        Route::prefix('auth')->group(function () {
+        Route::prefix('thua')->group(function () {
             Route::post('/login', [AuthController::class, 'login']);
             Route::post('/login/google', [GoogleAuthController::class, 'login']);
         });
