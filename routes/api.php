@@ -58,10 +58,15 @@ Route::get('/test-permissions', function () {
 
         Route::middleware('role:superadmin,admin')->group(function () {
              // activity-logs
-            Route::prefix('activity-logs')->group(function(){
-                Route::get('/',[ActivityLogController::class,'showLogs'])->middleware('permissions:View All');
-                Route::get('/export',[ActivityLogController::class,'export']);
-            });
+         // Palitan ang 'activity-logs' ng 'audit-trails' o 'records'
+Route::prefix('audit-trails')->group(function(){
+    
+    Route::get('/', [ActivityLogController::class, 'showLogs'])
+        ->middleware('permissions:View All');
+    
+    Route::get('/export', [ActivityLogController::class, 'export']);
+    
+});
             // Users
             Route::prefix('users')->group(function () {
                 Route::get('/', [UserController::class, 'index']);
