@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Services;
+
 use App\Models\Product;
 use App\Models\SalesTransaction;
 use App\Models\User;
@@ -9,84 +11,86 @@ use App\Models\Category;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
-class DashboardService{
-    
-// get dashboard stats
-    public function getStats(){
+class DashboardService
+{
+
+    // get dashboard stats
+    public function getStats()
+    {
         $userCount = User::count();
         $productCount = Product::count();
         $transactionCount = SalesTransaction::count();
         $salesItem = SalesItem::count();
         $revenue = SalesTransaction::sum('subtotal');
-        $lowstock = Inventory::where('quantity','<',10)->count();
-       $outOfStock = Inventory::where('quantity', 0)->count();
+        $lowstock = Inventory::join('products', 'inventory.product_id', '=', 'products.id')
+            ->whereNull('products.deleted_at')
+            ->whereColumn('inventory.quantity', '<=', 'products.reorder_level')
+            ->where('inventory.quantity', '>', 0)
+            ->count();
+        $outOfStock = Inventory::where('quantity', 0)->count();
 
 
 
-         $user = auth('api')->user();
-   
-         if($user->role->role_name == 'admin' || $user->role->role_name == 'superadmin' ){
-                 return [
-          'total_products' => $productCount,
-          'total_revenue' => $revenue,
-          'total_transactions' => $transactionCount,
-           'total_sales'=> $salesItem,
-           'low_stock'=> $lowstock,
-           'out_of_stock' => $outOfStock,
-           'active_users' => $userCount
-        ];
-         }else if( $user->role->role_name == 'staff' ) {
+        $user = auth('api')->user();
+
+        if ($user->role->role_name == 'admin' || $user->role->role_name == 'superadmin') {
+            return [
+                'total_products' => $productCount,
+                'total_revenue' => $revenue,
+                'total_transactions' => $transactionCount,
+                'total_sales' => $salesItem,
+                'low_stock' => $lowstock,
+                'out_of_stock' => $outOfStock,
+                'active_users' => $userCount
+            ];
+        } else if ($user->role->role_name == 'staff') {
 
             return [
-          'total_products' => $productCount,
-           'low_stock'=> $lowstock,
-           'out_of_stock' => $outOfStock,
-        ];
-         }
-          
-      
-
-
+                'total_products' => $productCount,
+                'low_stock' => $lowstock,
+                'out_of_stock' => $outOfStock,
+            ];
+        }
     }
 
-  // get sales trend
-      public function getSalesTrend(){
-            $sales = [];
+    // get sales trend
+    public function getSalesTrend()
+    {
+        $sales = [];
 
-            for($i = 6; $i >= 0; $i--){
-                $date = Carbon::now()->subDays($i)->format('Y-m-d');
-                 $dateConvert = Carbon::now()->subDays($i)->format('M d');  
-                $total = SalesTransaction::whereDate('created_at',$date)->sum('subtotal');
+        for ($i = 6; $i >= 0; $i--) {
+            $date = Carbon::now()->subDays($i)->format('Y-m-d');
+            $dateConvert = Carbon::now()->subDays($i)->format('M d');
+            $total = SalesTransaction::whereDate('created_at', $date)->sum('subtotal');
 
-                $sales[$dateConvert] = $total;
-            }
-
-
-
-            return $sales;
+            $sales[$dateConvert] = $total;
         }
 
 
-// get top products
-        public function getTopProducts(){
-           $products = Product::count(); 
-           $topProducts = [];
-           $productsName  = Product::pluck('name')->toArray();
-            
-          for($i = 1; $i <= $products; $i++){
+        return $sales;
+    }
 
-            $total = SalesItem::where('product_id',$i)->count();
-            $topProducts[$productsName[$i-1]] = $total;
-          }
-          return $topProducts;
 
-        
+    // get top products
+    public function getTopProducts()
+    {
+        $products = Product::count();
+        $topProducts = [];
+        $productsName  = Product::pluck('name')->toArray();
+
+        for ($i = 1; $i <= $products; $i++) {
+
+            $total = SalesItem::where('product_id', $i)->count();
+            $topProducts[$productsName[$i - 1]] = $total;
         }
+        return $topProducts;
+    }
 
-  // get revenue by category
+    // get revenue by category
 
-      public function getRevenueByCategory(){
-        
+    public function getRevenueByCategory()
+    {
+
         $revenueByCategory = Category::query()
             ->select('categories.name as category_name', \Illuminate\Support\Facades\DB::raw('SUM(sales_items.unit_price * sales_items.quantity) as total_revenue'))
             ->join('products', 'categories.id', '=', 'products.category_id')
@@ -96,32 +100,32 @@ class DashboardService{
             ->get();
 
         return $revenueByCategory->pluck('total_revenue', 'category_name');
-        
-      }
+    }
 
 
-      //get inventory Overview
+    //get inventory Overview
 
-      public function getInventoryOverview(){
-        $totalInventoryValue = Inventory::join('products','inventory.product_id','=','products.id')
-        ->where('inventory.quantity','>',0)
-        ->sum(\Illuminate\Support\Facades\DB::raw('inventory.quantity * products.cost_price'));
+    public function getInventoryOverview()
+    {
+        $totalInventoryValue = Inventory::join('products', 'inventory.product_id', '=', 'products.id')
+            ->where('inventory.quantity', '>', 0)
+            ->sum(\Illuminate\Support\Facades\DB::raw('inventory.quantity * products.cost_price'));
 
-        $totalInStocksProducts =  Inventory::join('products','inventory.product_id','=','products.id')
-        ->where('inventory.quantity','>',0)
-        ->count();
+        $totalInStocksProducts =  Inventory::join('products', 'inventory.product_id', '=', 'products.id')
+            ->where('inventory.quantity', '>', 0)
+            ->count();
 
 
-        $reOrderStock =  Inventory::join('products','inventory.product_id','=','products.id')
-        ->where('inventory.quantity','=',0)
-        ->count();
+        $reOrderStock =  Inventory::join('products', 'inventory.product_id', '=', 'products.id')
+            ->where('inventory.quantity', '=', 0)
+            ->count();
 
 
 
         return [
-          'total_inventory_value' => $totalInventoryValue,
-          'in_stock_products' => $totalInStocksProducts,
-           'need_reorder' => $reOrderStock
+            'total_inventory_value' => $totalInventoryValue,
+            'in_stock_products' => $totalInStocksProducts,
+            'need_reorder' => $reOrderStock
         ];
-      }
+    }
 }
