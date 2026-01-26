@@ -25,14 +25,14 @@ use App\Http\Controllers\API\SystemSettingController;
 
 Route::prefix('v1')->group(function () {
 
-Route::get('/test-permissions', function () {
-    try {
-        \File::put(storage_path('test.txt'), 'ok');
-        return 'Storage writable!';
-    } catch (\Exception $e) {
-        return 'Error: '.$e->getMessage();
-    }
-});
+    Route::get('/test-permissions', function () {
+        try {
+            \File::put(storage_path('test.txt'), 'ok');
+            return 'Storage writable!';
+        } catch (\Exception $e) {
+            return 'Error: ' . $e->getMessage();
+        }
+    });
 
 
     // Public routes (Unauthenticated)
@@ -43,7 +43,7 @@ Route::get('/test-permissions', function () {
             Route::post('/login/google', [GoogleAuthController::class, 'login']);
         });
 
-        Route::get('test-activity-logs',[ActivityLogController::class,'showLogs']);
+        Route::get('test-activity-logs', [ActivityLogController::class, 'showLogs']);
     });
 
     // Private routes (Authenticated)
@@ -57,10 +57,10 @@ Route::get('/test-permissions', function () {
 
 
         Route::middleware('role:superadmin,admin')->group(function () {
-             // activity-logs
-            Route::prefix('activity-logs')->group(function(){
-                Route::get('/',[ActivityLogController::class,'showLogs'])->middleware('permissions:View All');
-                Route::get('/export',[ActivityLogController::class,'export']);
+            // activity-logs
+            Route::prefix('activity-logs')->group(function () {
+                Route::get('/', [ActivityLogController::class, 'showLogs'])->middleware('permissions:View All');
+                Route::get('/export', [ActivityLogController::class, 'export']);
             });
             // Users
             Route::prefix('users')->group(function () {
@@ -232,7 +232,7 @@ Route::get('/test-permissions', function () {
                 Route::get('/product-performance', [ReportsController::class, 'showPerformance'])->middleware('permissions:View');
                 Route::get('/stock-adjustments', [ReportsController::class, 'showStockAdjustments'])->middleware('permissions:View');
                 Route::get('/profit-loss', [ReportsController::class, 'showProfitLossReport'])->middleware('permissions:View');
-                Route::get('/{type}/export',[ReportsController::class,'showReportCSV'])->middleware('permissions:View');
+                Route::get('/{type}/export', [ReportsController::class, 'showReportCSV'])->middleware('permissions:View');
             });
 
             // Settings
@@ -257,8 +257,9 @@ Route::get('/test-permissions', function () {
         //Dashboard
         Route::prefix('dashboard')->group(function () {
             Route::get('/stats', [DashboardController::class, 'showStats']);
-            Route::get('/charts/sales-trend', [DashboardController::class, 'showSalesTrend'])->middleware('permissions:View');;
-            Route::get('/charts/top-products', [DashboardController::class, 'showTopProducts'])->middleware('permissions:View');;
+            Route::get('/charts/sales-trend', [DashboardController::class, 'showSalesTrend'])->middleware('permissions:View');
+            Route::get('/charts/top-products', [DashboardController::class, 'showTopProducts'])->middleware('permissions:View');
+            Route::get('/recent-activities', [DashboardController::class, 'showRecentActivities'])->middleware('permissions:View');
         });
 
         //Settings

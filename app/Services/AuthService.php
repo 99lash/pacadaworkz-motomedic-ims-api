@@ -2,10 +2,12 @@
 
 namespace App\Services;
 
+use App\Exceptions\Auth\InvalidCredentialsException;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Services\ActivityLogService;
+
 class AuthService
 {
 
@@ -22,7 +24,7 @@ public function login(array $credentials)
     $accessToken = auth('api')->setTTL(60)->attempt($credentials);
 
     if (!$accessToken) {
-        return false;
+        throw new InvalidCredentialsException();
     }
 
     // Get authenticated user
@@ -80,6 +82,10 @@ public function login(array $credentials)
     // Get authenticated user
     public function me()
     {
-        return JWTAuth::user();
+        $user = auth('api')->user();
+        if ($user) {
+            $user->load('role');
+        }
+        return $user;
     }
 }

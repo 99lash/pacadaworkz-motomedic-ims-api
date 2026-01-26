@@ -14,16 +14,27 @@ class ActivityLogMiddleware
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
 
- public function handle(Request $request, Closure $next): Response
-    {
-        //  Execute controller first
-        $response = $next($request);
-
-        //  Only log authenticated users
-      if (auth()->check()) {
-    // 1️⃣ Get all URL segments
-    $segments = $request->segments();
-
+     public function handle(Request $request, Closure $next): Response
+     {
+         //  Execute controller first
+         $response = $next($request);
+ 
+         // Define excluded paths that are handled manually in services
+         $excludedPaths = [
+             'api/v1/auth/login',
+             'api/v1/auth/logout',
+             'api/v1/pos/checkout',
+         ];
+ 
+         // Check if current path is excluded
+         if ($request->is($excludedPaths)) {
+             return $response;
+         }
+ 
+         //  Only log authenticated users
+       if (auth()->check()) {
+     // 1️⃣ Get all URL segments
+     $segments = $request->segments();
     // 2️⃣ Take last segment, skip numeric IDs
     $lastSegment = end($segments);
     $module = is_numeric($lastSegment) ? prev($segments) : $lastSegment;
