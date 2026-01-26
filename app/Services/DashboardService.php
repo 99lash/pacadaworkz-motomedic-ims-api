@@ -8,28 +8,33 @@ use App\Models\User;
 use App\Models\SalesItem;
 use App\Models\Inventory;
 use App\Models\Category;
+use App\Models\ActivityLog;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class DashboardService
 {
-
     // get dashboard stats
     public function getStats()
     {
         $userCount = User::count();
         $productCount = Product::count();
-        $transactionCount = SalesTransaction::count();
-        $salesItem = SalesItem::count();
-        $revenue = SalesTransaction::sum('subtotal');
+        $transactionCount = SalesTransaction::where('status', '!=', 'voided')->count();
+
+        $salesItem = SalesItem::join('sales_transactions', 'sales_items.sales_transactions_id', '=', 'sales_transactions.id')
+            ->where('sales_transactions.status', '!=', 'voided')
+            ->sum(DB::raw('sales_items.quantity - sales_items.quantity_returned'));
+
+        $revenue = (float) SalesTransaction::where('status', '!=', 'voided')
+            ->sum(DB::raw('subtotal - refund_amount'));
+
         $lowstock = Inventory::join('products', 'inventory.product_id', '=', 'products.id')
             ->whereNull('products.deleted_at')
             ->whereColumn('inventory.quantity', '<=', 'products.reorder_level')
             ->where('inventory.quantity', '>', 0)
             ->count();
+
         $outOfStock = Inventory::where('quantity', 0)->count();
-
-
 
         $user = auth('api')->user();
 
@@ -44,7 +49,6 @@ class DashboardService
                 'active_users' => $userCount
             ];
         } else if ($user->role->role_name == 'staff') {
-
             return [
                 'total_products' => $productCount,
                 'low_stock' => $lowstock,
@@ -66,66 +70,100 @@ class DashboardService
             $sales[$dateConvert] = $total;
         }
 
-
         return $sales;
     }
-
 
     // get top products
     public function getTopProducts()
     {
-        $products = Product::count();
-        $topProducts = [];
-        $productsName  = Product::pluck('name')->toArray();
-
-        for ($i = 1; $i <= $products; $i++) {
-
-            $total = SalesItem::where('product_id', $i)->count();
-            $topProducts[$productsName[$i - 1]] = $total;
-        }
-        return $topProducts;
+        return Product::query()
+            ->leftJoin('sales_items', 'products.id', '=', 'sales_items.product_id')
+            ->leftJoin('sales_transactions', function ($join) {
+                $join->on('sales_items.sales_transactions_id', '=', 'sales_transactions.id')
+                    ->where('sales_transactions.status', '!=', 'voided');
+            })
+            ->whereNull('products.deleted_at')
+            ->select(
+                'products.name',
+                DB::raw('COALESCE(SUM(CASE WHEN sales_transactions.id IS NOT NULL THEN sales_items.quantity - sales_items.quantity_returned ELSE 0 END), 0) as total_sold')
+            )
+            ->groupBy('products.id', 'products.name')
+            ->orderByDesc('total_sold')
+            ->limit(5)
+            ->get()
+            ->pluck('total_sold', 'name');
     }
 
     // get revenue by category
-
     public function getRevenueByCategory()
     {
-
-        $revenueByCategory = Category::query()
-            ->select('categories.name as category_name', \Illuminate\Support\Facades\DB::raw('SUM(sales_items.unit_price * sales_items.quantity) as total_revenue'))
-            ->join('products', 'categories.id', '=', 'products.category_id')
-            ->join('sales_items', 'products.id', '=', 'sales_items.product_id')
-            ->groupBy('categories.name')
+        return Category::query()
+            ->select(
+                'categories.name as category_name',
+                DB::raw('COALESCE(SUM(sales_items.unit_price * (sales_items.quantity - sales_items.quantity_returned)), 0) as total_revenue')
+            )
+            ->leftJoin('products', 'categories.id', '=', 'products.category_id')
+            ->leftJoin('sales_items', 'products.id', '=', 'sales_items.product_id')
+            ->leftJoin('sales_transactions', function ($join) {
+                $join->on('sales_items.sales_transactions_id', '=', 'sales_transactions.id')
+                    ->where('sales_transactions.status', '!=', 'voided');
+            })
+            ->groupBy('categories.id', 'categories.name')
             ->orderByDesc('total_revenue')
             ->get();
-
-        return $revenueByCategory->pluck('total_revenue', 'category_name');
     }
 
-
-    //get inventory Overview
-
+    // get inventory Overview
     public function getInventoryOverview()
     {
         $totalInventoryValue = Inventory::join('products', 'inventory.product_id', '=', 'products.id')
+            ->whereNull('products.deleted_at')
             ->where('inventory.quantity', '>', 0)
-            ->sum(\Illuminate\Support\Facades\DB::raw('inventory.quantity * products.cost_price'));
+            ->sum(DB::raw('inventory.quantity * products.cost_price'));
 
         $totalInStocksProducts =  Inventory::join('products', 'inventory.product_id', '=', 'products.id')
+            ->whereNull('products.deleted_at')
             ->where('inventory.quantity', '>', 0)
             ->count();
 
-
         $reOrderStock =  Inventory::join('products', 'inventory.product_id', '=', 'products.id')
-            ->where('inventory.quantity', '=', 0)
+            ->whereNull('products.deleted_at')
+            ->whereColumn('inventory.quantity', '<=', 'products.reorder_level')
+            ->where('inventory.quantity', '>=', 0)
             ->count();
 
-
-
         return [
-            'total_inventory_value' => $totalInventoryValue,
+            'total_inventory_value' => doubleval($totalInventoryValue),
             'in_stock_products' => $totalInStocksProducts,
             'need_reorder' => $reOrderStock
         ];
+    }
+
+    // get recent activities
+    public function getRecentActivities()
+    {
+        $user = auth('api')->user();
+
+        // Check if user is admin/superadmin OR has "View All Activity Logs" permission
+        if (!$user->relationLoaded('role')) {
+            $user->load('role.permissions');
+        } elseif (!$user->role->relationLoaded('permissions')) {
+            $user->role->load('permissions');
+        }
+
+        $isAdminOrSuperAdmin = in_array(strtolower($user->role->role_name), ['admin', 'superadmin']);
+
+        $hasViewAllPermission = $user->role->permissions->contains(function ($permission) {
+            return $permission->module === 'Activity Logs' && $permission->name === 'View All';
+        });
+
+        $query = ActivityLog::with('user')->orderBy('created_at', 'desc');
+
+        if (!$isAdminOrSuperAdmin && !$hasViewAllPermission) {
+            // If not admin/superadmin and doesn't have "View All" permission, restrict to own logs
+            $query->where('user_id', $user->id);
+        }
+
+        return $query->take(10)->get();
     }
 }
