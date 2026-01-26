@@ -82,6 +82,10 @@ public function login(array $credentials)
     // Get authenticated user
     public function me()
     {
-        return JWTAuth::user();
+        $user = auth('api')->user();
+        if ($user) {
+            $user->load('role');
+        }
+        return $user;
     }
 }
