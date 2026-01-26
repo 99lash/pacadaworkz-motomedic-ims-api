@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\API\Controller;
 use Illuminate\Http\Request;
 use App\Services\AuthService;
+use App\Exceptions\Auth\InvalidCredentialsException;
 
 class AuthController extends Controller
 {
@@ -30,11 +31,16 @@ class AuthController extends Controller
                     "refresh_token" => $tokens["refresh_token"]
                 ]
             ]);
-        } catch (\Exception $e) {
+        } catch (InvalidCredentialsException $e) {
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage()
-            ], 401);
+            ], $e->getCode());
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal server error'
+            ], 500);
         }
     }
 
