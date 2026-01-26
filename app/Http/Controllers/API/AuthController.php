@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\API\Controller;
 use Illuminate\Http\Request;
 use App\Services\AuthService;
+use App\Http\Controllers\API\Controller;
+use App\Http\Resources\AuthUserResource;
 use App\Exceptions\Auth\InvalidCredentialsException;
 
 class AuthController extends Controller
@@ -81,7 +82,7 @@ class AuthController extends Controller
             $me = $this->authService->me();
             return response()->json([
                 "success" => true,
-                "data" => $me
+                "data" => AuthUserResource::make($me)
             ]);
         } catch (\Exception $e) {
             return response()->json([
