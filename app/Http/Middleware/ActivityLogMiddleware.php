@@ -6,49 +6,133 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Services\ActivityLogService;
-class ActivityLogMiddleware
-{
+
     /**
      * Handle an incoming request.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
+class ActivityLogMiddleware
+{
+    public function handle(Request $request, Closure $next): Response
+    {
+        // Execute controller first
+        $response = $next($request);
 
-     public function handle(Request $request, Closure $next): Response
-     {
-         //  Execute controller first
-         $response = $next($request);
- 
-         // Define excluded paths that are handled manually in services
-         $excludedPaths = [
-             'api/v1/auth/login',
-             'api/v1/auth/logout',
-             'api/v1/pos/checkout',
-         ];
- 
-         // Check if current path is excluded
-         if ($request->is($excludedPaths)) {
-             return $response;
-         }
- 
-         //  Only log authenticated users
-       if (auth()->check()) {
-     // 1️⃣ Get all URL segments
-     $segments = $request->segments();
-    // 2️⃣ Take last segment, skip numeric IDs
-    $lastSegment = end($segments);
-    $module = is_numeric($lastSegment) ? prev($segments) : $lastSegment;
+        // Excluded paths (handled manually)
+        $excludedPaths = [
+            'api/v1/auth/login',
+            'api/v1/auth/logout',
+            'api/v1/pos/checkout',
+        ];
 
-    // 3️⃣ Log activity
-    app(ActivityLogService::class)->log(
-        module: $module,
-        action: $this->mapAction($request->method()),
-        description: ucfirst($this->mapAction($request->method())) . ' ' . $module
-    );
-}
+        // Skip excluded paths
+        if ($request->is($excludedPaths)) {
+            return $response;
+        }
 
-   return $response;
+        // Skip plain GET requests without query params
+        if ($request->isMethod('GET') && empty($request->query())) {
+            return $response;
+        }
+
+        // Only log authenticated users
+        if (! auth()->check()) {
+            return $response;
+        }
+
+        $method = $request->method();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Determine module name
+        |--------------------------------------------------------------------------
+        */
+        $segments = $request->segments();
+        $lastSegment = end($segments);
+
+        // If last segment is numeric (ID), use previous segment as module
+        $module = is_numeric($lastSegment)
+            ? prev($segments)
+            : $lastSegment;
+
+        /*
+        |--------------------------------------------------------------------------
+        | Determine action & description
+        |--------------------------------------------------------------------------
+        */
+        $action = $this->mapAction($request->method());
+        $description = ucfirst($action) . ' ' . $module;
+
+        // Handle search / filter logging
+        if ($request->isMethod('GET') && ! empty($request->query())) {
+
+            $action = 'Filter/Search';
+
+            $searchDetails = collect($request->query())
+                ->except(['password', 'token']) // safety
+                ->map(fn ($value, $key) => "$key = $value")
+                ->implode(', ');
+
+            $description = "Searched {$module} with {$searchDetails}";
+        }
+        
+
+        
+     if ($method === 'POST') {
+
+            $data = collect($request->all())
+                ->except(['password', 'token'])
+                ->map(fn ($value, $key) => "$key = $value")
+                ->implode(', ');
+
+            $description = "Created {$module} with ({$data})";
+        }
+
+
+                if (in_array($method, ['PUT', 'PATCH'])) {
+
+            $data = collect($request->all())
+                ->except(['password', 'token'])
+                ->map(fn ($value, $key) => "$key = $value")
+                ->implode(', ');
+
+            $id = is_numeric($lastSegment) ? $lastSegment : 'unknown';
+
+            $description = "Updated {$module} ID {$id} with ({$data})";
+        }
+
+
+                if ($method === 'DELETE') {
+
+            $id = is_numeric($lastSegment) ? $lastSegment : 'unknown';
+
+            $description = "Deleted {$module} ID {$id}";
+        }
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Save activity log
+        |--------------------------------------------------------------------------
+        */
+        app(ActivityLogService::class)->log(
+            module: $module,
+            action: $action,
+            description: $description
+        );
+
+        return $response;
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Map HTTP methods to actions
+    |--------------------------------------------------------------------------
+    */
+
+
     private function mapAction(string $method): string
 {
     return match ($method) {
