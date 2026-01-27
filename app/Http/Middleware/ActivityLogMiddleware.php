@@ -43,11 +43,7 @@ class ActivityLogMiddleware
 
         $method = $request->method();
 
-        /*
-        |--------------------------------------------------------------------------
-        | Determine module name
-        |--------------------------------------------------------------------------
-        */
+        //determine module name
         $segments = $request->segments();
         $lastSegment = end($segments);
 
@@ -56,11 +52,7 @@ class ActivityLogMiddleware
             ? prev($segments)
             : $lastSegment;
 
-        /*
-        |--------------------------------------------------------------------------
-        | Determine action & description
-        |--------------------------------------------------------------------------
-        */
+      //Determine Action and desciption
         $action = $this->mapAction($request->method());
         $description = ucfirst($action) . ' ' . $module;
 
@@ -81,14 +73,17 @@ class ActivityLogMiddleware
         
      if ($method === 'POST') {
 
-            $data = collect($request->all())
-                ->except(['password', 'token'])
-                ->map(fn ($value, $key) => "$key = $value")
-                ->implode(', ');
+            // $data = collect($request->all())
+            //     ->except(['password', 'token'])
+            //     ->map(fn ($value, $key) => "$key = $value")
+            //     ->implode(', ');
 
-            $description = "Created {$module} with ({$data})";
+                $data = $request->input('name');
+
+
+            $description = "Created {$module} : {$data}";
         }
-
+              
 
                 if (in_array($method, ['PUT', 'PATCH'])) {
 
@@ -99,7 +94,7 @@ class ActivityLogMiddleware
 
             $id = is_numeric($lastSegment) ? $lastSegment : 'unknown';
 
-            $description = "Updated {$module} ID {$id} with ({$data})";
+            $description = "Updated {$module} ID {$id} with {$data}";
         }
 
 
@@ -112,11 +107,7 @@ class ActivityLogMiddleware
 
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | Save activity log
-        |--------------------------------------------------------------------------
-        */
+       // save as activity log
         app(ActivityLogService::class)->log(
             module: $module,
             action: $action,
@@ -126,12 +117,7 @@ class ActivityLogMiddleware
         return $response;
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Map HTTP methods to actions
-    |--------------------------------------------------------------------------
-    */
-
+   // map http actions
 
     private function mapAction(string $method): string
 {
