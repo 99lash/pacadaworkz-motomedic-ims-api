@@ -12,6 +12,11 @@ use App\Services\ActivityLogService;
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     */
 class ActivityLogMiddleware
 {
     public function handle(Request $request, Closure $next): Response
@@ -37,158 +42,142 @@ class ActivityLogMiddleware
         }
 
         // Only log authenticated users
-        if (! auth()->check()) {
+        if (!auth()->check()) {
             return $response;
         }
 
         $method = $request->method();
+        $path   = $request->path();
 
-        //determine module name
-        $segments = $request->segments();
-        $lastSegment = end($segments);
+        $module = $this->detectModule($path);
+        $action = $this->mapAction($method);
 
-        // If last segment is numeric (ID), use previous segment as module
-        $module = is_numeric($lastSegment)
-            ? prev($segments)
-            : $lastSegment;
+        $description = $this->buildDescription($request, $module, $action);
 
-      //Determine Action and desciption
-        $action = $this->mapAction($request->method());
-        $description = ucfirst($action) . ' ' . $module;
-
-        // Handle search / filter logging
-        if ($request->isMethod('GET') && ! empty($request->query())) {
-
-            $action = 'Filter/Search';
-
-            $searchDetails = collect($request->query())
-                ->except(['password', 'token']) // safety
-                ->map(fn ($value, $key) => "$key = $value")
-                ->implode(', ');
-
-            $description = "Searched {$module} with {$searchDetails}";
-        }
-        
-
-        
-     if ($method === 'POST') {
-
-            // $data = collect($request->all())
-            //     ->except(['password', 'token'])
-            //     ->map(fn ($value, $key) => "$key = $value")
-            //     ->implode(', ');
-
-                $data = $request->input('name');
-
-
-            $description = "Created {$module} : {$data}";
-        }
-              
-
-                if (in_array($method, ['PUT', 'PATCH'])) {
-
-            $data = collect($request->all())
-                ->except(['password', 'token'])
-                ->map(fn ($value, $key) => "$key = $value")
-                ->implode(', ');
-
-            $id = is_numeric($lastSegment) ? $lastSegment : 'unknown';
-
-            $description = "Updated {$module} ID {$id} with {$data}";
-        }
-
-
-                if ($method === 'DELETE') {
-
-            $id = is_numeric($lastSegment) ? $lastSegment : 'unknown';
-
-            $description = "Deleted {$module} ID {$id}";
-        }
-
-
-
-       // save as activity log
+        // ✅ Correct: instance-based service call
         app(ActivityLogService::class)->log(
             module: $module,
             action: $action,
-            description: $description
+            description: $description,
+            userId: auth()->id()
         );
 
         return $response;
     }
 
-   // map http actions
-
+    /* =========================
+     * ACTION MAPPING
+     * ========================= */
     private function mapAction(string $method): string
-{
-    return match ($method) {
-        'GET'    => 'View',
-        'POST'   => 'Create',
-        'PUT',
-        'PATCH'  => 'Edit',
-        'DELETE' => 'Delete',
-        default  => 'performed',
-    };
-}
+    {
+        return match ($method) {
+            'GET'    => 'View',
+            'POST'   => 'Create',
+            'PUT',
+            'PATCH'  => 'Edit',
+            'DELETE' => 'Delete',
+            default  => 'Performed',
+        };
+    }
 
+    /* =========================
+     * MODULE DETECTION
+     * ========================= */
+    private function detectModule(string $path): string
+    {
+        return match (true) {
 
-private function detectModule(string $path): string
-{
-    return match (true) {
+            // Authentication
+            str_starts_with($path, 'api/v1/auth') => 'Authentication',
 
-        // Authentication
-        str_starts_with($path, 'api/v1/auth') =>
-            'Authentication',
+            // Users & Access Control
+            str_starts_with($path, 'api/v1/users') => 'Users',
+            str_starts_with($path, 'api/v1/roles') => 'Roles',
+            str_starts_with($path, 'api/v1/permissions') => 'Permissions',
 
-        // Users & Access Control
-        str_starts_with($path, 'api/v1/users') =>
-            'Users',
-        str_starts_with($path, 'api/v1/roles') =>
-            'Roles',
-        str_starts_with($path, 'api/v1/permissions') =>
-            'Permissions',
+            // Master Data
+            str_starts_with($path, 'api/v1/categories') => 'Categories',
+            str_starts_with($path, 'api/v1/brands') => 'Brands',
+            str_starts_with($path, 'api/v1/attributes') => 'Attributes',
+            str_starts_with($path, 'api/v1/products') => 'Products',
+            str_starts_with($path, 'api/v1/suppliers') => 'Suppliers',
 
-        // Master Data
-        str_starts_with($path, 'api/v1/categories') =>
-            'Categories',
-        str_starts_with($path, 'api/v1/brands') =>
-            'Brands',
-        str_starts_with($path, 'api/v1/attributes') =>
-            'Attributes',
-        str_starts_with($path, 'api/v1/products') =>
-            'Products',
-        str_starts_with($path, 'api/v1/suppliers') =>
-            'Suppliers',
+            // Inventory
+            str_starts_with($path, 'api/v1/inventory') => 'Inventory',
+            str_starts_with($path, 'api/v1/stock-movements') => 'Stock Movements',
+            str_starts_with($path, 'api/v1/stock-adjustments') => 'Stock Adjustments',
 
-        // Inventory & Stocks
-        str_starts_with($path, 'api/v1/inventory') =>
-            'Inventory',
-        str_starts_with($path, 'api/v1/stock-movements') =>
-            'Stock Movements',
-        str_starts_with($path, 'api/v1/stock-adjustments') =>
-            'Stock Adjustments',
+            // POS
+            str_starts_with($path, 'api/v1/pos') => 'POS',
 
-        // POS & Transactions
-        str_starts_with($path, 'api/v1/pos') =>
-            'POS',
-        str_starts_with($path, 'api/v1/purchases') =>
-            'Purchases',
-        str_starts_with($path, 'api/v1/sales') =>
-            'Sales',
+            // Transactions
+            str_starts_with($path, 'api/v1/purchases') => 'Purchases',
+            str_starts_with($path, 'api/v1/sales') => 'Sales',
 
-        // Reports & Dashboard
-        str_starts_with($path, 'api/v1/reports') =>
-            'Reports',
-        str_starts_with($path, 'api/v1/dashboard') =>
-            'Dashboard',
+            // Reports
+            str_starts_with($path, 'api/v1/reports') => 'Reports',
+            str_starts_with($path, 'api/v1/dashboard') => 'Dashboard',
+            str_starts_with($path, 'api/v1/activity-logs') => 'Activity Logs',
 
-        // Activity Logs
-        str_starts_with($path, 'api/v1/activity-logs') =>
-            'Activity Logs',
+            default => 'General',
+        };
+    }
 
-        default =>
-            'General',
-    };
-}
+    /* =========================
+     * DESCRIPTION BUILDER
+     * ========================= */
+    private function buildDescription(Request $request, string $module, string $action): string
+    {
+        $segments = $request->segments();
+        $last     = end($segments);
+        $id       = is_numeric($last) ? $last : null;
 
+        /* ===== POS SPECIAL CASES ===== */
+        if ($module === 'POS') {
+            return $this->buildPosDescription($request, $id, $last);
+        }
+
+        /* ===== SEARCH / FILTER ===== */
+        if ($request->isMethod('GET') && !empty($request->query())) {
+            return "Searched {$module}";
+        }
+
+        /* ===== GENERIC FALLBACK ===== */
+        return match ($action) {
+            'Create' => "Created {$module}",
+            'Edit'   => "Updated {$module}" . ($id ? " ID {$id}" : ""),
+            'Delete' => "Deleted {$module}" . ($id ? " ID {$id}" : ""),
+            default  => "Viewed {$module}",
+        };
+    }
+
+    /* =========================
+     * POS DESCRIPTION HANDLER
+     * ========================= */
+    private function buildPosDescription(Request $request, ?string $id, string $last): string
+    {
+        if ($request->isMethod('POST')) {
+            return match ($last) {
+                'add-item'       => 'Added item to cart',
+                'clear'          => 'Cleared the cart',
+                'apply-discount' => 'Applied discount to cart',
+                'checkout'       => 'Checked out the cart',
+                default          => 'Performed POS action',
+            };
+        }
+
+        if ($request->isMethod('PATCH')) {
+            return $id
+                ? "Updated item #{$id} in cart"
+                : "Updated cart item";
+        }
+
+        if ($request->isMethod('DELETE')) {
+            return $id
+                ? "Removed item #{$id} from cart"
+                : "Removed item from cart";
+        }
+
+        return 'Viewed POS';
+    }
 }
