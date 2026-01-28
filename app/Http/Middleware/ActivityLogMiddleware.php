@@ -6,17 +6,8 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Services\ActivityLogService;
+use App\Models\Role;
 
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
 class ActivityLogMiddleware
 {
     public function handle(Request $request, Closure $next): Response
@@ -140,6 +131,10 @@ class ActivityLogMiddleware
             return $this->buildSalesDescription($request, $id, $last);
         }
 
+        if ($module === 'Roles') {
+            return $this->buildRolesDescription($request, $id, $last);
+        }
+
         if ($request->isMethod('GET') && !empty($request->query())) {
             $query = collect($request->query())
                 ->except(['password', 'token'])
@@ -214,5 +209,31 @@ class ActivityLogMiddleware
         }
 
         return 'Performed sales action';
+    }
+
+    private function buildRolesDescription(Request $request, ?string $id, string $last): string
+    {
+        $roleId = $request->route('role') ?? $id;
+        $roleName = null;
+
+        if ($roleId) {
+            $role = Role::find($roleId);
+            if ($role) {
+                $roleName = $role->role_name;
+            }
+        }
+
+        $roleIdentifier = $roleName ? "'{$roleName}'" : ($roleId ? "#{$roleId}" : "");
+
+        if ($request->isMethod('POST') && $last === 'permissions') {
+            return "Assigned permissions to role {$roleIdentifier}";
+        }
+
+        return match ($request->method()) {
+            'POST'   => 'Created a new role',
+            'PUT'    => "Updated role {$roleIdentifier}",
+            'DELETE' => "Deleted role {$roleIdentifier}",
+            default  => "Viewed role {$roleIdentifier}",
+        };
     }
 }
