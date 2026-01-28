@@ -27,10 +27,19 @@ class ActivityLogMiddleware
             return $response;
         }
 
+
+         //determine module name
+        $segments = $request->segments();
+        $lastSegment = end($segments);
+
         // Skip plain GET requests without query params
-        if ($request->isMethod('GET') && empty($request->query())) {
-            return $response;
-        }
+       if (
+    $request->isMethod('GET')
+    && empty($request->query())
+    && $lastSegment !== 'export'
+) {
+    return $response;
+}
 
         // Only log authenticated users
         if (!auth()->check()) {
@@ -135,6 +144,10 @@ class ActivityLogMiddleware
             return $this->buildRolesDescription($request, $id, $last);
         }
 
+        if ($module === 'Stock Movements') {
+            return $this->buildStockMovementsDescription($request, $id, $last);
+        }
+
         if ($request->isMethod('GET') && !empty($request->query())) {
             $query = collect($request->query())
                 ->except(['password', 'token'])
@@ -236,4 +249,26 @@ class ActivityLogMiddleware
             default  => "Viewed role {$roleIdentifier}",
         };
     }
+
+
+private function buildStockMovementsDescription(Request $request, ?string $id, string $last): string
+{
+    if ($request->isMethod('GET')) {
+        if ($last === 'export') {
+            return "Exported stock movements to CSV";
+        }
+
+        if (!empty($request->query())) {
+            $query = collect($request->query())
+                ->except(['password', 'token'])
+                ->map(fn ($v, $k) => str_replace('_', ' ', $k) . "=" . $v)
+                ->implode(', ');
+            return "Searched/filtered stock movements" . ($query ? " with: {$query}" : "");
+        }
+
+        return "Viewed stock movement" . ($id ? " #{$id}" : "");
+    }
+
+    return 'Performed stock movement action';
+} 
 }
