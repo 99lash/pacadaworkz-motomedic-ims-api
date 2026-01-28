@@ -132,25 +132,26 @@ class ActivityLogMiddleware
         $last     = end($segments);
         $id       = is_numeric($last) ? $last : null;
 
-        /* ===== POS SPECIAL CASES ===== */
         if ($module === 'POS') {
             return $this->buildPosDescription($request, $id, $last);
         }
 
-        /* ===== SEARCH / FILTER ===== */
-        if ($request->isMethod('GET') && !empty($request->query())) {
-         $query = collect($request->query())
-        ->except(['password', 'token'])
-        ->map(fn ($v, $k) => "$k=$v")
-        ->implode(', ');
-            return "Searched/filter {$module}".($query ? " {$query}":"");
+        if ($module === 'Sales') {
+            return $this->buildSalesDescription($request, $id, $last);
         }
 
-        /* ===== GENERIC FALLBACK ===== */
+        if ($request->isMethod('GET') && !empty($request->query())) {
+            $query = collect($request->query())
+                ->except(['password', 'token'])
+                ->map(fn ($v, $k) => "$k=$v")
+                ->implode(', ');
+            return "Searched/filtered {$module}" . ($query ? " with: {$query}" : "");
+        }
+
         return match ($action) {
-            'Create' => "Created {$module}",
-            'Edit'   => "Updated {$module}" . ($id ? " ID {$id}" : ""),
-            'Delete' => "Deleted {$module}" . ($id ? " ID {$id}" : ""),
+            'Create' => "Created a new {$module}",
+            'Edit'   => "Updated {$module}" . ($id ? " #{$id}" : ""),
+            'Delete' => "Deleted {$module}" . ($id ? " #{$id}" : ""),
             default  => "Viewed {$module}",
         };
     }
@@ -183,5 +184,35 @@ class ActivityLogMiddleware
         }
 
         return 'Viewed POS';
+    }
+
+
+    private function buildSalesDescription(Request $request, ?string $id, string $last): string
+    {
+        if ($request->isMethod('POST')) {
+            return match ($last) {
+                'void'   => "Voided sales transaction" . ($id ? " #{$id}" : ""),
+                'refund' => "Refunded sales transaction" . ($id ? " #{$id}" : ""),
+                default  => 'Created sales transaction',
+            };
+        }
+
+        if ($request->isMethod('GET')) {
+            if ($last === 'receipt') {
+                return "Viewed sales receipt" . ($id ? " for transaction #{$id}" : "");
+            }
+
+            if (!empty($request->query())) {
+                $query = collect($request->query())
+                    ->except(['password', 'token'])
+                    ->map(fn ($v, $k) => str_replace('_', ' ', $k) . "=" . $v)
+                    ->implode(', ');
+                return "Searched/filtered sales transaction" . ($query ? " with: {$query}" : "");
+            }
+
+            return "Viewed sales transaction" . ($id ? " #{$id}" : "");
+        }
+
+        return 'Performed sales action';
     }
 }
