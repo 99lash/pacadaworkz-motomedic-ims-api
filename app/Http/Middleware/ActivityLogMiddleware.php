@@ -139,7 +139,11 @@ class ActivityLogMiddleware
 
         /* ===== SEARCH / FILTER ===== */
         if ($request->isMethod('GET') && !empty($request->query())) {
-            return "Searched {$module}";
+         $query = collect($request->query())
+        ->except(['password', 'token'])
+        ->map(fn ($v, $k) => "$k=$v")
+        ->implode(', ');
+            return "Searched/filter {$module}".($query ? " {$query}":"");
         }
 
         /* ===== GENERIC FALLBACK ===== */
