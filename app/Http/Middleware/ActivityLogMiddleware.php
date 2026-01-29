@@ -276,6 +276,19 @@ private function buildStockMovementsDescription(Request $request, ?string $id, s
 
     return 'Performed stock movement action';
 } 
+
+private function buildStockAdjustmentsDescription(Request $request, ?string $id, string $last): string
+{
+
+if ($request->isMethod('GET')) {
+        if ($last === 'export') {
+            return "Exported stock adjustments to CSV";
+        }
+}
+
+
+return 'niggas';
+}
 }
 
 /*
