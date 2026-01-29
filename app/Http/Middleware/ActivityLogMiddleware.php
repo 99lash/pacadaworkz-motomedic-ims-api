@@ -269,14 +269,35 @@ private function buildStockMovementsDescription(Request $request, ?string $id, s
 private function buildStockAdjustmentsDescription(Request $request, ?string $id, string $last): string
 {
 
+
 if ($request->isMethod('GET')) {
         if ($last === 'export') {
             return "Exported stock adjustments to CSV";
         }
+
+}else if($request->isMethod('POST')){
+       $reason = $request->input('reason');
+        return "stock adjusted, reason : {$reason}";
+}else if (in_array($request->method(), ['PUT', 'PATCH'])) {
+
+$description = "Updated stock adjustment #{$id}";
+
+    if ($request->filled('reason')) {
+        $description .= " | reason: " . $request->input('reason');
+    }
+
+    if ($request->filled('notes')) {
+        $description .= " | notes: " . $request->input('notes');
+    }
+
+    return $description;
 }
+ $query = collect($request->query())
+                ->except(['password', 'token'])
+                ->map(fn ($v, $k) => str_replace('_', ' ', $k) . "=" . $v)
+                ->implode(', ');
+return "filtered/search stock adjustments {$query}";
 
-
-return 'niggas';
 }
 
 
@@ -288,6 +309,7 @@ private function specialDescriptionHolder($module,$request, $id, $last){
     $module ==='Sales' => $this->buildSalesDescription($request, $id, $last),
     $module === 'Roles' => $this->buildRolesDescription($request, $id, $last),
     $module === 'Stock Movements' => $this->buildStockMovementsDescription($request, $id, $last),
+    $module === 'Stock Adjustments' => $this->buildStockAdjustmentsDescription($request, $id, $last),
     default => false
   };
 
@@ -302,5 +324,5 @@ Mga nagawan ko na ng customized buildDescription
 2.POS
 3.Roles
 4.Stock-movements
-
+5.Stock-adjustments
 */
