@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\ProductAttributeResource;
 use App\Http\Requests\Product\ProductRequest;
+use App\Http\Requests\Product\ProductUpdateRequest;
 use App\Http\Requests\Product\ProductAttributeRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -120,7 +121,7 @@ class ProductController
 
 
 //update product
-      public function update(ProductRequest $request, $id){
+      public function update(ProductUpdateRequest $request, $id){
      
               
       try{
