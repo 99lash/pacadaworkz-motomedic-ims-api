@@ -54,7 +54,7 @@ class ActivityLogMiddleware
 
         $description = $this->buildDescription($request, $module, $action);
 
-        // ✅ Correct: instance-based service call
+        //  Correct: instance-based service call
         app(ActivityLogService::class)->log(
             module: $module,
             action: $action,
@@ -195,6 +195,8 @@ class ActivityLogMiddleware
     }
 
 
+
+    // sales description
     private function buildSalesDescription(Request $request, ?string $id, string $last): string
     {
         if ($request->isMethod('POST')) {
@@ -224,6 +226,7 @@ class ActivityLogMiddleware
         return 'Performed sales action';
     }
 
+    // roles description
     private function buildRolesDescription(Request $request, ?string $id, string $last): string
     {
         $roleId = $request->route('role') ?? $id;
@@ -251,6 +254,8 @@ class ActivityLogMiddleware
     }
 
 
+
+    //stock movement
 private function buildStockMovementsDescription(Request $request, ?string $id, string $last): string
 {
     if ($request->isMethod('GET')) {
@@ -272,3 +277,13 @@ private function buildStockMovementsDescription(Request $request, ?string $id, s
     return 'Performed stock movement action';
 } 
 }
+
+/*
+
+Mga nagawan ko na ng customized buildDescription
+1.sales
+2.POS
+3.Roles
+4.Stock-movements
+
+*/
