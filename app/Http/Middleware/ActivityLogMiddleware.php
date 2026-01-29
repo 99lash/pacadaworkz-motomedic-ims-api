@@ -132,21 +132,10 @@ class ActivityLogMiddleware
         $last     = end($segments);
         $id       = is_numeric($last) ? $last : null;
 
-        if ($module === 'POS') {
-            return $this->buildPosDescription($request, $id, $last);
-        }
+        $description = $this->specialDescriptionHolder($module,$request, $id, $last);
 
-        if ($module === 'Sales') {
-            return $this->buildSalesDescription($request, $id, $last);
-        }
-
-        if ($module === 'Roles') {
-            return $this->buildRolesDescription($request, $id, $last);
-        }
-
-        if ($module === 'Stock Movements') {
-            return $this->buildStockMovementsDescription($request, $id, $last);
-        }
+        if($description)
+            return $description;
 
         if ($request->isMethod('GET') && !empty($request->query())) {
             $query = collect($request->query())
@@ -289,6 +278,21 @@ if ($request->isMethod('GET')) {
 
 return 'niggas';
 }
+
+
+// helper function that helps to hold descriptions dynamically
+private function specialDescriptionHolder($module,$request, $id, $last){
+   
+  return match(true){
+    $module ==='POS' => $this->buildPosDescription($request, $id, $last),
+    $module ==='Sales' => $this->buildSalesDescription($request, $id, $last),
+    $module === 'Roles' => $this->buildRolesDescription($request, $id, $last),
+    $module === 'Stock Movements' => $this->buildStockMovementsDescription($request, $id, $last),
+    default => false
+  };
+
+}
+
 }
 
 /*
