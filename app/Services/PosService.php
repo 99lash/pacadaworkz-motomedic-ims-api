@@ -151,6 +151,12 @@ class PosService
         $cart = Cart::where('user_id', $userId)->firstOrFail();
 
         $cart->cart_items()->delete();
+           $this->activityLogService->log(
+                module: 'POS',
+                action: 'clear carts',
+                description: "remove overall cart items in list",
+                userId: $userId
+            );
 
         return true;
     }
@@ -171,7 +177,7 @@ class PosService
             $this->activityLogService->log(
                 module: 'POS',
                 action: 'apply discount',
-                description: "Implement discount:{$discount}, discount type:{$discount_type}",
+                description: "Implement discount:{$discount}%",
                 userId: $userId
             );
 

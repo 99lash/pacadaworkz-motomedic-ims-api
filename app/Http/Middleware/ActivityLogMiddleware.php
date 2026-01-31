@@ -22,7 +22,8 @@ class ActivityLogMiddleware
             'api/v1/pos/cart/add-item',
             'api/v1/pos/cart/update-item',
             'api/v1/pos/cart/remove-item',
-               'api/v1/pos/cart/apply-discount'
+               'api/v1/pos/cart/apply-discount',
+            'api/v1/pos/cart/clear'
 
         ];
 
@@ -56,8 +57,9 @@ class ActivityLogMiddleware
         $module = $this->detectModule($path);
         $action = $this->mapAction($method);
 
-        $description = $this->buildDescription($request, $module, $action);
-
+        $description = $this->buildDescription($request, $module, $action,$response);
+        
+        if($description != false){
         //  Correct: instance-based service call
         app(ActivityLogService::class)->log(
             module: $module,
@@ -65,7 +67,7 @@ class ActivityLogMiddleware
             description: $description,
             userId: auth()->id()
         );
-
+        }
         return $response;
     }
 
@@ -149,25 +151,9 @@ class ActivityLogMiddleware
             return "Searched/filtered {$module}" . ($query ? " with: {$query}" : "");
         }
 
-        return match ($action) {
-            'Create' => "Created a new {$module}",
-            'Edit'   => "Updated {$module}" . ($id ? " #{$id}" : ""),
-            'Delete' => "Deleted {$module}" . ($id ? " #{$id}" : ""),
-            default  => "Viewed {$module}",
-        };
+      return false;
     }
 
-    /* =========================
-     * POS DESCRIPTION HANDLER
-     * ========================= */
-    private function buildPosDescription(Request $request, ?string $id, string $last): string
-    {
-        if ($request->isMethod('GET')) {
-            return 'Viewed POS';
-        }
-
-        return 'Performed POS action';
-    }
 
 
 
@@ -279,14 +265,7 @@ return "filtered/search stock adjustments {$query}";
 }
 
 
-private function buildSuppliersDescription(Request $request, ?string $id, string $last):string
-{
 
-if(in_array($request->method(), ['PUT', 'PATCH'])){
-    
-}
-
-}
 
 // helper function that helps to hold descriptions dynamically
 private function specialDescriptionHolder($module,$request, $id, $last){
