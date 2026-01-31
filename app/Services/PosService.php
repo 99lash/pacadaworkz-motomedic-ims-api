@@ -102,7 +102,7 @@ class PosService
         $cart = Cart::where('user_id', $userId)->firstOrFail();
 
         $cartItem = $cart->cart_items()->where('id', $cartItemId)->first();
-
+        $name = $cartItem->product->name;
         if (!$cartItem)
             throw new CartItemNotFoundException();
 
@@ -110,6 +110,14 @@ class PosService
         $cartItem->save();
 
         $cartItem->load('product');
+
+
+            $this->activityLogService->log(
+                module: 'POS',
+                action: 'Update',
+                description: "Add item to cart for product {$name}, quantity: $quantity",
+                userId: $userId
+            );
 
         return $cartItem;
     }
