@@ -4,7 +4,7 @@ namespace App\Http\Requests\Product;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ProductRequest extends FormRequest
+class ProductUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,12 +21,9 @@ class ProductRequest extends FormRequest
      */
     public function rules(): array
     {
-
-        $id = $this->route('id');
         return [
              'category_id' => 'required',
              'brand_id' => 'required',
-             'sku' => 'required|unique:products,sku',
              'name' => 'required',
              'description' => 'sometimes',
              'unit_price' => 'required',
