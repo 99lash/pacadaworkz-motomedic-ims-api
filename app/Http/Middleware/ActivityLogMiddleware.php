@@ -18,12 +18,7 @@ class ActivityLogMiddleware
         $excludedPaths = [
             'api/v1/auth/login',
             'api/v1/auth/logout',
-            'api/v1/pos/checkout',
-            'api/v1/pos/cart/add-item',
-            'api/v1/pos/cart/update-item',
-            'api/v1/pos/cart/remove-item',
-               'api/v1/pos/cart/apply-discount',
-            'api/v1/pos/cart/clear'
+            'api/v1/pos/checkout'
 
         ];
 
@@ -157,27 +152,8 @@ class ActivityLogMiddleware
 
 
 
-    // sales description
-    private function buildSalesDescription(Request $request, ?string $id, string $last): string
-    {
-        if ($request->isMethod('GET')) {
-            if ($last === 'receipt') {
-                return "Viewed sales receipt" . ($id ? " for transaction #{$id}" : "");
-            }
 
-            if (!empty($request->query())) {
-                $query = collect($request->query())
-                    ->except(['password', 'token'])
-                    ->map(fn ($v, $k) => str_replace('_', ' ', $k) . "=" . $v)
-                    ->implode(', ');
-                return "Searched/filtered sales transaction" . ($query ? " with: {$query}" : "");
-            }
-
-            return "Viewed sales transaction" . ($id ? " #{$id}" : "");
-        }
-
-        return 'Performed sales action';
-    }
+  
 
     // roles description
     private function buildRolesDescription(Request $request, ?string $id, string $last): string
@@ -271,8 +247,6 @@ return "filtered/search stock adjustments {$query}";
 private function specialDescriptionHolder($module,$request, $id, $last){
    
   return match(true){
-    $module ==='POS' => $this->buildPosDescription($request, $id, $last),
-    $module ==='Sales' => $this->buildSalesDescription($request, $id, $last),
     $module === 'Roles' => $this->buildRolesDescription($request, $id, $last),
     $module === 'Stock Movements' => $this->buildStockMovementsDescription($request, $id, $last),
     $module === 'Stock Adjustments' => $this->buildStockAdjustmentsDescription($request, $id, $last),

@@ -90,7 +90,7 @@ class SalesService
 
             $this->activityLogService->log(
                 module: 'Sales',
-                action: 'Edit',
+                action: 'Void transaction',
                 description: "Voided sales transaction #{$salesTransaction->transaction_no}",
                 userId: $userId
             );
@@ -204,10 +204,12 @@ class SalesService
 
             $salesTransaction->save();
 
+            $refundTypeDescription = ($refundType === 'full') ? 'Fully' : 'Partially';
+
             $this->activityLogService->log(
                 module: 'Sales',
-                action: 'Edit',
-                description: "Refunded {$refundAmount} for sales transaction #{$salesTransaction->transaction_no}",
+                action: 'Refund',
+                description: "{$refundTypeDescription} refunded {$refundAmount} for sales transaction #{$salesTransaction->transaction_no}",
                 userId: $userId
             );
 
