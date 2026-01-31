@@ -6,7 +6,6 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Services\ActivityLogService;
-use App\Models\Role;
 
 class ActivityLogMiddleware
 {
@@ -20,6 +19,7 @@ class ActivityLogMiddleware
             'api/v1/auth/login',
             'api/v1/auth/logout',
             'api/v1/pos/checkout',
+            'api/v1/pos/cart/add-item'
         ];
 
         // Skip excluded paths
@@ -158,29 +158,11 @@ class ActivityLogMiddleware
      * ========================= */
     private function buildPosDescription(Request $request, ?string $id, string $last): string
     {
-        if ($request->isMethod('POST')) {
-            return match ($last) {
-                'add-item'       => 'Added item to cart',
-                'clear'          => 'Cleared the cart',
-                'apply-discount' => 'Applied discount to cart',
-                'checkout'       => 'Checked out the cart',
-                default          => 'Performed POS action',
-            };
+        if ($request->isMethod('GET')) {
+            return 'Viewed POS';
         }
 
-        if ($request->isMethod('PATCH')) {
-            return $id
-                ? "Updated item #{$id} in cart"
-                : "Updated cart item";
-        }
-
-        if ($request->isMethod('DELETE')) {
-            return $id
-                ? "Removed item #{$id} from cart"
-                : "Removed item from cart";
-        }
-
-        return 'Viewed POS';
+        return 'Performed POS action';
     }
 
 
@@ -188,14 +170,6 @@ class ActivityLogMiddleware
     // sales description
     private function buildSalesDescription(Request $request, ?string $id, string $last): string
     {
-        if ($request->isMethod('POST')) {
-            return match ($last) {
-                'void'   => "Voided sales transaction" . ($id ? " #{$id}" : ""),
-                'refund' => "Refunded sales transaction" . ($id ? " #{$id}" : ""),
-                default  => 'Created sales transaction',
-            };
-        }
-
         if ($request->isMethod('GET')) {
             if ($last === 'receipt') {
                 return "Viewed sales receipt" . ($id ? " for transaction #{$id}" : "");
@@ -301,6 +275,15 @@ return "filtered/search stock adjustments {$query}";
 }
 
 
+private function buildSuppliersDescription(Request $request, ?string $id, string $last):string
+{
+
+if(in_array($request->method(), ['PUT', 'PATCH'])){
+    
+}
+
+}
+
 // helper function that helps to hold descriptions dynamically
 private function specialDescriptionHolder($module,$request, $id, $last){
    
@@ -312,6 +295,8 @@ private function specialDescriptionHolder($module,$request, $id, $last){
     $module === 'Stock Adjustments' => $this->buildStockAdjustmentsDescription($request, $id, $last),
     default => false
   };
+
+
 
 }
 

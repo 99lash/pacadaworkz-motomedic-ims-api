@@ -18,6 +18,10 @@ use Illuminate\Support\Str;
 
 class PosService
 {
+    public function __construct(private ActivityLogService $activityLogService)
+    {
+    }
+
     public function getCart(int $userId)
     {
         //create cart kung waley pa
@@ -79,6 +83,17 @@ class PosService
             $cart_item->quantity += 1;
             $cart_item->save();
         }
+
+              //find name first of the product
+              $name=$product->name;
+              
+          
+            $this->activityLogService->log(
+                module: 'POS',
+                action: 'Create',
+                description: "Add item to cart for product {$name}, quantity: 1",
+                userId: $userId
+            );
         return $cart_item;
     }
 
@@ -217,6 +232,13 @@ class PosService
             // Clear Cart
             $cart->cart_items()->delete();
             $cart->update(['discount' => 0, 'discount_type' => 'fixed']);
+
+            $this->activityLogService->log(
+                module: 'POS',
+                action: 'Create',
+                description: "Completed sales transaction #{$transaction->transaction_no} with a total of {$transaction->total_amount}",
+                userId: $userId
+            );
 
             return $transaction->load('sales_items');
         });
