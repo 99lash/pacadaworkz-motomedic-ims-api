@@ -90,7 +90,7 @@ class SalesService
 
             $this->activityLogService->log(
                 module: 'Sales',
-                action: 'Edit',
+                action: 'Void transaction',
                 description: "Voided sales transaction #{$salesTransaction->transaction_no}",
                 userId: $userId
             );
