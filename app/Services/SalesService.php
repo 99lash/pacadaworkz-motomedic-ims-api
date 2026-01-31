@@ -13,6 +13,9 @@ use App\Models\StockMovement;
 
 class SalesService
 {
+    public function __construct(private ActivityLogService $activityLogService)
+    {
+    }
 
     public function getAllSales($search = null, $filters = [])
     {
@@ -84,6 +87,13 @@ class SalesService
 
             $salesTransaction->status = 'voided';
             $salesTransaction->save();
+
+            $this->activityLogService->log(
+                module: 'Sales',
+                action: 'Edit',
+                description: "Voided sales transaction #{$salesTransaction->transaction_no}",
+                userId: $userId
+            );
 
             return $salesTransaction;
         });
@@ -193,6 +203,13 @@ class SalesService
             }
 
             $salesTransaction->save();
+
+            $this->activityLogService->log(
+                module: 'Sales',
+                action: 'Edit',
+                description: "Refunded {$refundAmount} for sales transaction #{$salesTransaction->transaction_no}",
+                userId: $userId
+            );
 
             return $salesTransaction;
         });

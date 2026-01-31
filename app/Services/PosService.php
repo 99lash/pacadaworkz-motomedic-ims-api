@@ -18,6 +18,10 @@ use Illuminate\Support\Str;
 
 class PosService
 {
+    public function __construct(private ActivityLogService $activityLogService)
+    {
+    }
+
     public function getCart(int $userId)
     {
         //create cart kung waley pa
@@ -79,6 +83,17 @@ class PosService
             $cart_item->quantity += 1;
             $cart_item->save();
         }
+
+              //find name first of the product
+              $name=$product->name;
+              
+          
+            $this->activityLogService->log(
+                module: 'POS',
+                action: 'Add item to cart',
+                description: "Add item to cart for product {$name}, quantity: 1",
+                userId: $userId
+            );
         return $cart_item;
     }
 
@@ -87,7 +102,7 @@ class PosService
         $cart = Cart::where('user_id', $userId)->firstOrFail();
 
         $cartItem = $cart->cart_items()->where('id', $cartItemId)->first();
-
+        $name = $cartItem->product->name;
         if (!$cartItem)
             throw new CartItemNotFoundException();
 
@@ -95,6 +110,14 @@ class PosService
         $cartItem->save();
 
         $cartItem->load('product');
+
+
+            $this->activityLogService->log(
+                module: 'POS',
+                action: 'update item to cart',
+                description: "Add item to cart for product {$name}, quantity: $quantity",
+                userId: $userId
+            );
 
         return $cartItem;
     }
@@ -104,11 +127,21 @@ class PosService
         $cart = Cart::where('user_id', $userId)->firstOrFail();
 
         $cartItem = $cart->cart_items()->where('id', $cartItemId)->first();
-
+         $name = $cartItem->product->name;
         if (!$cartItem)
             throw new CartItemNotFoundException();
 
         $cartItem->delete();
+
+
+        
+            $this->activityLogService->log(
+                module: 'POS',
+                action: 'Delete cart',
+                description: "Delete cart, product name:{$name}",
+                userId: $userId
+            );
+
 
         return true;
     }
@@ -118,6 +151,12 @@ class PosService
         $cart = Cart::where('user_id', $userId)->firstOrFail();
 
         $cart->cart_items()->delete();
+           $this->activityLogService->log(
+                module: 'POS',
+                action: 'clear carts',
+                description: "remove overall cart items in list",
+                userId: $userId
+            );
 
         return true;
     }
@@ -132,6 +171,15 @@ class PosService
         $cart->discount = $discountDetails['discount'];
         $cart->discount_type = $discountDetails['discount_type'];
         $cart->save();
+          
+        $discount =  $discountDetails['discount'];
+        $discount_type = $discountDetails['discount_type'];
+            $this->activityLogService->log(
+                module: 'POS',
+                action: 'apply discount',
+                description: "Implement discount:{$discount}%",
+                userId: $userId
+            );
 
         return $cart;
     }
@@ -217,6 +265,13 @@ class PosService
             // Clear Cart
             $cart->cart_items()->delete();
             $cart->update(['discount' => 0, 'discount_type' => 'fixed']);
+
+            $this->activityLogService->log(
+                module: 'POS',
+                action: 'Create',
+                description: "Completed sales transaction #{$transaction->transaction_no} with a total of {$transaction->total_amount}",
+                userId: $userId
+            );
 
             return $transaction->load('sales_items');
         });
