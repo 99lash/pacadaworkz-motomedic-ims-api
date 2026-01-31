@@ -127,11 +127,21 @@ class PosService
         $cart = Cart::where('user_id', $userId)->firstOrFail();
 
         $cartItem = $cart->cart_items()->where('id', $cartItemId)->first();
-
+         $name = $cartItem->product->name;
         if (!$cartItem)
             throw new CartItemNotFoundException();
 
         $cartItem->delete();
+
+
+        
+            $this->activityLogService->log(
+                module: 'POS',
+                action: 'Delete',
+                description: "Delete cart, product name:{$name}",
+                userId: $userId
+            );
+
 
         return true;
     }
