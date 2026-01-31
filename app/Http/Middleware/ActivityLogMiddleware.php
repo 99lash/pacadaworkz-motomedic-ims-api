@@ -21,7 +21,9 @@ class ActivityLogMiddleware
             'api/v1/pos/checkout',
             'api/v1/pos/cart/add-item',
             'api/v1/pos/cart/update-item',
-            'api/v1/pos/cart/remove-item'
+            'api/v1/pos/cart/remove-item',
+               'api/v1/pos/cart/apply-discount'
+
         ];
 
         // Skip excluded paths

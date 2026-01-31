@@ -90,7 +90,7 @@ class PosService
           
             $this->activityLogService->log(
                 module: 'POS',
-                action: 'Create',
+                action: 'Add item to cart',
                 description: "Add item to cart for product {$name}, quantity: 1",
                 userId: $userId
             );
@@ -114,7 +114,7 @@ class PosService
 
             $this->activityLogService->log(
                 module: 'POS',
-                action: 'Update',
+                action: 'update item to cart',
                 description: "Add item to cart for product {$name}, quantity: $quantity",
                 userId: $userId
             );
@@ -137,7 +137,7 @@ class PosService
         
             $this->activityLogService->log(
                 module: 'POS',
-                action: 'Delete',
+                action: 'Delete cart',
                 description: "Delete cart, product name:{$name}",
                 userId: $userId
             );
@@ -165,6 +165,15 @@ class PosService
         $cart->discount = $discountDetails['discount'];
         $cart->discount_type = $discountDetails['discount_type'];
         $cart->save();
+          
+        $discount =  $discountDetails['discount'];
+        $discount_type = $discountDetails['discount_type'];
+            $this->activityLogService->log(
+                module: 'POS',
+                action: 'apply discount',
+                description: "Implement discount:{$discount}, discount type:{$discount_type}",
+                userId: $userId
+            );
 
         return $cart;
     }
