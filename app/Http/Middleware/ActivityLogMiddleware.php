@@ -184,28 +184,6 @@ class ActivityLogMiddleware
 
 
 
-    //stock movement
-private function buildStockMovementsDescription(Request $request, ?string $id, string $last): string
-{
-    if ($request->isMethod('GET')) {
-        if ($last === 'export') {
-            return "Exported stock movements to CSV";
-        }
-//ed
-        if (!empty($request->query())) {
-            $query = collect($request->query())
-                ->except(['password', 'token'])
-                ->map(fn ($v, $k) => str_replace('_', ' ', $k) . "=" . $v)
-                ->implode(', ');
-            return "Searched/filtered stock movements" . ($query ? " with: {$query}" : "");
-        }
-
-        return "Viewed stock movement" . ($id ? " #{$id}" : "");
-    }
-
-    return false;
-}
-
 private function buildStockAdjustmentsDescription(Request $request, ?string $id, string $last): string
 {
 
