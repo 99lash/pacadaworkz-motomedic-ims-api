@@ -1,35 +1,63 @@
 <?php
 
 namespace App\Services;
+
 use App\Models\Role;
 
-class RoleService{
+class RoleService
+{
 
-    public function getAllRoles(){
+    protected $activityLogService;
+
+    public function __construct(ActivityLogService $activityLogService)
+    {
+        $this->activityLogService = $activityLogService;
+    }
+
+    public function getAllRoles()
+    {
         return Role::all();
     }
-   
-    public function getRoleById($id){
-        
+
+    public function getRoleById($id)
+    {
+
         return Role::findOrFail($id);
     }
-   
-   
+
+
     public function create(array $data)
     {
-        return Role::create([
+        $role = Role::create([
             'role_name' => $data['role_name'],
             'description' => $data['description']
         ]);
+
+        $this->activityLogService->log(
+            module: 'Role',
+            action: 'Create',
+            description: "Role created: {$role->role_name}",
+            userId: auth()->id()
+        );
+
+        return $role;
     }
 
-     
 
-    public function update(array $data,$id){
-     
+
+    public function update(array $data, $id)
+    {
+
         $role = Role::findOrFail($id);
-        
+
         $role->update($data);
+
+        $this->activityLogService->log(
+            module: 'Role',
+            action: 'Update',
+            description: "Role updated: {$role->role_name}",
+            userId: auth()->id()
+        );
 
         return $role;
     }
@@ -38,9 +66,20 @@ class RoleService{
 
     public function delete($id)
     {
-       $role = Role::findOrFail($id);
-       
-       return $role->delete();
+        $role = Role::findOrFail($id);
+
+        $roleName = $role->role_name;
+
+        $role->delete();
+
+        $this->activityLogService->log(
+            module: 'Role',
+            action: 'Delete',
+            description: "Role deleted: {$roleName}",
+            userId: auth()->id()
+        );
+
+        return true;
     }
 
 }

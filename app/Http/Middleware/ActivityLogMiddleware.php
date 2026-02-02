@@ -199,8 +199,6 @@ private function buildStockMovementsDescription(Request $request, ?string $id, s
                 ->implode(', ');
             return "Searched/filtered stock movements" . ($query ? " with: {$query}" : "");
         }
-
-        return "Viewed stock movement" . ($id ? " #{$id}" : "");
     }
 
     return false;
