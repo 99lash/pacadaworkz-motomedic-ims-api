@@ -18,7 +18,8 @@ class ActivityLogMiddleware
         $excludedPaths = [
             'api/v1/auth/login',
             'api/v1/auth/logout',
-            'api/v1/pos/checkout'
+            'api/v1/pos/checkout',
+            'api/v1/roles'
 
         ];
 
@@ -155,33 +156,6 @@ class ActivityLogMiddleware
 
 
 
-    // roles description
-    private function buildRolesDescription(Request $request, ?string $id, string $last): string
-    {
-        $roleId = $request->route('role') ?? $id;
-        $roleName = null;
-
-        if ($roleId) {
-            $role = Role::find($roleId);
-            if ($role) {
-                $roleName = $role->role_name;
-            }
-        }
-
-        $roleIdentifier = $roleName ? "'{$roleName}'" : ($roleId ? "#{$roleId}" : "");
-
-        if ($request->isMethod('POST') && $last === 'permissions') {
-            return "Assigned permissions to role {$roleIdentifier}";
-        }
-
-        return match ($request->method()) {
-            'POST'   => 'Created a new role',
-            'PUT'    => "Updated role {$roleIdentifier}",
-            'DELETE' => "Deleted role {$roleIdentifier}",
-            default  => "Viewed role {$roleIdentifier}",
-        };
-    }
-
 
 
     //stock movement
@@ -199,8 +173,6 @@ private function buildStockMovementsDescription(Request $request, ?string $id, s
                 ->implode(', ');
             return "Searched/filtered stock movements" . ($query ? " with: {$query}" : "");
         }
-
-        return "Viewed stock movement" . ($id ? " #{$id}" : "");
     }
 
     return false;
@@ -247,7 +219,7 @@ return "filtered/search stock adjustments {$query}";
 private function specialDescriptionHolder($module,$request, $id, $last){
 
   return match(true){
-    $module === 'Roles' => $this->buildRolesDescription($request, $id, $last),
+
     $module === 'Stock Movements' => $this->buildStockMovementsDescription($request, $id, $last),
     $module === 'Stock Adjustments' => $this->buildStockAdjustmentsDescription($request, $id, $last),
     default => false
