@@ -156,33 +156,6 @@ class ActivityLogMiddleware
 
 
 
-    // roles description
-    private function buildRolesDescription(Request $request, ?string $id, string $last): string
-    {
-        $roleId = $request->route('role') ?? $id;
-        $roleName = null;
-
-        if ($roleId) {
-            $role = Role::find($roleId);
-            if ($role) {
-                $roleName = $role->role_name;
-            }
-        }
-
-        $roleIdentifier = $roleName ? "'{$roleName}'" : ($roleId ? "#{$roleId}" : "");
-
-        if ($request->isMethod('POST') && $last === 'permissions') {
-            return "Assigned permissions to role {$roleIdentifier}";
-        }
-
-        return match ($request->method()) {
-            'POST'   => 'Created a new role',
-            'PUT'    => "Updated role {$roleIdentifier}",
-            'DELETE' => "Deleted role {$roleIdentifier}",
-            default  => "Viewed role {$roleIdentifier}",
-        };
-    }
-
 
 
     //stock movement
