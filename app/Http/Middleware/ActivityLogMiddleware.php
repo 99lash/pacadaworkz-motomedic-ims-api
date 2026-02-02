@@ -53,7 +53,7 @@ class ActivityLogMiddleware
         $action = $this->mapAction($method);
 
         $description = $this->buildDescription($request, $module, $action,$response);
-        
+
         if($description != false){
         //  Correct: instance-based service call
         app(ActivityLogService::class)->log(
@@ -153,7 +153,7 @@ class ActivityLogMiddleware
 
 
 
-  
+
 
     // roles description
     private function buildRolesDescription(Request $request, ?string $id, string $last): string
@@ -191,7 +191,7 @@ private function buildStockMovementsDescription(Request $request, ?string $id, s
         if ($last === 'export') {
             return "Exported stock movements to CSV";
         }
-
+//ed
         if (!empty($request->query())) {
             $query = collect($request->query())
                 ->except(['password', 'token'])
@@ -203,8 +203,8 @@ private function buildStockMovementsDescription(Request $request, ?string $id, s
         return "Viewed stock movement" . ($id ? " #{$id}" : "");
     }
 
-    return 'Performed stock movement action';
-} 
+    return false;
+}
 
 private function buildStockAdjustmentsDescription(Request $request, ?string $id, string $last): string
 {
@@ -245,7 +245,7 @@ return "filtered/search stock adjustments {$query}";
 
 // helper function that helps to hold descriptions dynamically
 private function specialDescriptionHolder($module,$request, $id, $last){
-   
+
   return match(true){
     $module === 'Roles' => $this->buildRolesDescription($request, $id, $last),
     $module === 'Stock Movements' => $this->buildStockMovementsDescription($request, $id, $last),
@@ -267,4 +267,5 @@ Mga nagawan ko na ng customized buildDescription
 3.Roles
 4.Stock-movements
 5.Stock-adjustments
+
 */
