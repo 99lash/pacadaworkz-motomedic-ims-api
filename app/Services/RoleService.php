@@ -49,13 +49,13 @@ class RoleService
     {
 
         $role = Role::findOrFail($id);
-
+        $previousRole = $role->role_name;
         $role->update($data);
 
         $this->activityLogService->log(
             module: 'Role',
             action: 'Update',
-            description: "Role updated: {$role->role_name}",
+            description: "Role name : {$previousRole} updated to: {$role->role_name}",
             userId: auth()->id()
         );
 

@@ -18,7 +18,8 @@ class ActivityLogMiddleware
         $excludedPaths = [
             'api/v1/auth/login',
             'api/v1/auth/logout',
-            'api/v1/pos/checkout'
+            'api/v1/pos/checkout',
+            'api/v1/roles'
 
         ];
 
@@ -245,7 +246,7 @@ return "filtered/search stock adjustments {$query}";
 private function specialDescriptionHolder($module,$request, $id, $last){
 
   return match(true){
-    $module === 'Roles' => $this->buildRolesDescription($request, $id, $last),
+
     $module === 'Stock Movements' => $this->buildStockMovementsDescription($request, $id, $last),
     $module === 'Stock Adjustments' => $this->buildStockAdjustmentsDescription($request, $id, $last),
     default => false
