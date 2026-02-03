@@ -4,6 +4,12 @@ namespace App\Services;
 use App\Models\PurchaseOrder;
 class PurchaseService
 {
+    protected $activityLogService;
+
+    public function __construct(ActivityLogService $activityLogService)
+    {
+        $this->activityLogService = $activityLogService;
+    }
 //get purchase service
 public function getPurchases($search = null)
 {
@@ -40,12 +46,14 @@ public function getPurchases($search = null)
 // create purchase service
     public function createPurchase(array $data)
     {
-         return PurchaseOrder::create($data);
+        $purchase = PurchaseOrder::create($data);
+        $this->activityLogService->log('Purchase', 'Create', "Created purchase order #{$purchase->id}");
+        return $purchase;
     }
 
     public function findPurchase($id)
     {
-        
+
         return PurchaseOrder::findOrFail($id);
     }
 
@@ -55,15 +63,17 @@ public function getPurchases($search = null)
     {
         $purchase = $this->findPurchase($id);
         $purchase->update($data);
+        $this->activityLogService->log('Purchase', 'Update', "Updated purchase order #{$purchase->id}");
         return $purchase;
     }
-   
+
 
   // delete purchase service
     public function deletePurchase($id)
     {
         $purchase = PurchaseOrder::findOrFail($id);
-
-        return $purchase->delete();
+        $purchase->delete();
+        $this->activityLogService->log('Purchase', 'Delete', "Deleted purchase order #{$purchase->id}");
+        return true;
     }
 }
