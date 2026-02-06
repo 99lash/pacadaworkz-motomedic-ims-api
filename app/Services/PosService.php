@@ -18,9 +18,7 @@ use Illuminate\Support\Str;
 
 class PosService
 {
-    public function __construct(private ActivityLogService $activityLogService)
-    {
-    }
+    public function __construct(private ActivityLogService $activityLogService) {}
 
     public function getCart(int $userId)
     {
@@ -28,7 +26,7 @@ class PosService
         $cart = $this->createCart($userId);
 
         //woah load lopet orm
-        $cart->load('cart_items.product');
+        $cart->load('cart_items.product.inventory');
 
         $result['cart'] = $cart;
 
@@ -64,36 +62,43 @@ class PosService
         $productId = $itemDetails['product_id'];
 
         //validate Product exists and is not soft-deleted
-        $product = Product::findOrFail($productId);
+        $product = Product::with('inventory')->findOrFail($productId);
+
+        if (!$product->inventory || $product->inventory->quantity <= 0) {
+            throw new InsufficientStockException("Product is out of stock");
+        }
 
         $cart = $this->createCart($userId);
 
-        // $quantity = intval($itemDetails['quantity']);
+        $cart_item = $cart->cart_items()->where('product_id', $productId)->first();
 
-        $cart_item = $cart->cart_items()->firstOrCreate(
-            ['product_id' => $productId],
-            [
+        if ($cart_item) {
+            if ($cart_item->quantity + 1 > $product->inventory->quantity) {
+                throw new InsufficientStockException("Cannot add more items. Only {$product->inventory->quantity} in stock.");
+            }
+            $cart_item->quantity += 1;
+            $cart_item->save();
+        } else {
+            $cart_item = $cart->cart_items()->create([
                 'product_id' => $productId,
                 'quantity' => 1,
                 'unit_price' => intval($product->unit_price),
-            ]
-        );
-
-        if (!$cart_item->wasRecentlyCreated) {
-            $cart_item->quantity += 1;
-            $cart_item->save();
+            ]);
         }
 
-              //find name first of the product
-              $name=$product->name;
-              
-          
-            $this->activityLogService->log(
-                module: 'POS',
-                action: 'Add item to cart',
-                description: "Add item to cart for product {$name}, quantity: 1",
-                userId: $userId
-            );
+        //find name first of the product
+        $name = $product->name;
+
+
+        $this->activityLogService->log(
+            module: 'POS',
+            action: 'Add item to cart',
+            description: "Add item to cart for product {$name}, quantity: 1",
+            userId: $userId
+        );
+
+        $cart_item->load('product.inventory');
+
         return $cart_item;
     }
 
@@ -101,23 +106,31 @@ class PosService
     {
         $cart = Cart::where('user_id', $userId)->firstOrFail();
 
-        $cartItem = $cart->cart_items()->where('id', $cartItemId)->first();
-        $name = $cartItem->product->name;
+        $cartItem = $cart->cart_items()->with('product.inventory')->where('id', $cartItemId)->first();
+
         if (!$cartItem)
             throw new CartItemNotFoundException();
+
+        $product = $cartItem->product;
+        $name = $product->name;
+
+        if (!$product->inventory || $quantity > $product->inventory->quantity) {
+            $available = $product->inventory ? $product->inventory->quantity : 0;
+            throw new InsufficientStockException("Insufficient stock. Only {$available} available.");
+        }
 
         $cartItem->quantity = $quantity;
         $cartItem->save();
 
-        $cartItem->load('product');
+        $cartItem->load('product.inventory');
 
 
-            $this->activityLogService->log(
-                module: 'POS',
-                action: 'update item to cart',
-                description: "Add item to cart for product {$name}, quantity: $quantity",
-                userId: $userId
-            );
+        $this->activityLogService->log(
+            module: 'POS',
+            action: 'update item to cart',
+            description: "Add item to cart for product {$name}, quantity: $quantity",
+            userId: $userId
+        );
 
         return $cartItem;
     }
@@ -127,20 +140,20 @@ class PosService
         $cart = Cart::where('user_id', $userId)->firstOrFail();
 
         $cartItem = $cart->cart_items()->where('id', $cartItemId)->first();
-         $name = $cartItem->product->name;
+        $name = $cartItem->product->name;
         if (!$cartItem)
             throw new CartItemNotFoundException();
 
         $cartItem->delete();
 
 
-        
-            $this->activityLogService->log(
-                module: 'POS',
-                action: 'Delete cart',
-                description: "Delete cart, product name:{$name}",
-                userId: $userId
-            );
+
+        $this->activityLogService->log(
+            module: 'POS',
+            action: 'Delete cart',
+            description: "Delete cart, product name:{$name}",
+            userId: $userId
+        );
 
 
         return true;
@@ -151,12 +164,12 @@ class PosService
         $cart = Cart::where('user_id', $userId)->firstOrFail();
 
         $cart->cart_items()->delete();
-           $this->activityLogService->log(
-                module: 'POS',
-                action: 'clear carts',
-                description: "remove overall cart items in list",
-                userId: $userId
-            );
+        $this->activityLogService->log(
+            module: 'POS',
+            action: 'clear carts',
+            description: "remove overall cart items in list",
+            userId: $userId
+        );
 
         return true;
     }
@@ -171,15 +184,15 @@ class PosService
         $cart->discount = $discountDetails['discount'];
         $cart->discount_type = $discountDetails['discount_type'];
         $cart->save();
-          
+
         $discount =  $discountDetails['discount'];
         $discount_type = $discountDetails['discount_type'];
-            $this->activityLogService->log(
-                module: 'POS',
-                action: 'apply discount',
-                description: "Implement discount:{$discount}%",
-                userId: $userId
-            );
+        $this->activityLogService->log(
+            module: 'POS',
+            action: 'apply discount',
+            description: "Implement discount:{$discount}%",
+            userId: $userId
+        );
 
         return $cart;
     }
