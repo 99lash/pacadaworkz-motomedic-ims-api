@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Services\ActivityLogService;
 use App\Models\SystemSetting;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
@@ -12,6 +13,13 @@ use Exception;
 
 class SystemSettingService
 {
+    protected $activityLogService;
+
+    public function __construct(ActivityLogService $activityLogService)
+    {
+        $this->activityLogService = $activityLogService;
+    }
+
     /**
      * Get all system settings as key-value pairs.
      *
@@ -33,14 +41,47 @@ class SystemSettingService
         $updatedSettings = collect();
 
         foreach ($settings as $key => $value) {
+            $setting = SystemSetting::where('setting_key', $key)->first();
+            $action = $setting ? 'Updated' : 'Created';
+            $oldValue = $setting ? $setting->setting_value : 'N/A';
+
             $setting = SystemSetting::updateOrCreate(
                 ['setting_key' => $key],
                 ['setting_value' => $value]
             );
             $updatedSettings->push($setting);
+
+            $this->activityLogService->log(
+                'System Setting',
+                $action,
+                "{$action} setting '{$key}' from '{$oldValue}' to '{$value}'"
+            );
         }
 
         return $updatedSettings;
+    }
+
+    /**
+     * Delete a system setting.
+     *
+     * @param string $key
+     * @return bool
+     */
+    public function deleteSetting(string $key): bool
+    {
+        $setting = SystemSetting::where('setting_key', $key)->first();
+
+        if ($setting) {
+            $setting->delete();
+            $this->activityLogService->log(
+                'System Setting',
+                'Deleted',
+                "Deleted setting '{$key}' with value '{$setting->setting_value}'"
+            );
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -97,8 +138,19 @@ class SystemSettingService
         $process->run();
 
         if (!$process->isSuccessful()) {
+            $this->activityLogService->log(
+                'Database',
+                'Backup Failed',
+                "Database backup failed: " . $process->getErrorOutput()
+            );
             throw new ProcessFailedException($process);
         }
+
+        $this->activityLogService->log(
+            'Database',
+            'Backup Created',
+            "Database backup created: {$filename}"
+        );
 
         return "{$directory}/{$filename}";
     }
@@ -149,7 +201,18 @@ class SystemSettingService
         $process->run();
 
         if (!$process->isSuccessful()) {
+            $this->activityLogService->log(
+                'Database',
+                'Restore Failed',
+                "Database restore failed from {$filePath}: " . $process->getErrorOutput()
+            );
             throw new ProcessFailedException($process);
         }
+
+        $this->activityLogService->log(
+            'Database',
+            'Restore Completed',
+            "Database restored from backup file: {$filePath}"
+        );
     }
 }
