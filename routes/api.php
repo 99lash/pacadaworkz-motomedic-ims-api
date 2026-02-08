@@ -206,6 +206,7 @@ Route::prefix('v1')->group(function () {
                 Route::post('/', [PurchaseController::class, 'store'])->middleware('permissions:Create');
                 Route::patch('/{id}', [PurchaseController::class, 'update'])->middleware('permissions:Edit');
                 Route::delete('/{id}', [PurchaseController::class, 'destroy'])->middleware('permissions:Delete');
+                Route::post('/{id}/receive', [PurchaseController::class, 'receive'])->middleware('permissions:Edit');
             });
 
 
