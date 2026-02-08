@@ -24,7 +24,7 @@ class PurchaseOrdersResource extends JsonResource
             'user_name' => $this->user->name ?? null,
             'order_date' => $this->order_date,
             'expected_delivery' => $this->expected_delivery,
-            'total_amount' => $this->total_amount,
+            'total_amount' => floatval($this->total_amount),
             'status' => $this->status,
             'notes' => $this->notes,
             'items' => PurchaseItemResource::collection($this->whenLoaded('purchase_items')),

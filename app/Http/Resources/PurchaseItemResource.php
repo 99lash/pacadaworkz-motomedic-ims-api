@@ -19,8 +19,8 @@ class PurchaseItemResource extends JsonResource
             'product_id' => $this->product_id,
             'product_name' => $this->product->name ?? null,
             'quantity' => $this->quantity,
-            'unit_cost' => $this->unit_cost,
-            'total_cost' => $this->total_cost,
+            'unit_cost' => floatval($this->unit_cost),
+            'total_cost' => floatval($this->total_cost),
         ];
     }
 }
