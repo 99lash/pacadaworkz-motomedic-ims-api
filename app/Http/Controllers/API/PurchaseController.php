@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Exceptions\Purchase\PurchaseReceiveException;
+use App\Exceptions\Purchase\PurchaseUpdateException;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\API\Controller;
 use App\Services\PurchaseService;
@@ -62,8 +63,8 @@ class PurchaseController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
-                // 'message' => 'An error occurred'
+                // 'message' => $e->getMessage()
+                'message' => 'An error occurred'
             ], 500);
         }
     }
@@ -103,6 +104,11 @@ class PurchaseController extends Controller
                 'success' => true,
                 'data' => new PurchaseOrdersResource($result)
             ]);
+        } catch (PurchaseUpdateException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], $e->getCode());
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
@@ -111,8 +117,7 @@ class PurchaseController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                // 'message' => 'An error occurred'
-                'message' => $e->getMessage()
+                'message' => 'An error occurred'
             ], 500);
         }
     }
@@ -130,6 +135,11 @@ class PurchaseController extends Controller
                     'message' => 'Purchase order deleted successfully'
                 ]
             ]);
+        } catch (PurchaseUpdateException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], $e->getCode());
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
@@ -158,7 +168,7 @@ class PurchaseController extends Controller
         } catch (PurchaseReceiveException $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                // 'message' => $e->getMessage()
             ], $e->getCode());
         } catch (ModelNotFoundException $e) {
             return response()->json([

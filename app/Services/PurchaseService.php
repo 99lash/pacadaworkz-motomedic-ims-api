@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Exceptions\Purchase\PurchaseReceiveException;
+use App\Exceptions\Purchase\PurchaseUpdateException;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseItem;
 use App\Models\Inventory;
@@ -90,7 +91,7 @@ class PurchaseService
             $purchase = PurchaseOrder::findOrFail($id);
 
             if ($purchase->status === 'received') {
-                throw new \Exception("Cannot update a received purchase order.");
+                throw new PurchaseUpdateException("Cannot update a received purchase order.");
             }
 
             $items = $data['items'] ?? null;
@@ -128,7 +129,7 @@ class PurchaseService
         $purchase = PurchaseOrder::findOrFail($id);
 
         if ($purchase->status === 'received') {
-            throw new \Exception("Cannot delete a received purchase order.");
+            throw new PurchaseUpdateException("Cannot delete a received purchase order.");
         }
 
         $purchase->delete();
