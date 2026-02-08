@@ -200,7 +200,7 @@ class ProductController
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'An error occured',
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
