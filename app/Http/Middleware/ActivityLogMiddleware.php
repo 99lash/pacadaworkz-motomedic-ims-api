@@ -33,15 +33,10 @@ class ActivityLogMiddleware
         $segments = $request->segments();
         $lastSegment = end($segments);
 
-        // Skip plain GET requests without query params
-       if (
-    $request->isMethod('GET')
-    && empty($request->query())
-    && $lastSegment !== 'export'
-) {
-    return $response;
-}
-
+                // Skip plain GET requests without query params, unless it's an export
+                if ($request->isMethod('GET') && empty($request->query()) && $lastSegment !== 'export') {
+                    return $response;
+                }
         // Only log authenticated users
         if (!auth()->check()) {
             return $response;
@@ -134,20 +129,24 @@ class ActivityLogMiddleware
         $last     = end($segments);
         $id       = is_numeric($last) ? $last : null;
 
-        $description = $this->specialDescriptionHolder($module,$request, $id, $last);
-
-        if($description)
-            return $description;
-
-        if ($request->isMethod('GET') && !empty($request->query())) {
-            $query = collect($request->query())
-                ->except(['password', 'token'])
-                ->map(fn ($v, $k) => "$k=$v")
-                ->implode(', ');
-            return "Searched/filtered {$module}" . ($query ? " with: {$query}" : "");
+        if ($request->isMethod('GET')) {
+            if ($last === 'export') {
+                return "Export {$module}";
+            }
+            // If it's a GET request and not an export, then check for query params for searching/filtering
+            if (!empty($request->query())) {
+                $query = collect($request->query())
+                    ->except(['password', 'token'])
+                    ->map(fn ($v, $k) => "$k=$v")
+                    ->implode(', ');
+                return "Searched/filtered {$module}" . ($query ? " with: {$query}" : "");
+            }
+            // If it's a GET request, not an export, and no query params, return false to skip logging.
+            return false;
         }
 
-      return false;
+        // Return false for non-GET requests if no specific description logic is provided
+        return false;
     }
 
 
@@ -158,25 +157,6 @@ class ActivityLogMiddleware
 
 
 
-    //stock movement
-private function buildStockMovementsDescription(Request $request, ?string $id, string $last): string
-{
-    if ($request->isMethod('GET')) {
-        if ($last === 'export') {
-            return "Exported stock movements to CSV";
-        }
-//ed
-        if (!empty($request->query())) {
-            $query = collect($request->query())
-                ->except(['password', 'token'])
-                ->map(fn ($v, $k) => str_replace('_', ' ', $k) . "=" . $v)
-                ->implode(', ');
-            return "Searched/filtered stock movements" . ($query ? " with: {$query}" : "");
-        }
-    }
-
-    return false;
-}
 
 private function buildStockAdjustmentsDescription(Request $request, ?string $id, string $last): string
 {
@@ -215,29 +195,6 @@ return "filtered/search stock adjustments {$query}";
 
 
 
-// helper function that helps to hold descriptions dynamically
-private function specialDescriptionHolder($module,$request, $id, $last){
-
-  return match(true){
-
-    $module === 'Stock Movements' => $this->buildStockMovementsDescription($request, $id, $last),
-    $module === 'Stock Adjustments' => $this->buildStockAdjustmentsDescription($request, $id, $last),
-    default => false
-  };
-
-
 
 }
 
-}
-
-/*
-
-Mga nagawan ko na ng customized buildDescription
-1.sales
-2.POS
-3.Roles
-4.Stock-movements
-5.Stock-adjustments
-
-*/
