@@ -162,6 +162,15 @@ public function getAllProducts($search = null, $categoryId = null, $brandId = nu
 
      public function deleteAttributeProduct($id,$attributeValueId){
           
+      $product= Product::findOrFail($id); 
+      $product_name = $product->name;
+
+      $this->activityLogService->log(
+           module: 'Products',
+           action: 'deleted attribute',
+           description: "delete attribute to product:{$product_name}",
+           userId: auth()->id()
+        );
         return ProductAttribute::where('product_id', $id)
                                 ->where('attribute_value_id', $attributeValueId)
                                 ->delete();
