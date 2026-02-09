@@ -68,25 +68,37 @@ class ReportsService
     // purchase report
     public function getPurchases($start = null, $end = null)
     {
-        $start = $start ?? Carbon::now()->format('Y-m-d');
-        $end = $end ?? Carbon::now()->format('Y-m-d');
+        // Set start date
+        if (!$start) {
+            $start = DB::table('purchase_orders')->min('created_at');
+            $start = $start
+                ? Carbon::parse($start)->startOfDay()
+                : Carbon::today()->startOfDay();
+        } else {
+            $start = Carbon::parse($start)->startOfDay();
+        }
 
-        //  $itemsQuery = PurchaseItem::query(); baka magamit soon
-        $ordersQuery = PurchaseOrder::query();
-        $ordersQuery->whereBetween('created_at', [$start, $end]);
-        $averageOrder = round($ordersQuery->avg('total_amount'), 2) ?? 0;
+        // Set end date
+        $end = $end
+            ? Carbon::parse($end)->endOfDay()
+            : Carbon::today()->endOfDay();
 
-        $trend = PurchaseOrder::selectRaw('DATE(created_at) as date, SUM(total_amount)as total')
-            ->when($start && $end, function ($x) use ($start, $end) {
-                $x->whereBetween('created_at', [$start, $end]);
-            })
+        $baseOrdersQuery = PurchaseOrder::query();
+        if ($start && $end) {
+            $baseOrdersQuery->whereBetween('created_at', [$start, $end]);
+        }
+
+        $averageOrder = round($baseOrdersQuery->clone()->avg('total_amount'), 2) ?? 0;
+
+        $trend = $baseOrdersQuery->clone()
+            ->selectRaw('DATE(created_at) as date, SUM(total_amount)as total')
             ->groupBy('date')
             ->orderBy('date')
             ->get();
 
         return [
-            'total_purchases' => $ordersQuery->sum('total_amount'),
-            'purchase_orders' => $ordersQuery->count(),
+            'total_purchases' => $baseOrdersQuery->clone()->sum('total_amount'),
+            'purchase_orders' => $baseOrdersQuery->clone()->count(),
             'average_orders' => $averageOrder,
             'trend' => $trend
         ];
