@@ -3,7 +3,17 @@
 namespace App\Services;
 use App\Models\Attribute;
 use App\Models\AttributesValue;
+use App\Services\ActivityLogService;
+use Illuminate\Support\Facades\Auth;
+
 class AttributeService{
+
+    protected $activityLogService;
+
+    public function __construct(ActivityLogService $activityLogService)
+    {
+        $this->activityLogService = $activityLogService;
+    }
  
 
     //get all attributes
@@ -29,14 +39,19 @@ class AttributeService{
 
    
  //crate new Attribute
-    public function create(array $data){
-          
-      
-        return Attribute::create(['name'=> $data['name']]);
-      
-
-
-    }
+        public function create(array $data){
+    
+            $attribute = Attribute::create(['name'=> $data['name']]);
+    
+            $this->activityLogService->log(
+                'Attribute', // module
+                'created',   // action
+                'Attribute created: ' . $attribute->name,
+                Auth::id()
+            );
+    
+            return $attribute;
+        }
 
 
 //update attribute
@@ -44,6 +59,13 @@ class AttributeService{
       $attribute = Attribute::findOrFail($id);
 
       $attribute->update($data);
+
+                  $this->activityLogService->log(
+                      'Attribute', // module
+                      'updated',   // action
+                      'Attribute updated: ' . $attribute->name,
+                      Auth::id()
+                  );
       return $attribute;
   } 
   
@@ -51,9 +73,18 @@ class AttributeService{
   //delete attribute
    public function delete($id){
         $attribute = Attribute::findOrFail($id);
+        $attributeName = $attribute->name; // Capture name before deletion
+        $attributeId = $attribute->id;
+        $attributeTable = $attribute->getTable();
+
         $attribute->delete();
 
-   }
+                    $this->activityLogService->log(
+                        'Attribute', // module
+                        'deleted',   // action
+                        'Attribute deleted: ' . $attributeName,
+                        Auth::id()
+                    );   }
 
 
    //create value to the specific attribute
@@ -62,7 +93,16 @@ class AttributeService{
         'attribute_id' => $id,
         'value' => $data['value'],
       ]);
-  
+
+      $attribute = Attribute::findOrFail($id);
+
+      $attribute_name = $attribute->name;
+      $this->activityLogService->log(
+          'Attribute Value', // module
+          'created',         // action
+          'Attribute Value created: ' . $attribute_value->value . ' for Attribute : ' . $attribute_name,
+          Auth::id()
+      );
 
       return $attribute_value;
    }
