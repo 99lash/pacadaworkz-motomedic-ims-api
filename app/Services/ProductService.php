@@ -3,7 +3,16 @@ namespace App\Services;
 use App\Models\Product;
 use App\Models\Attribute;
 use App\Models\ProductAttribute;
+use App\Services\ActivityLogService;
+
 class ProductService{
+
+  protected $activityLogService;
+
+  public function __construct(ActivityLogService $activityLogService)
+  {
+      $this->activityLogService = $activityLogService;
+  }
 
 
 
@@ -47,52 +56,91 @@ public function getAllProducts($search = null, $categoryId = null, $brandId = nu
 
 
   // create  products
-   public function create(array $data){
-       
-     return Product::create([
-      'category_id' => $data['category_id'],
-      'brand_id' => $data['brand_id'],
-       'sku' => $data['sku'],
-       'name' => $data['name'],
-       'description' => $data['description'] ?? null,
-       'unit_price' => $data['unit_price'],
-       'cost_price' => $data['cost_price'],
-      'reorder_level' =>$data['reorder_level'] ?? 10,
-     ]);
-     
-   }
-
+      public function create(array $data){
+   
+        $product = Product::create([
+         'category_id' => $data['category_id'],
+         'brand_id' => $data['brand_id'],
+          'sku' => $data['sku'],
+          'name' => $data['name'],
+          'description' => $data['description'] ?? null,
+          'unit_price' => $data['unit_price'],
+          'cost_price' => $data['cost_price'],
+         'reorder_level' =>$data['reorder_level'] ?? 10,
+        ]);
+   
+        // Log activity
+        $this->activityLogService->log(
+           module: 'Products',
+           action: 'Create',
+           description: "Created product: {$product->name} (SKU: {$product->sku})",
+           userId: auth()->id()
+        );
+   
+        return $product;
+   
+      }
 
 
 //update product
    public function update(array $data, $id){
-     
+
       $product = Product::findOrFail($id);
+      $oldName = $product->name;
 
       $product->update($data);
+
+      // Log activity
+      $this->activityLogService->log(
+         module: 'Products',
+         action: 'Edit',
+         description: "Updated product: {$oldName} to {$product->name} (SKU: {$product->sku})",
+         userId: auth()->id()
+      );
 
        return $product;
 
    }
-
 //delete product
    public function delete($id)
    {
-     
-      $product = Product::findOrFail($id);
-       
-      return $product->delete();
-   }
 
+      $product = Product::findOrFail($id);
+      $productName = $product->name;
+
+      $result = $product->delete();
+
+      if ($result) {
+        // Log activity if deletion was successful
+        $this->activityLogService->log(
+           module: 'Products',
+           action: 'Delete',
+           description: "Deleted product: {$productName}",
+           userId: auth()->id()
+        );
+      }
+
+      return $result;
+   }
 
    //create attribute in product
 
      public function createAttributeProduct(array $data,$id,$attributeId){
        
       $attribute = Attribute::findOrFail($attributeId);
+
+      $product= Product::findOrFail($id); 
+      $product_name = $product->name;
       if(!$attribute)
          return $attribute;
-   
+       else{
+         $this->activityLogService->log(
+           module: 'Products',
+           action: 'Add attribute',
+           description: "Add attribute to product:{$product_name}",
+           userId: auth()->id()
+        );
+       }
       
 
       return ProductAttribute::updateOrCreate(
@@ -114,6 +162,15 @@ public function getAllProducts($search = null, $categoryId = null, $brandId = nu
 
      public function deleteAttributeProduct($id,$attributeValueId){
           
+      $product= Product::findOrFail($id); 
+      $product_name = $product->name;
+
+      $this->activityLogService->log(
+           module: 'Products',
+           action: 'deleted attribute',
+           description: "delete attribute to product:{$product_name}",
+           userId: auth()->id()
+        );
         return ProductAttribute::where('product_id', $id)
                                 ->where('attribute_value_id', $attributeValueId)
                                 ->delete();
