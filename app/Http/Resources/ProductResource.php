@@ -25,11 +25,13 @@ class ProductResource extends JsonResource
             'sku' => $this->sku,
             'name' => $this->name,
             'description' => $this->description,
-            'unit_price' => $this->unit_price,
-            'cost_price' => $this->cost_price,
+            'unit_price' => floatval($this->unit_price),
+            'cost_price' => floatval($this->cost_price),
             'reorder_level' => $this->reorder_level,
             'image_url' => $this->image_url,
-            'is_active' => $this->is_active
+            'is_active' => $this->is_active,
+            'current_stock' => $this->current_stock ?? $this->inventory?->quantity ?? 0,
+            'updated_at' => $this->updated_at
         ];
     }
 }
