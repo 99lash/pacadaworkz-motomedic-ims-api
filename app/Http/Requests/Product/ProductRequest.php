@@ -24,15 +24,17 @@ class ProductRequest extends FormRequest
 
         $id = $this->route('id');
         return [
-             'category_id' => 'required',
-             'brand_id' => 'required',
+             'category_id' => 'required|exists:categories,id',
+             'brand_id' => 'required|exists:brands,id',
              'sku' => 'required|unique:products,sku',
              'name' => 'required',
-             'description' => 'sometimes',
-             'unit_price' => 'required',
-             'cost_price' => 'required',
-             'reorder_level' => 'sometimes',
-             'image_url' => 'sometimes',
+             'description' => 'sometimes|nullable',
+             'unit_price' => 'required|numeric',
+             'cost_price' => 'required|numeric',
+             'reorder_level' => 'sometimes|integer',
+             'image_url' => 'sometimes|nullable',
+             'initial_stock' => 'sometimes|integer|min:0',
+             'location' => 'sometimes|nullable|string',
         ];
     }
 }
