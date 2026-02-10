@@ -31,6 +31,7 @@ class ProductResource extends JsonResource
             'image_url' => $this->image_url,
             'is_active' => $this->is_active,
             'current_stock' => $this->current_stock ?? $this->inventory?->quantity ?? 0,
+            'updated_at' => $this->updated_at
         ];
     }
 }
