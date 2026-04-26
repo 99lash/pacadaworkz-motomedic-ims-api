@@ -107,4 +107,44 @@ class AttributeService{
       return $attribute_value;
    }
 
+   //update value of the specific attribute
+   public function updateAttributesValue(array $data, $valueId)
+   {
+       $attribute_value = AttributesValue::findOrFail($valueId);
+       $oldValue = $attribute_value->value;
+
+       $attribute_value->update([
+           'value' => $data['value']
+       ]);
+
+       $attribute = $attribute_value->attribute;
+       $this->activityLogService->log(
+           'Attribute Value',
+           'updated',
+           'Attribute Value updated from ' . $oldValue . ' to ' . $attribute_value->value . ' for Attribute: ' . $attribute->name,
+           Auth::id()
+       );
+
+       return $attribute_value;
+   }
+
+   //delete value of the specific attribute
+   public function deleteAttributesValue($valueId)
+   {
+       $attribute_value = AttributesValue::findOrFail($valueId);
+       $valueText = $attribute_value->value;
+       $attributeName = $attribute_value->attribute->name;
+
+       $attribute_value->delete();
+
+       $this->activityLogService->log(
+           'Attribute Value',
+           'deleted',
+           'Attribute Value deleted: ' . $valueText . ' from Attribute: ' . $attributeName,
+           Auth::id()
+       );
+
+       return true;
+   }
+
 }

@@ -170,4 +170,52 @@ class AttributeController
             ], 500);
         }
     }
+
+    //update AttributesValue
+    public function updateAttributesValue(AttributesValueRequest $request, $valueId)
+    {
+        try {
+            $result = $this->attributeService->updateAttributesValue($request->validated(), $valueId);
+
+            return response()->json([
+                'success' => true,
+                'data' => new AttributesValueResource($result)
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Attribute value not found'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    //delete AttributesValue
+    public function destroyAttributesValue($valueId)
+    {
+        try {
+            $this->attributeService->deleteAttributesValue($valueId);
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'message' => 'Attribute value deleted successfully'
+                ]
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Attribute value not found'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

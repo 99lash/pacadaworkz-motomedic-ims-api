@@ -21,11 +21,10 @@ class AttributesValueRequest extends FormRequest
      */
     public function rules(): array
     {
+        $valueId = $this->route('valueId');
         
-        $id = $this->route('id');
         return [
-          //  'attribute_id' => 'required',
-            'value' => 'required|unique:attributes_values,value'
+            'value' => 'required|unique:attributes_values,value,' . ($valueId ?? 'NULL')
         ];
     }
 }

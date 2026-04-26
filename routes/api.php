@@ -130,6 +130,8 @@ Route::prefix('v1')->group(function () {
                 });
 
                 Route::post('/{id}/values', [AttributeController::class, 'storeAttributesValue']);
+                Route::patch('/values/{valueId}', [AttributeController::class, 'updateAttributesValue']);
+                Route::delete('/values/{valueId}', [AttributeController::class, 'destroyAttributesValue']);
             });
 
             // Products

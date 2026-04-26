@@ -218,6 +218,66 @@
           }
         }
       }
+    },
+    {
+      "name": "Update Attribute Value",
+      "method": "PATCH",
+      "path": "/values/{valueId}",
+      "access": "Authenticated",
+      "request": {
+        "url_params": {
+          "valueId": {
+            "type": "integer",
+            "required": true
+          }
+        },
+        "body": {
+          "value": {
+            "type": "string",
+            "required": true,
+            "unique": "attributes_values.value (except current)",
+            "example": "Blue"
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "success": true,
+            "data": {
+              "id": 5,
+              "attribute": "Color",
+              "value": "Blue"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Delete Attribute Value",
+      "method": "DELETE",
+      "path": "/values/{valueId}",
+      "access": "Authenticated",
+      "request": {
+        "url_params": {
+          "valueId": {
+            "type": "integer",
+            "required": true
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "success": true,
+            "data": {
+              "message": "Attribute value deleted successfully"
+            }
+          }
+        }
+      }
     }
   ]
 }
