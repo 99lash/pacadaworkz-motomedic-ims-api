@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             CategorySeeder::class,
             BrandSeeder::class,
+            AttributeSeeder::class, // <-- New: Added attributes
             SupplierSeeder::class, // <-- CRITICAL: Must be before Purchase Orders
 
             // 2. Secondary Foundations (Depends on Roles)
@@ -31,6 +32,7 @@ class DatabaseSeeder extends Seeder
 
             // 3. Inventory (Depends on Categories, Brands, and Suppliers)
             ProductSeeder::class,
+            ProductAttributeSeeder::class, // <-- New: Links products and attributes
             InventorySeeder::class,
 
             // 4. Transactions (Depends on Users, Suppliers, and Products)

@@ -79,8 +79,8 @@
 | -------- | ---------------------------------------------- | ----------------------------- | ------ | --------------------------------- |
 | `GET`    | `/api/v1/products`                             | List all products             | AP     | Paginated, Searchable, Filterable |
 | `GET`    | `/api/v1/products/:id`                         | Get specific product details  | AP     | -                                 |
-| `POST`   | `/api/v1/products`                             | Create new product            | AP     | -                                 |
-| `PUT`    | `/api/v1/products/:id`                         | Update product details        | AP     | -                                 |
+| `POST`   | `/api/v1/products`                             | Create new product (supports unified attribute sync) | AP     | -                                 |
+| `PUT`    | `/api/v1/products/:id`                         | Update product details (supports unified attribute sync) | AP     | -                                 |
 | `DELETE` | `/api/v1/products/:id`                         | Delete product (soft delete)  | AP     | -                                 |
 | `POST`   | `/api/v1/products/:id/attributes/:attributeId` | Assign attribute to product   | AP     | -                                 |
 | `DELETE` | `/api/v1/products/:id/attributes/:attributeId` | Remove attribute from product | AP     | -                                 |

@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\AttributesValueResource;
 
 
 class ProductResource extends JsonResource
@@ -31,6 +32,7 @@ class ProductResource extends JsonResource
             'image_url' => $this->image_url,
             'is_active' => $this->is_active,
             'current_stock' => $this->current_stock ?? $this->inventory?->quantity ?? 0,
+            'attribute_values' => AttributesValueResource::collection($this->whenLoaded('attribute_values')),
             'updated_at' => $this->updated_at
         ];
     }

@@ -35,6 +35,8 @@ class ProductRequest extends FormRequest
              'image_url' => 'sometimes|nullable',
              'initial_stock' => 'sometimes|integer|min:0',
              'location' => 'sometimes|nullable|string',
+             'attribute_values' => 'sometimes|array',
+             'attribute_values.*' => 'exists:attributes_values,id',
         ];
     }
 }

@@ -30,6 +30,8 @@ class ProductUpdateRequest extends FormRequest
              'cost_price' => 'required',
              'reorder_level' => 'sometimes',
              'image_url' => 'sometimes',
+             'attribute_values' => 'sometimes|array',
+             'attribute_values.*' => 'exists:attributes_values,id',
         ];
     }
 }

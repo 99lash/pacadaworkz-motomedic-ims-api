@@ -98,7 +98,8 @@ class ProductController
                 [
                     'success'  => true,
                     'data' => new ProductResource($result)
-                ]
+                ],
+                201
             );
         } catch (ModelNotFoundException $e) {
             return response()->json([
@@ -217,7 +218,7 @@ class ProductController
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'message' => 'Product deleted successfully'
+                    'message' => 'Product attribute removed successfully'
                 ]
             ]);
         } catch (ModelNotFoundException $e) {

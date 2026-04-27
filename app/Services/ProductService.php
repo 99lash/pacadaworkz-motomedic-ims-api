@@ -22,7 +22,7 @@ class ProductService
     // get all products
     public function getAllProducts($search = null, $categoryId = null, $brandId = null)
     {
-        $query = Product::query()
+        $query = Product::with(['attribute_values.attribute', 'category', 'brand'])
             ->leftJoin('categories', 'categories.id', '=', 'products.category_id')
             ->leftJoin('brands', 'brands.id', '=', 'products.brand_id')
             ->leftJoin('inventory', 'inventory.product_id', '=', 'products.id')
@@ -53,8 +53,7 @@ class ProductService
     //get products by if
     public function getProductById($id)
     {
-
-        return Product::findOrFail($id);
+        return Product::with(['category', 'brand', 'attribute_values.attribute', 'inventory'])->findOrFail($id);
     }
 
 
@@ -74,7 +73,10 @@ class ProductService
                 'reorder_level' => $data['reorder_level'] ?? 10,
             ]);
 
-            // TODO: entry sa attribute table
+            // entry sa attribute table
+            if (isset($data['attribute_values'])) {
+                $product->attribute_values()->sync($data['attribute_values']);
+            }
 
             // Create inventory entry
             $product->inventory()->create([
@@ -90,6 +92,9 @@ class ProductService
                 description: "Created product: {$product->name} (SKU: {$product->sku}) and initialized inventory",
                 userId: auth()->id()
             );
+
+            $product->load(['attribute_values.attribute', 'category', 'brand', 'inventory']);
+
             return $product;
         });
     }
@@ -104,6 +109,11 @@ class ProductService
 
         $product->update($data);
 
+        // sync attributes if provided
+        if (isset($data['attribute_values'])) {
+            $product->attribute_values()->sync($data['attribute_values']);
+        }
+
         // Log activity
         $this->activityLogService->log(
             module: 'Products',
@@ -111,6 +121,8 @@ class ProductService
             description: "Updated product: {$oldName} to {$product->name} (SKU: {$product->sku})",
             userId: auth()->id()
         );
+
+        $product->load(['attribute_values.attribute', 'category', 'brand', 'inventory']);
 
         return $product;
     }
