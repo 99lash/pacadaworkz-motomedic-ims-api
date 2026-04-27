@@ -30,9 +30,7 @@ class Role extends Model
 {
     return $this->belongsToMany(Permission::class, 'role_permissions')
         ->using(RolePermission::class)
-        ->withTimestamps()
-        ->withPivot('deleted_at')
-        ->wherePivotNull('deleted_at'); 
+        ->withTimestamps(); 
 }
 
 }

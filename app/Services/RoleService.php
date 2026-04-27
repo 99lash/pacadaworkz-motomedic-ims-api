@@ -16,27 +16,41 @@ class RoleService
 
     public function getAllRoles()
     {
-        return Role::all();
+        return Role::with('permissions')->withCount('users')->get();
     }
 
     public function getRoleById($id)
     {
-
-        return Role::findOrFail($id);
+        return Role::with('permissions')->withCount('users')->findOrFail($id);
     }
 
 
     public function create(array $data)
     {
-        $role = Role::create([
-            'role_name' => $data['role_name'],
-            'description' => $data['description']
-        ]);
+        // Check if there is a soft-deleted role with the same name
+        $existingRole = Role::withTrashed()
+            ->where('role_name', $data['role_name'])
+            ->first();
+
+        if ($existingRole && $existingRole->trashed()) {
+            $existingRole->restore();
+            $existingRole->update([
+                'description' => $data['description']
+            ]);
+            $role = $existingRole;
+            $action = 'Restore';
+        } else {
+            $role = Role::create([
+                'role_name' => $data['role_name'],
+                'description' => $data['description']
+            ]);
+            $action = 'Create';
+        }
 
         $this->activityLogService->log(
             module: 'Role',
-            action: 'Create',
-            description: "Role created: {$role->role_name}",
+            action: $action,
+            description: "Role {$action}: {$role->role_name}",
             userId: auth()->id()
         );
 

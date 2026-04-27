@@ -11,18 +11,18 @@ class RoleRequest extends FormRequest
         return true;
     }
 
-public function rules()
-{
-    $roleId = $this->route('id');
+    public function rules()
+    {
+        $roleId = $this->route('id');
 
-    return [
-        'role_name' => [
-            'required',
-            'max:50',
-            Rule::unique('roles', 'role_name')->ignore($roleId),
-        ],
-        'description' => 'required',
-    ];
-}
+        return [
+            'role_name' => [
+                'required',
+                'max:50',
+                Rule::unique('roles', 'role_name')->whereNull('deleted_at')->ignore($roleId),
+            ],
+            'description' => 'required',
+        ];
+    }
 
 }

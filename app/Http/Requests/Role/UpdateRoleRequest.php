@@ -25,7 +25,7 @@ class UpdateRoleRequest extends FormRequest
         return [
             'role_name' => [
                 'sometimes',
-                Rule::unique('roles', 'role_name')->ignore($this->route('id')),
+                Rule::unique('roles', 'role_name')->whereNull('deleted_at')->ignore($this->route('id')),
                 'max:50'
             ],
             'description' => 'required',
