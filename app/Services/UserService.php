@@ -25,9 +25,12 @@ class UserService
         /**
          * Searching Logic
          **/
-        // by name
+        // by name or email
         if (isset($params['search'])) {
-            $query->where('name', 'like', "%{$params['search']}%");
+            $query->where(function ($q) use ($params) {
+                $q->where('name', 'ILIKE', "%{$params['search']}%")
+                    ->orWhere('email', 'ILIKE', "%{$params['search']}%");
+            });
         }
         // var_dump($params);
 

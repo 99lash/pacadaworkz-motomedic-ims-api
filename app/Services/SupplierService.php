@@ -18,7 +18,10 @@ class SupplierService
         $query = Supplier::query();
 
         if ($search) {
-            $query->where('name', 'ILIKE', "%{$search}%");
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'ILIKE', "%{$search}%")
+                    ->orWhere('contact_person', 'ILIKE', "%{$search}%");
+            });
         }
 
         return $query->paginate(10)->withQueryString();

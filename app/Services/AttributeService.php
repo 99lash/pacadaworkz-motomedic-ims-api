@@ -22,7 +22,7 @@ class AttributeService{
         $query = Attribute::with('attribute_values.attribute');
        
         if($search)
-            $query->where('name','like',"%{$search}%");
+            $query->where('name','ILIKE',"%{$search}%");
 
 
 

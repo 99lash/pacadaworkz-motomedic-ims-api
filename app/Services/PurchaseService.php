@@ -29,20 +29,20 @@ class PurchaseService
 
                 // Supplier match
                 $q->whereHas('supplier', function ($supplierQuery) use ($search) {
-                    $supplierQuery->where('name', 'LIKE', "%{$search}%");
+                    $supplierQuery->where('name', 'ILIKE', "%{$search}%");
                 })
 
                     // OR User match
                     ->orWhereHas('user', function ($userQuery) use ($search) {
-                        $userQuery->where('name', 'LIKE', "%{$search}%")
-                            ->orWhere('email', 'LIKE', "%{$search}%");
+                        $userQuery->where('name', 'ILIKE', "%{$search}%")
+                            ->orWhere('email', 'ILIKE', "%{$search}%");
                     })
 
                     // OR PurchaseOrder fields
                     ->orWhere(function ($purchaseQuery) use ($search) {
-                        $purchaseQuery->where('status', 'LIKE', "%{$search}%")
-                            ->orWhere('notes', 'LIKE', "%{$search}%")
-                            ->orWhere('total_amount', 'LIKE', "%{$search}%");
+                        $purchaseQuery->where('status', 'ILIKE', "%{$search}%")
+                            ->orWhere('notes', 'ILIKE', "%{$search}%")
+                            ->orWhere('id', 'LIKE', "%{$search}%");
                     });
             });
         }

@@ -18,6 +18,7 @@ class InventoryService
         if ($search) {
             $query->whereHas('product', function ($q) use ($search) {
                 $q->where('name', 'ILIKE', "%{$search}%")
+                    ->orWhere('sku', 'ILIKE', "%{$search}%")
                     ->orWhereHas('brand', function ($q) use ($search) {
                         $q->where('name', 'ILIKE', "%{$search}%");
                     });
