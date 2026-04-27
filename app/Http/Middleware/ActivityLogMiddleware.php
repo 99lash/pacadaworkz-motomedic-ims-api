@@ -29,14 +29,14 @@ class ActivityLogMiddleware
         }
 
 
-         //determine module name
+        //determine module name
         $segments = $request->segments();
         $lastSegment = end($segments);
 
-                // Skip plain GET requests without query params, unless it's an export
-                if ($request->isMethod('GET') && empty($request->query()) && $lastSegment !== 'export') {
-                    return $response;
-                }
+        // Skip all GET requests (View actions), unless it's an export
+        if ($request->isMethod('GET') && $lastSegment !== 'export') {
+            return $response;
+        }
         // Only log authenticated users
         if (!auth()->check()) {
             return $response;
@@ -48,16 +48,16 @@ class ActivityLogMiddleware
         $module = $this->detectModule($path);
         $action = $this->mapAction($method);
 
-        $description = $this->buildDescription($request, $module, $action,$response);
+        $description = $this->buildDescription($request, $module, $action, $response);
 
-        if($description != false){
-        //  Correct: instance-based service call
-        app(ActivityLogService::class)->log(
-            module: $module,
-            action: $action,
-            description: $description,
-            userId: auth()->id()
-        );
+        if ($description != false) {
+            //  Correct: instance-based service call
+            app(ActivityLogService::class)->log(
+                module: $module,
+                action: $action,
+                description: $description,
+                userId: auth()->id()
+            );
         }
         return $response;
     }
@@ -137,7 +137,7 @@ class ActivityLogMiddleware
             if (!empty($request->query())) {
                 $query = collect($request->query())
                     ->except(['password', 'token'])
-                    ->map(fn ($v, $k) => "$k=$v")
+                    ->map(fn($v, $k) => "$k=$v")
                     ->implode(', ');
                 return "Searched/filtered {$module}" . ($query ? " with: {$query}" : "");
             }
@@ -158,43 +158,35 @@ class ActivityLogMiddleware
 
 
 
-private function buildStockAdjustmentsDescription(Request $request, ?string $id, string $last): string
-{
+    private function buildStockAdjustmentsDescription(Request $request, ?string $id, string $last): string
+    {
 
 
-if ($request->isMethod('GET')) {
-        if ($last === 'export') {
-            return "Exported stock adjustments to CSV";
+        if ($request->isMethod('GET')) {
+            if ($last === 'export') {
+                return "Exported stock adjustments to CSV";
+            }
+        } else if ($request->isMethod('POST')) {
+            $reason = $request->input('reason');
+            return "stock adjusted, reason : {$reason}";
+        } else if (in_array($request->method(), ['PUT', 'PATCH'])) {
+
+            $description = "Updated stock adjustment #{$id}";
+
+            if ($request->filled('reason')) {
+                $description .= " | reason: " . $request->input('reason');
+            }
+
+            if ($request->filled('notes')) {
+                $description .= " | notes: " . $request->input('notes');
+            }
+
+            return $description;
         }
-
-}else if($request->isMethod('POST')){
-       $reason = $request->input('reason');
-        return "stock adjusted, reason : {$reason}";
-}else if (in_array($request->method(), ['PUT', 'PATCH'])) {
-
-$description = "Updated stock adjustment #{$id}";
-
-    if ($request->filled('reason')) {
-        $description .= " | reason: " . $request->input('reason');
+        $query = collect($request->query())
+            ->except(['password', 'token'])
+            ->map(fn($v, $k) => str_replace('_', ' ', $k) . "=" . $v)
+            ->implode(', ');
+        return "filtered/search stock adjustments {$query}";
     }
-
-    if ($request->filled('notes')) {
-        $description .= " | notes: " . $request->input('notes');
-    }
-
-    return $description;
 }
- $query = collect($request->query())
-                ->except(['password', 'token'])
-                ->map(fn ($v, $k) => str_replace('_', ' ', $k) . "=" . $v)
-                ->implode(', ');
-return "filtered/search stock adjustments {$query}";
-
-}
-
-
-
-
-
-}
-
